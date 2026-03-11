@@ -1,0 +1,65 @@
+# MANIFEST.in - Specifies files to include in FastMVC source distribution
+
+# Include essential files
+include README.md
+include LICENSE
+include CHANGELOG.md
+include pyproject.toml
+include requirements.txt
+include uv.lock
+include pytest.ini
+include alembic.ini
+include .coveragerc
+
+# Include Docker files
+include Dockerfile
+include docker-compose.yml
+
+# Include all JSON configuration files
+recursive-include config *.json
+
+# Include migration files
+recursive-include migrations *.py *.mako
+include migrations/versions/.gitkeep
+
+# Include all README files in subdirectories
+recursive-include abstractions *.md *.py
+recursive-include configurations *.md *.py
+recursive-include constants *.md *.py
+recursive-include controllers *.md *.py
+recursive-include dependencies *.md *.py
+recursive-include dtos *.md *.py
+recursive-include errors *.md *.py
+recursive-include fastmvc_cli *.md *.py
+recursive-include middlewares *.md *.py
+recursive-include models *.md *.py
+recursive-include repositories *.md *.py
+recursive-include services *.md *.py
+recursive-include tests *.md *.py
+recursive-include utilities *.md *.py
+
+# Include type hints
+global-include py.typed
+
+# Exclude compiled and cache files
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude *.egg-info
+global-exclude .git
+global-exclude .gitignore
+
+# Exclude test artifacts
+prune htmlcov
+prune .pytest_cache
+prune .coverage
+prune .mypy_cache
+prune .ruff_cache
+prune build
+prune dist
+prune *.egg-info
+
+# Exclude IDE files
+prune .idea
+prune .vscode

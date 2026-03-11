@@ -2,7 +2,7 @@
 DTOs for security-related configuration settings (rate limiting, headers,
 validation, auth, CORS).
 """
-from typing import List, Optional
+
 from pydantic import BaseModel
 
 
@@ -15,8 +15,8 @@ class RateLimitingConfig(BaseModel):
     enable_sliding_window: bool = True
     enable_token_bucket: bool = False
     enable_fixed_window: bool = False
-    excluded_paths: List[str] = ["/health", "/docs", "/openapi.json"]
-    excluded_methods: List[str] = ["OPTIONS"]
+    excluded_paths: list[str] = ["/health", "/docs", "/openapi.json"]
+    excluded_methods: list[str] = ["OPTIONS"]
 
 
 class SecurityHeadersConfigDTO(BaseModel):
@@ -31,8 +31,8 @@ class SecurityHeadersConfigDTO(BaseModel):
     content_type_options: str = "nosniff"
     xss_protection: str = "1; mode=block"
     referrer_policy: str = "strict-origin-when-cross-origin"
-    custom_csp: Optional[str] = None
-    custom_permissions_policy: Optional[str] = None
+    custom_csp: str | None = None
+    custom_permissions_policy: str | None = None
 
 
 class InputValidationConfigDTO(BaseModel):
@@ -44,7 +44,7 @@ class InputValidationConfigDTO(BaseModel):
     enable_sql_injection_check: bool = True
     enable_xss_check: bool = True
     enable_path_traversal_check: bool = True
-    weak_passwords: List[str] = [
+    weak_passwords: list[str] = [
         "password", "123456", "qwerty", "admin", "letmein"
     ]
 
@@ -62,9 +62,9 @@ class AuthenticationConfigDTO(BaseModel):
 
 class CORSConfigDTO(BaseModel):
     """CORS configuration."""
-    allowed_origins: List[str] = ["*"]
-    allowed_methods: List[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    allowed_headers: List[str] = ["*"]
+    allowed_origins: list[str] = ["*"]
+    allowed_methods: list[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allowed_headers: list[str] = ["*"]
     allow_credentials: bool = True
     max_age: int = 3600
 

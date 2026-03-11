@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 
-from services.apis.abstraction import IAPIService
-
 from dtos.responses.base import BaseResponseDTO
+from services.apis.abstraction import IAPIService
 
 
 class IV1APIService(IAPIService):

@@ -1,0 +1,304 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyfastmvc"
+version = "1.4.0"
+description = "Production-grade MVC Framework for FastAPI - Generate projects, entities, and migrations with a single command"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Shivansh Sengar", email = "sengarsinghshivansh@gmail.com"},
+    {name = "Shreyansh Sengar", email = "sengarsinghshreyansh@gmail.com"}
+]
+maintainers = [
+    {name = "Shivansh Sengar", email = "sengarsinghshivansh@gmail.com"},
+    {name = "Shreyansh Sengar", email = "sengarsinghshreyansh@gmail.com"}
+]
+keywords = [
+    "fastapi",
+    "mvc",
+    "framework",
+    "api",
+    "rest",
+    "web",
+    "backend",
+    "python",
+    "scaffold",
+    "generator",
+    "crud",
+    "authentication",
+    "jwt",
+    "sqlalchemy",
+    "pydantic",
+    "alembic",
+    "migrations",
+    "redis",
+    "caching",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.0.0,<9.0.0",
+    "fastapi>=0.100.0,<1.0.0",
+    "uvicorn>=0.20.0,<1.0.0",
+    "starlette>=0.27.0,<1.0.0",
+    "pydantic>=2.0.0,<3.0.0",
+    "sqlalchemy>=2.0.0,<3.0.0",
+    "alembic>=1.10.0,<2.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "loguru>=0.7.0,<1.0.0",
+    "pyjwt>=2.8.0,<3.0.0",
+    "bcrypt>=4.0.0,<5.0.0",
+    "redis>=4.0.0,<7.0.0",
+    "psycopg2-binary>=2.9.0,<3.0.0",
+    "email-validator>=2.0.0,<3.0.0",
+    "python-ulid>=1.0.0,<3.0.0",
+    "httpx>=0.24.0,<1.0.0",
+    "cachetools>=5.0.0,<6.0.0",
+    "mako>=1.2.0,<2.0.0",
+    "fastmvc-middleware>=0.6.2",
+    "cryptography>=41.0.0,<44.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0,<9.0.0",
+    "pytest-asyncio>=0.21.0,<1.0.0",
+    "pytest-cov>=4.0.0,<6.0.0",
+    "pytest-mock>=3.10.0,<4.0.0",
+    "coverage>=7.0.0,<8.0.0",
+    "time-machine>=2.10.0,<3.0.0",
+    "ruff>=0.1.0,<1.0.0",
+    "twine>=4.0.0,<6.0.0",
+    "build>=1.0.0,<2.0.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+all = [
+    "pyfastmvc[dev,docs]",
+]
+
+[project.urls]
+Homepage = "https://github.com/shregar1/fastMVC"
+Documentation = "https://fastapi-mvc.dev/docs"
+Repository = "https://github.com/shregar1/fastMVC"
+Issues = "https://github.com/shregar1/fastMVC/issues"
+Changelog = "https://github.com/shregar1/fastMVC/blob/main/CHANGELOG.md"
+
+[project.scripts]
+fastmvc = "fastmvc_cli.cli:main"
+
+[tool.setuptools]
+packages = [
+    "fastmvc_cli",
+    "abstractions",
+    "config",
+    "config.cache",
+    "config.db",
+    "config.security",
+    "configurations",
+    "constants",
+    "constants.db",
+    "controllers",
+    "controllers.apis",
+    "controllers.apis.v1",
+    "controllers.user",
+    "controllers.product",
+    "dependencies",
+    "dependencies.repositiories",
+    "dependencies.services",
+    "dependencies.services.user",
+    "dependencies.utilities",
+    "dtos",
+    "dtos.configurations",
+    "dtos.requests",
+    "dtos.requests.user",
+    "dtos.requests.product",
+    "dtos.responses",
+    "errors",
+    "middlewares",
+    "migrations",
+    "models",
+    "repositories",
+    "services",
+    "services.apis",
+    "services.apis.v1",
+    "services.user",
+    "services.product",
+    "tests",
+    "utilities",
+    "core",
+    "core.health",
+    "core.observability",
+    "core.resilience",
+    "core.tasks",
+    "core.security",
+    "core.features",
+    "core.tenancy",
+    "core.versioning",
+    "core.testing",
+]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"*" = [
+    "*.json",
+    "*.md",
+    "*.yml",
+    "*.yaml",
+    "*.txt",
+    "*.ini",
+    "*.mako",
+    "*.example",
+]
+"config" = ["**/*.json"]
+"migrations" = ["*.py", "*.mako", "versions/*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+python_classes = ["Test*"]
+addopts = "-v --tb=short"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "tests/*",
+    "htmlcov/*",
+    "venv/*",
+    ".venv/*",
+    "build/*",
+    "dist/*",
+    "*.egg-info/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip = [".venv", "venv", "build", "dist", "migrations"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "migrations",
+    "htmlcov",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "B024",  # abstract class without abstract methods (used for base classes)
+    "B904",  # raise from within except (not always needed)
+    "C901",  # too complex
+    "E402",  # module level import not at top (needed for mocking in tests)
+    "F401",  # imported but unused (needed for re-exports in __init__.py)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "E402"]
+"tests/*" = ["E402", "F401", "B"]
+"conftest.py" = ["E402", "F401"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "venv",
+    ".venv",
+    "build",
+    "dist",
+    "migrations",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0,<9.0.0",
+    "pytest-asyncio>=0.21.0,<1.0.0",
+    "pytest-cov>=4.0.0,<6.0.0",
+    "pytest-mock>=3.10.0,<4.0.0",
+    "coverage>=7.0.0,<8.0.0",
+    "time-machine>=2.10.0,<3.0.0",
+    "ruff>=0.1.0,<1.0.0",
+    "twine>=4.0.0,<6.0.0",
+    "build>=1.0.0,<2.0.0",
+]

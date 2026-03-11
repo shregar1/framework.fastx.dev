@@ -1,0 +1,29 @@
+[run]
+# Coverage.py configuration
+source = .
+omit = 
+    tests/*
+    venv/*
+    .venv/*
+    */__pycache__/*
+    */migrations/*
+    setup.py
+    conftest.py
+
+[report]
+# Report configuration
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+
+show_missing = True
+precision = 2
+
+[html]
+directory = htmlcov
+

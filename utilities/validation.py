@@ -3,14 +3,13 @@ Utility classes for input validation, security checks
 """
 import re
 import uuid
-from typing import Any, Dict, Union
 from datetime import datetime
-from email_validator import validate_email, EmailNotValidError
+from typing import Any
+
+from email_validator import EmailNotValidError, validate_email
 
 from abstractions.utility import IUtility
-
 from constants.regular_expression import RegularExpression
-
 from start_utils import logger
 
 
@@ -20,7 +19,7 @@ class ValidationUtility(IUtility):
     """
 
     @staticmethod
-    def validate_password_strength(password: str) -> Dict[str, Any]:
+    def validate_password_strength(password: str) -> dict[str, Any]:
         """
         Validate password strength with detailed feedback.
 
@@ -76,7 +75,7 @@ class ValidationUtility(IUtility):
         }
 
     @staticmethod
-    def validate_email_format(email: str) -> Dict[str, Any]:
+    def validate_email_format(email: str) -> dict[str, Any]:
         """
         Validate email format using email-validator library.
         """
@@ -110,7 +109,7 @@ class ValidationUtility(IUtility):
         start_date: datetime,
         end_date: datetime,
         max_days: int = 365,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Validate date range with maximum allowed span.
         """
@@ -155,9 +154,9 @@ class ValidationUtility(IUtility):
 
     @staticmethod
     def validate_numeric_range(
-        value: Union[int, float],
-        min_val: Union[int, float],
-        max_val: Union[int, float],
+        value: int | float,
+        min_val: int | float,
+        max_val: int | float,
     ) -> bool:
         """
         Validate numeric value is within specified range.

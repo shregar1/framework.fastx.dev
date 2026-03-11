@@ -1,15 +1,13 @@
-import jwt
-
 from datetime import datetime, timedelta
+
+import jwt
 from jwt import PyJWTError
-from typing import Dict, Union
 
 from abstractions.utility import IUtility
-
 from start_utils import (
-    SECRET_KEY,
-    ALGORITHM,
     ACCESS_TOKEN_EXPIRE_MINUTES,
+    ALGORITHM,
+    SECRET_KEY,
 )
 
 
@@ -94,7 +92,7 @@ class JWTUtility(IUtility):
 
         return encoded_jwt
 
-    def decode_token(self, token: str) -> Union[Dict[str, str]]:
+    def decode_token(self, token: str) -> dict[str, str]:
         """
         Decode a JWT token and return its payload.
         Args:

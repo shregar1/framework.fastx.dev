@@ -1,42 +1,126 @@
+"""
+Security Configuration Module.
+
+This module provides a configuration manager for security-related settings
+including authentication, input validation, and HTTP security headers.
+Supports JSON file configuration with environment variable overrides.
+
+Usage:
+    >>> config = SecurityConfiguration()
+    >>> security_dto = config.get_config()
+    >>> jwt_expiry = security_dto.authentication.jwt_expiry_minutes
+"""
+
 import json
 import os
-from typing import Dict, Any
 from pathlib import Path
+from typing import Any
 
 from constants.default import Default
-
 from dtos.configurations.security import SecurityConfigurationDTO
-
 from start_utils import logger
 
 
 class SecurityConfiguration:
     """
-    Security configuration loader and manager.
-    Loads configuration from config/security/config.json and supports
-    environment variable overrides.
+    Configuration manager for security-related settings.
+
+    This class loads security configuration from a JSON file and supports
+    runtime overrides via environment variables. Unlike the singleton
+    pattern used by other configuration classes, this allows for multiple
+    instances with different config paths.
+
+    Features:
+        - JSON file-based configuration
+        - Environment variable overrides
+        - Default fallback values
+        - Configuration hot-reload support
+
+    Attributes:
+        config_path (str): Path to the security configuration JSON file.
+
+    Example:
+        >>> # Load default configuration
+        >>> security = SecurityConfiguration()
+        >>> config = security.get_config()
+        >>>
+        >>> # Access nested settings
+        >>> max_attempts = config.authentication.max_login_attempts
+        >>> jwt_expiry = config.authentication.jwt_expiry_minutes
+
+    Configuration File Format (config/security/config.json):
+        ```json
+        {
+            "security_headers": {
+                "hsts_max_age": 31536000,
+                "hsts_include_subdomains": true,
+                "enable_csp": true,
+                "enable_hsts": true
+            },
+            "input_validation": {
+                "max_string_length": 1000,
+                "min_password_length": 8
+            },
+            "authentication": {
+                "jwt_expiry_minutes": 60,
+                "max_login_attempts": 5
+            }
+        }
+        ```
+
+    Environment Variable Overrides:
+        - SECURITY_HSTS_MAX_AGE
+        - SECURITY_HSTS_INCLUDE_SUBDOMAINS
+        - SECURITY_ENABLE_CSP
+        - SECURITY_ENABLE_HSTS
+        - SECURITY_MAX_STRING_LENGTH
+        - SECURITY_MIN_PASSWORD_LENGTH
+        - SECURITY_JWT_EXPIRY_MINUTES
+        - SECURITY_MAX_LOGIN_ATTEMPTS
     """
-    def __init__(self, config_path: str = None):
+
+    def __init__(self, config_path: str | None = None) -> None:
         """
         Initialize the SecurityConfiguration.
+
         Args:
-            config_path (str): Optional path to the security config file.
+            config_path (str, optional): Path to the security config file.
+                Defaults to "config/security/config.json".
         """
         self.config_path = config_path or "config/security/config.json"
-        self._config = None
+        self._config: SecurityConfigurationDTO | None = None
 
     def get_config(self) -> SecurityConfigurationDTO:
         """
-        Load and return security configuration as a DTO.
+        Get security configuration as a validated DTO.
+
+        Loads configuration on first access and caches the result.
+        Subsequent calls return the cached configuration.
+
+        Returns:
+            SecurityConfigurationDTO: Pydantic model containing nested
+                configuration for security_headers, input_validation,
+                and authentication settings.
+
+        Example:
+            >>> config = SecurityConfiguration().get_config()
+            >>> if config.security_headers.enable_hsts:
+            ...     print("HSTS is enabled")
         """
         if self._config is None:
             self._load_config()
         return self._config
 
-    def _load_config(self):
+    def _load_config(self) -> None:
         """
-        Load configuration from JSON file, with environment variable overrides.
-        Logs errors and falls back to default config if needed.
+        Load configuration from JSON file with environment overrides.
+
+        Attempts to load from the configured file path. If the file doesn't
+        exist or contains invalid JSON, falls back to default configuration.
+        After loading, applies any environment variable overrides.
+
+        Note:
+            Errors are logged but not raised; defaults are used as fallback.
         """
         try:
             config_file = Path(self.config_path)
@@ -46,7 +130,7 @@ class SecurityConfiguration:
                 )
                 self._config = self._get_default_config()
                 return
-            with open(config_file, 'r') as f:
+            with open(config_file) as f:
                 config_data = json.load(f)
             config_data = self._override_with_env_vars(config_data)
             self._config = SecurityConfigurationDTO(**config_data)
@@ -57,10 +141,30 @@ class SecurityConfiguration:
 
     def _override_with_env_vars(
         self,
-        config_data: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        config_data: dict[str, Any],
+    ) -> dict[str, Any]:
         """
-        Override configuration with environment variables.
+        Apply environment variable overrides to configuration.
+
+        Checks for specific environment variables and overrides the
+        corresponding configuration values. Handles type conversion
+        for boolean, integer, and float values.
+
+        Args:
+            config_data (dict): The configuration dictionary to modify.
+
+        Returns:
+            dict: Modified configuration with environment overrides applied.
+
+        Environment Variables:
+            - SECURITY_HSTS_MAX_AGE: Override HSTS max-age (int)
+            - SECURITY_HSTS_INCLUDE_SUBDOMAINS: Include subdomains (bool)
+            - SECURITY_ENABLE_CSP: Enable CSP header (bool)
+            - SECURITY_ENABLE_HSTS: Enable HSTS header (bool)
+            - SECURITY_MAX_STRING_LENGTH: Max input length (int)
+            - SECURITY_MIN_PASSWORD_LENGTH: Min password length (int)
+            - SECURITY_JWT_EXPIRY_MINUTES: JWT token expiry (int)
+            - SECURITY_MAX_LOGIN_ATTEMPTS: Max failed logins (int)
         """
         env_mappings = {
             "SECURITY_HSTS_MAX_AGE": ("security_headers", "hsts_max_age"),
@@ -99,14 +203,29 @@ class SecurityConfiguration:
 
     def _get_default_config(self) -> SecurityConfigurationDTO:
         """
-        Get default security configuration as a DTO.
+        Get default security configuration.
+
+        Returns:
+            SecurityConfigurationDTO: Configuration with default values
+                as defined in constants.default.Default.SECURITY_CONFIGURATION.
         """
         default_config = Default.SECURITY_CONFIGURATION
         return SecurityConfigurationDTO(**default_config)
 
-    def reload_config(self):
+    def reload_config(self) -> SecurityConfigurationDTO:
         """
         Reload configuration from file.
+
+        Clears the cached configuration and reloads from the file.
+        Useful for picking up configuration changes without restarting.
+
+        Returns:
+            SecurityConfigurationDTO: Freshly loaded configuration.
+
+        Example:
+            >>> security = SecurityConfiguration()
+            >>> # After modifying config file...
+            >>> new_config = security.reload_config()
         """
         logger.debug("Reloading security configuration from file.")
         self._config = None

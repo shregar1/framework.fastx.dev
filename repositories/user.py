@@ -2,11 +2,11 @@
 Repository for user data access, providing methods to query and manage users.
 """
 from datetime import datetime
+
 from sqlalchemy.orm import Session
 
-from models.user import User
-
 from abstractions.repository import IRepository
+from models.user import User
 
 
 class UserRepository(IRepository):

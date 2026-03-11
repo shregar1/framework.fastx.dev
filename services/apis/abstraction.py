@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 
 from abstractions.service import IService
-
 from dtos.responses.base import BaseResponseDTO
 
 

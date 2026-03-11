@@ -1,227 +1,222 @@
-# Testing Guide for CalCount
+# FastMVC Test Suite
 
-This directory contains all the tests for the CalCount project. We use pytest as our testing framework.
+Comprehensive test suite for the FastMVC framework with 100% code coverage target.
 
-## Setup
+## Overview
 
-### 1. Install Dependencies
+This test suite covers all major components of the FastMVC framework:
 
-First, install the testing dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Environment Setup
-
-The test environment is automatically configured by the test runner. However, you can set custom test environment variables:
-
-```bash
-export TEST_DATABASE_URL="sqlite:///:memory:"
-export BCRYPT_SALT="test_salt_for_testing_only"
-export JWT_SECRET_KEY="test_jwt_secret_key_for_testing_only"
-```
+- **Utilities**: Dictionary manipulation, JWT operations, validation
+- **DTOs**: Request/response data transfer objects
+- **Errors**: Custom exception classes
+- **Constants**: Application constants and configuration values
+- **Abstractions**: Base classes and interfaces
+- **Models**: SQLAlchemy ORM models
+- **Repositories**: Data access layer
+- **Services**: Business logic layer
+- **Controllers**: HTTP request handlers
+- **Middlewares**: Request/response middleware
+- **Dependencies**: FastAPI dependency injection
+- **Configurations**: Configuration loaders
+- **App**: Main application
 
 ## Running Tests
 
-### Using the Test Runner Script
-
-The easiest way to run tests is using the provided test runner:
+### All Tests with Coverage
 
 ```bash
-python run_tests.py
+pytest
 ```
 
-### Using pytest directly
+### Run with Verbose Output
 
 ```bash
-# Run all tests
-pytest
-
-# Run with verbose output
 pytest -v
+```
 
-# Run specific test file
-pytest tests/services/user/test_login.py
+### Run Specific Test File
 
-# Run specific test class
-pytest tests/services/user/test_login.py::TestUserLoginService
+```bash
+pytest tests/unit/utilities/test_dictionary.py
+```
 
-# Run specific test method
-pytest tests/services/user/test_login.py::TestUserLoginService::test_successful_login
+### Run Specific Test Class
 
-# Run tests with coverage
+```bash
+pytest tests/unit/utilities/test_dictionary.py::TestDictionaryUtility
+```
+
+### Run Specific Test
+
+```bash
+pytest tests/unit/utilities/test_dictionary.py::TestDictionaryUtility::test_snake_to_camel_case_simple
+```
+
+### Run with Coverage Report
+
+```bash
 pytest --cov=. --cov-report=html
+```
 
-# Run only unit tests
-pytest -m unit
+### Run Only Unit Tests
 
-# Run only integration tests
-pytest -m integration
-
-# Run tests excluding slow tests
-pytest -m "not slow"
+```bash
+pytest tests/unit/
 ```
 
 ## Test Structure
 
 ```
 tests/
-├── conftest.py              # Shared fixtures and configuration
-├── services/                # Service layer tests
-│   └── user/
-│       ├── test_login.py
-│       ├── test_logout.py
-│       └── test_register.py
-├── controllers/             # Controller layer tests (future)
-├── repositories/            # Repository layer tests (future)
-└── integration/             # Integration tests (future)
+├── __init__.py
+├── conftest.py                  # Shared fixtures
+├── README.md
+├── test_app.py                  # Application tests
+└── unit/
+    ├── __init__.py
+    ├── abstractions/
+    │   ├── __init__.py
+    │   └── test_abstractions.py
+    ├── configurations/
+    │   ├── __init__.py
+    │   └── test_configurations.py
+    ├── constants/
+    │   ├── __init__.py
+    │   └── test_constants.py
+    ├── controllers/
+    │   ├── __init__.py
+    │   └── test_user_controllers.py
+    ├── dependencies/
+    │   ├── __init__.py
+    │   └── test_dependencies.py
+    ├── dtos/
+    │   ├── __init__.py
+    │   ├── test_base.py
+    │   ├── test_requests.py
+    │   └── test_responses.py
+    ├── errors/
+    │   ├── __init__.py
+    │   └── test_errors.py
+    ├── middlewares/
+    │   ├── __init__.py
+    │   └── test_middlewares.py
+    ├── models/
+    │   ├── __init__.py
+    │   └── test_user.py
+    ├── repositories/
+    │   ├── __init__.py
+    │   └── test_user.py
+    ├── services/
+    │   ├── __init__.py
+    │   └── test_user_services.py
+    └── utilities/
+        ├── __init__.py
+        ├── test_dictionary.py
+        ├── test_jwt.py
+        └── test_validation.py
 ```
 
-## Writing Tests
+## Fixtures
 
-### Test File Naming
+Common fixtures are defined in `conftest.py`:
 
-- Test files should be named `test_*.py`
-- Test classes should be named `Test*`
-- Test methods should be named `test_*`
+| Fixture | Description |
+|---------|-------------|
+| `sample_user_data` | Sample user data dictionary |
+| `valid_uuid` | Valid UUID string |
+| `mock_db_session` | Mock SQLAlchemy session |
+| `mock_redis_session` | Mock Redis session |
+| `mock_user` | Mock user object |
+| `mock_request` | Mock FastAPI request |
+| `valid_password` | Valid password meeting requirements |
+| `valid_email` | Valid email address |
+| `test_urn` | Test URN string |
+| `jwt_payload` | Sample JWT payload |
+| `mock_async_call_next` | Mock async middleware call_next |
 
-### Example Test Structure
+## Coverage Configuration
+
+Coverage is configured in `.coveragerc`:
+
+- Source includes all project files
+- Tests and virtual environments are excluded
+- Minimum coverage threshold: 80%
+- HTML report generated in `htmlcov/`
+
+## Writing New Tests
+
+### Unit Test Template
 
 ```python
+"""
+Tests for MyClass.
+"""
+
 import pytest
-from unittest.mock import Mock
+from module.path import MyClass
 
-@pytest.mark.asyncio
-class TestMyService:
-    @pytest.fixture(autouse=True)
-    def setup(self, db_session):
-        """Setup runs before each test method"""
-        self.service = MyService()
-        self.service.repository.session = db_session
 
-    async def test_successful_operation(self):
-        # Arrange
-        expected_result = {"status": "SUCCESS"}
-        
-        # Act
-        result = await self.service.run()
-        
-        # Assert
-        assert result == expected_result
+class TestMyClass:
+    """Tests for MyClass."""
 
-    async def test_error_handling(self):
-        # Arrange
-        self.service.repository.some_method = Mock(side_effect=Exception("Error"))
-        
-        # Act & Assert
-        with pytest.raises(Exception):
-            await self.service.run()
+    @pytest.fixture
+    def instance(self):
+        """Create MyClass instance."""
+        return MyClass()
+
+    def test_method_name(self, instance):
+        """Test description."""
+        result = instance.method()
+        assert result == expected_value
+
+    @pytest.mark.asyncio
+    async def test_async_method(self, instance):
+        """Test async method."""
+        result = await instance.async_method()
+        assert result is not None
 ```
 
-### Using Fixtures
+### Best Practices
 
-The `conftest.py` file provides several useful fixtures:
+1. **One assertion per test** when possible
+2. **Descriptive test names**: `test_method_returns_expected_when_condition`
+3. **Use fixtures** for common setup
+4. **Mock external dependencies**: database, cache, APIs
+5. **Test edge cases**: empty inputs, None values, errors
+6. **Group related tests** in classes
 
-- `db_session`: Database session for tests
-- `mock_user`: Mock user object
-- `mock_meal_log`: Mock meal log object
-- `mock_user_repository`: Mock user repository
-- `mock_meal_log_repository`: Mock meal log repository
-- `mock_jwt_utility`: Mock JWT utility
-- `sample_login_data`: Sample login data
-- `sample_registration_data`: Sample registration data
-- `sample_meal_data`: Sample meal data
+## CI/CD Integration
 
-### Async Tests
+Tests are designed to run in CI/CD pipelines:
 
-For async tests, use the `@pytest.mark.asyncio` decorator:
+```yaml
+# Example GitHub Actions
+- name: Run tests
+  run: |
+    pip install -r requirements.txt
+    pytest --cov=. --cov-report=xml
 
-```python
-@pytest.mark.asyncio
-async def test_async_function():
-    result = await some_async_function()
-    assert result is not None
+- name: Upload coverage
+  uses: codecov/codecov-action@v3
 ```
 
-## Test Categories
+## Debugging Failed Tests
 
-### Unit Tests
-
-Unit tests test individual components in isolation. Use mocks for dependencies.
-
-```python
-@pytest.mark.unit
-async def test_unit_test():
-    # Test individual component
-    pass
-```
-
-### Integration Tests
-
-Integration tests test how components work together.
-
-```python
-@pytest.mark.integration
-async def test_integration_test():
-    # Test component interaction
-    pass
-```
-
-### Slow Tests
-
-Mark tests that take longer to run:
-
-```python
-@pytest.mark.slow
-async def test_slow_test():
-    # Test that takes time
-    pass
-```
-
-## Coverage
-
-The project is configured to require at least 80% code coverage. Coverage reports are generated in:
-
-- Terminal output: `--cov-report=term-missing`
-- HTML report: `htmlcov/index.html`
-- XML report: `coverage.xml`
-
-## Best Practices
-
-1. **Arrange-Act-Assert**: Structure tests with clear sections
-2. **Descriptive Names**: Use descriptive test and method names
-3. **One Assertion**: Each test should test one thing
-4. **Use Fixtures**: Reuse common setup code
-5. **Mock Dependencies**: Mock external dependencies in unit tests
-6. **Test Edge Cases**: Include error conditions and edge cases
-7. **Keep Tests Fast**: Tests should run quickly
-8. **Clean Up**: Always clean up after tests
-
-## Debugging Tests
-
-To debug a failing test:
+### Run with print output
 
 ```bash
-# Run with more verbose output
-pytest -vvv
+pytest -v -s
+```
 
-# Run with print statements visible
-pytest -s
+### Run with debugger
 
-# Run specific test with debugger
-pytest tests/path/to/test.py::TestClass::test_method -s
-
-# Run with pdb on failures
+```bash
 pytest --pdb
 ```
 
-## Continuous Integration
+### Run only failed tests
 
-Tests are automatically run in CI/CD pipelines. The pipeline will:
+```bash
+pytest --lf
+```
 
-1. Install dependencies
-2. Run all tests
-3. Generate coverage reports
-4. Fail if coverage is below 80%
-5. Fail if any tests fail 

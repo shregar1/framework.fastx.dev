@@ -2,17 +2,11 @@ from http import HTTPStatus
 from typing import Optional
 
 from constants.api_status import APIStatus
-
-from errors.bad_input_error import BadInputError
-
 from dtos.responses.base import BaseResponseDTO
-
+from errors.bad_input_error import BadInputError
 from models.user import User
-
 from repositories.user import UserRepository
-
 from services.user.abstraction import IUserService
-
 from utilities.jwt import JWTUtility
 
 

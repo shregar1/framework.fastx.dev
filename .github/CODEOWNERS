@@ -1,0 +1,22 @@
+# CODEOWNERS - Defines who must review changes
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @shregar1
+
+# Core framework files require maintainer review
+/abstractions/ @shregar1
+/middlewares/ @shregar1
+/app.py @shregar1
+/start_utils.py @shregar1
+
+# CLI tooling
+/fastmvc_cli/ @shregar1
+
+# Security-sensitive files
+/configurations/ @shregar1
+/utilities/jwt.py @shregar1
+
+# Documentation
+/README.md @shregar1
+/CHANGELOG.md @shregar1

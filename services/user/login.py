@@ -1,23 +1,17 @@
-import bcrypt
-
 from datetime import datetime
 from http import HTTPStatus
 from typing import Optional
 
+import bcrypt
+
 from constants.api_status import APIStatus
-
-from errors.bad_input_error import BadInputError
-from errors.not_found_error import NotFoundError
-
 from dtos.requests.user.login import UserLoginRequestDTO
 from dtos.responses.base import BaseResponseDTO
-
+from errors.bad_input_error import BadInputError
+from errors.not_found_error import NotFoundError
 from models.user import User
-
 from repositories.user import UserRepository
-
 from services.user.abstraction import IUserService
-
 from utilities.jwt import JWTUtility
 
 

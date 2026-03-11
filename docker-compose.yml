@@ -2,7 +2,7 @@
 version: '3.8'
 
 networks:
-  calcount_net:
+  fastmvc_net:
     driver: bridge
 
 services:
@@ -15,23 +15,23 @@ services:
     ports:
       - 6379:6379
     networks:
-      - calcount_net
+      - fastmvc_net
 
   postgres:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: calcount123
-      POSTGRES_DB: calcount
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: fastmvc
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - calcount_net
+      - fastmvc_net
 
   fastapi:
-    image: calcount-fastapi:latest
+    image: fastmvc:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -43,7 +43,7 @@ services:
       - postgres
       - redis
     networks:
-      - calcount_net
+      - fastmvc_net
 
 volumes:
   postgres_data:

@@ -4,8 +4,6 @@ camel/snake case conversion and masking.
 """
 import re
 
-from typing import List
-
 from abstractions.utility import IUtility
 
 
@@ -36,7 +34,7 @@ class DictionaryUtility(IUtility):
             f"user_id={user_id}, urn={urn}, api_name={api_name}"
         )
 
-    def build_dictonary_with_key(self, records: List, key: str):
+    def build_dictonary_with_key(self, records: list, key: str):
         """
         Build a dictionary from a list of records using a specified attribute
         as the key.
@@ -48,7 +46,7 @@ class DictionaryUtility(IUtility):
         """
         self.logger.info(f"Building dictionary with key: {key}")
 
-        result: dict = dict()
+        result: dict = {}
 
         for record in records:
             result[getattr(record, key)] = record
@@ -161,7 +159,7 @@ class DictionaryUtility(IUtility):
             return self.mask_value(data)
 
     def remove_keys_from_dict(
-        self, data: dict, keys_to_remove: List[str]
+        self, data: dict, keys_to_remove: list[str]
     ) -> dict:
         """
         Remove specified keys from a dictionary recursively.

@@ -1,20 +1,20 @@
-import time
 import asyncio
-from typing import Dict, Optional, Tuple
+import time
 from collections import defaultdict, deque
+from http import HTTPStatus
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from http import HTTPStatus
 
 from constants.api_status import APIStatus
 from dtos.responses.base import BaseResponseDTO
 from start_utils import (
-    logger,
     RATE_LIMIT_BURST_LIMIT,
     RATE_LIMIT_REQUESTS_PER_HOUR,
     RATE_LIMIT_REQUESTS_PER_MINUTE,
     RATE_LIMIT_WINDOW_SECONDS,
+    logger,
     unprotected_routes,
 )
 
@@ -67,13 +67,13 @@ class RateLimitStore:
     Handles sliding window counters and provides thread-safe access.
     """
     def __init__(self):
-        self._sliding_windows: Dict[str, deque] = defaultdict(deque)
+        self._sliding_windows: dict[str, deque] = defaultdict(deque)
         self._lock = asyncio.Lock()
         logger.debug("Initialized RateLimitStore")
 
     async def check_sliding_window(
         self, key: str, limit: int, window: int
-    ) -> Tuple[bool, int]:
+    ) -> tuple[bool, int]:
         """
         Check sliding window rate limit for a given key.
 
@@ -139,9 +139,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app,
-        config: Optional[RateLimitConfig] = None,
-        excluded_paths: Optional[set] = None,
-        excluded_methods: Optional[set] = None,
+        config: RateLimitConfig | None = None,
+        excluded_paths: set | None = None,
+        excluded_methods: set | None = None,
     ):
         """
         Initialize the RateLimitMiddleware.
@@ -216,7 +216,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     async def _check_rate_limits(
         self,
         key: str,
-    ) -> Tuple[bool, Dict[str, any]]:
+    ) -> tuple[bool, dict[str, any]]:
         """
         Check all enabled rate limiting strategies for a given key.
         Args:

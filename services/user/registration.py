@@ -1,22 +1,17 @@
-import bcrypt
 import os
-import ulid
-
 from datetime import datetime
 from http import HTTPStatus
 from typing import Optional
 
-from constants.api_status import APIStatus
+import bcrypt
+import ulid
 
+from constants.api_status import APIStatus
 from dtos.requests.user.registration import UserRegistrationRequestDTO
 from dtos.responses.base import BaseResponseDTO
-
 from errors.bad_input_error import BadInputError
-
 from models.user import User
-
 from repositories.user import UserRepository
-
 from services.user.abstraction import IUserService
 
 
