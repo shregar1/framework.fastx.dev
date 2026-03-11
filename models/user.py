@@ -36,6 +36,9 @@ from constants.db.table import Table
 from models import Base
 
 
+__table_args__ = {"extend_existing": True}
+
+
 class User(Base):
     """
     SQLAlchemy ORM model for user accounts.

@@ -7,7 +7,7 @@ This module provides CRUD operations for Product entities.
 from datetime import datetime
 from http import HTTPStatus
 
-from ulid import ULID
+import ulid
 
 from constants.api_status import APIStatus
 from dtos.requests.product.create import ProductCreateRequestDTO
@@ -93,7 +93,7 @@ class ProductCRUDService(IProductService):
         self.logger.debug(f"Creating product: {request_dto.name}")
 
         record = Product(
-            urn=str(ULID()),
+            urn=str(ulid.new()),
             name=request_dto.name,
             description=request_dto.description,
             is_active=True,

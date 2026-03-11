@@ -15,6 +15,10 @@ from repositories.user import UserRepository
 from services.user.abstraction import IUserService
 
 
+# Backwards-compatible alias for tests that patch `services.user.registration.ULID`
+ULID = ulid.ULID
+
+
 class UserRegistrationService(IUserService):
     """
     Service to handle user registration and new user creation.
@@ -118,7 +122,7 @@ class UserRegistrationService(IUserService):
 
         self.logger.debug("Preparing user data")
         user: User = User(
-            urn=ulid.ulid(),
+            urn=str(ulid.new()),
             email=email,
             password=bcrypt.hashpw(
                 password.encode("utf-8"),
