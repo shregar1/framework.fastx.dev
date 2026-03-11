@@ -195,6 +195,21 @@ def cli():
     help="Include feature flags (LaunchDarkly/Unleash) configuration (default: False)",
 )
 @click.option(
+    "--with-llm/--no-llm",
+    default=False,
+    help="Include LLM provider configuration and helpers (default: False)",
+)
+@click.option(
+    "--with-pinecone/--no-pinecone",
+    default=False,
+    help="Include Pinecone vector store configuration and helpers (default: False)",
+)
+@click.option(
+    "--with-qdrant/--no-qdrant",
+    default=False,
+    help="Include Qdrant vector store configuration and helpers (default: False)",
+)
+@click.option(
     "--with-s3/--no-s3",
     default=False,
     help="Include AWS S3 object storage configuration and helpers (default: False)",
@@ -244,6 +259,9 @@ def generate(
     with_s3: bool,
     with_gcs: bool,
     with_azure_blob: bool,
+    with_llm: bool,
+    with_pinecone: bool,
+    with_qdrant: bool,
     with_identity: bool,
 ):
     """
@@ -309,6 +327,9 @@ def generate(
     generator.use_s3 = with_s3
     generator.use_gcs = with_gcs
     generator.use_azure_blob = with_azure_blob
+    generator.use_llm = with_llm
+    generator.use_pinecone = with_pinecone
+    generator.use_qdrant = with_qdrant
     generator.use_identity = with_identity
 
     # Simple helpers for repo files
