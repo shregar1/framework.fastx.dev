@@ -16,7 +16,7 @@ Example:
 from loguru import logger
 
 
-class IError(BaseException):
+class IError(Exception):
     """
     Base exception class for all application-specific errors.
 
