@@ -131,7 +131,8 @@ class ProjectGenerator:
         if sanitized and sanitized[0].isdigit():
             sanitized = "_" + sanitized
         # Use a neutral default if nothing valid remains
-        return sanitized or "my_project"
+        # Keep this in sync with tests in tests/unit/cli/test_generator.py
+        return sanitized or "fastmvc_project"
 
     def _get_template_path(self) -> Path:
         """
