@@ -339,6 +339,7 @@ class ProjectGenerator:
             "queues": bool(
                 getattr(self, "use_rabbitmq", False)
                 or getattr(self, "use_sqs", False)
+                or getattr(self, "use_service_bus", False)
             ),
             "jobs": bool(
                 getattr(self, "use_celery", False)
@@ -359,6 +360,8 @@ class ProjectGenerator:
             "feature_flags": getattr(self, "use_feature_flags", False),
             # Realtime / collaboration settings
             "realtime": getattr(self, "use_realtime", False),
+            # Streams / HFT hub
+            "streams": getattr(self, "use_streams", False),
         }
 
         for service_name, enabled in optional_services.items():

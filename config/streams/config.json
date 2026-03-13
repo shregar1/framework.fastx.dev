@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "tick_history": 200,
+  "max_fanout_per_symbol": 1000,
+  "coalesce_ms": 0,
+  "backpressure_mode": "immediate",
+  "fanout_queue_backend": null
+}
+

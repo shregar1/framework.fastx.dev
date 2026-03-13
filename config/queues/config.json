@@ -19,6 +19,11 @@
     ],
     "stream": "fastmvc",
     "subject": "events"
+  },
+  "service_bus": {
+    "enabled": false,
+    "connection_string": "",
+    "queue_name": ""
   }
 }
 

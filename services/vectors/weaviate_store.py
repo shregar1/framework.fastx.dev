@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-try:  # Optional dependency
-    import weaviate  # type: ignore[import]
-    from weaviate.auth import AuthApiKey  # type: ignore[import]
-except Exception:  # pragma: no cover - optional
-    weaviate = None  # type: ignore[assignment]
-    AuthApiKey = None  # type: ignore[assignment]
+from core.utils.optional_imports import optional_import
+
+weaviate, AuthApiKey = optional_import("weaviate", "auth.AuthApiKey")
 
 from .abstraction import IVectorStore
 

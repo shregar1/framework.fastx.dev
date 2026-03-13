@@ -15,21 +15,12 @@ from typing import Any, Dict, Optional
 from loguru import logger
 
 from configurations.queues import QueuesConfiguration
+from core.utils.optional_imports import optional_import
 
-try:  # Optional dependencies
-    import boto3
-except Exception:  # pragma: no cover - optional
-    boto3 = None  # type: ignore
-
-try:
-    import pika
-except Exception:  # pragma: no cover - optional
-    pika = None  # type: ignore
-
-try:
-    import nats
-except Exception:  # pragma: no cover - optional
-    nats = None  # type: ignore
+boto3, _ = optional_import("boto3")
+pika, _ = optional_import("pika")
+nats, _ = optional_import("nats")
+_sb_mod, ServiceBusClient = optional_import("azure.servicebus", "ServiceBusClient")
 
 
 @dataclass
@@ -134,6 +125,34 @@ class NATSBackend(IQueueBackend):
         await nc.drain()
 
 
+class AzureServiceBusBackend(IQueueBackend):
+    def __init__(self, connection_string: str, queue_name: str) -> None:
+        if ServiceBusClient is None:  # pragma: no cover - optional
+            raise RuntimeError("azure-servicebus is not installed")
+        self.name = "service_bus"
+        self._connection_string = connection_string
+        self._queue_name = queue_name
+
+    async def publish(self, message: QueueMessage, *, routing_key: Optional[str] = None) -> None:
+        if ServiceBusClient is None:  # pragma: no cover - optional
+            logger.warning("azure-servicebus is not installed; Service Bus publish skipped.")
+            return
+
+        def _send_sync() -> None:
+            with ServiceBusClient.from_connection_string(self._connection_string) as client:
+                sender = client.get_queue_sender(queue_name=self._queue_name)
+                with sender:
+                    from azure.servicebus import ServiceBusMessage  # type: ignore[import]
+
+                    sb_message = ServiceBusMessage(
+                        message.body.decode("utf-8"),
+                        application_properties=message.attributes or {},
+                    )
+                    sender.send_messages(sb_message)
+
+        await asyncio.to_thread(_send_sync)
+
+
 class QueueBroker:
     """
     High-level facade over multiple queue backends.
@@ -165,6 +184,12 @@ class QueueBroker:
             self._backends["nats"] = NATSBackend(
                 servers=cfg.nats.servers,
                 subject=cfg.nats.subject,
+            )
+
+        if cfg.service_bus.enabled and cfg.service_bus.connection_string and cfg.service_bus.queue_name:
+            self._backends["service_bus"] = AzureServiceBusBackend(
+                connection_string=cfg.service_bus.connection_string,
+                queue_name=cfg.service_bus.queue_name,
             )
 
         if not self._backends:

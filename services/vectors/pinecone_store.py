@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-try:  # Optional dependency
-    import pinecone  # type: ignore[import]
-except Exception:  # pragma: no cover - optional
-    pinecone = None  # type: ignore[assignment]
+from core.utils.optional_imports import optional_import
+
+pinecone, _ = optional_import("pinecone")
 
 from .abstraction import IVectorStore
 

@@ -2,12 +2,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
 
-try:  # Optional dependency
-    import faiss  # type: ignore[import]
-    import numpy as np  # type: ignore[import]
-except Exception:  # pragma: no cover - optional
-    faiss = None  # type: ignore[assignment]
-    np = None  # type: ignore[assignment]
+from core.utils.optional_imports import optional_import
+
+faiss, _ = optional_import("faiss")
+np, _ = optional_import("numpy")
 
 from .abstraction import IVectorStore
 

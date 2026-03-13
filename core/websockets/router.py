@@ -9,11 +9,12 @@ Provides:
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Any, AsyncGenerator, Dict, List, Tuple
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from services.channels.presence import InMemoryPresenceBackend, PresenceService
+from services.streams import Tick, OrderEvent, get_market_data_hub
 
 
 router = APIRouter(tags=["WebSockets"])
@@ -22,6 +23,30 @@ router = APIRouter(tags=["WebSockets"])
 # a more robust hub or use one of the Channels backends (Pusher/Ably/etc.).
 _room_connections: Dict[str, List[WebSocket]] = {}
 _presence = PresenceService(InMemoryPresenceBackend(ttl_seconds=60))
+_market_hub = get_market_data_hub()
+
+
+async def _stream_frames(
+    ws: WebSocket,
+    gen: AsyncGenerator[Tuple[str, Any], None],
+    snapshot_serializer: callable,
+    update_serializer: callable,
+) -> None:
+    """
+    Helper to stream snapshot + update frames over a WebSocket.
+
+    Expects the generator to yield (frame_type, payload) tuples where
+    frame_type is "snapshot" or "update".
+    """
+    await ws.accept()
+    try:
+        async for frame_type, payload in gen:
+            if frame_type == "snapshot":
+                await ws.send_json(snapshot_serializer(payload))
+            else:
+                await ws.send_json(update_serializer(payload))
+    except WebSocketDisconnect:
+        return
 
 
 @router.websocket("/ws/echo")
@@ -89,6 +114,93 @@ async def websocket_room(ws: WebSocket, room_id: str) -> None:
         if not connections and room_id in _room_connections:
             _room_connections.pop(room_id, None)
         return
+
+
+@router.websocket("/ws/market/{symbol}")
+async def websocket_market(ws: WebSocket, symbol: str) -> None:
+    """
+    Low-latency market data feed for a given symbol.
+
+    Sends an initial snapshot frame:
+        {"type": "snapshot", "ticks": [...]}
+
+    Followed by incremental updates:
+        {"type": "update", "tick": {...}}
+    """
+    hub = _market_hub
+
+    def snapshot_serializer(payload: Any) -> Dict[str, Any]:
+        ticks = [
+            {
+                "symbol": t.symbol,
+                "price": t.price,
+                "size": t.size,
+                "side": t.side,
+                "ts": t.ts,
+            }
+            for t in payload
+        ]
+        return {"type": "snapshot", "symbol": symbol, "ticks": ticks}
+
+    def update_serializer(payload: Any) -> Dict[str, Any]:
+        t: Tick = payload
+        return {
+            "type": "update",
+            "symbol": t.symbol,
+            "tick": {
+                "price": t.price,
+                "size": t.size,
+                "side": t.side,
+                "ts": t.ts,
+            },
+        }
+
+    await _stream_frames(ws, hub.subscribe_ticks(symbol), snapshot_serializer, update_serializer)
+
+
+@router.websocket("/ws/orders/{tenant_id}")
+async def websocket_orders(ws: WebSocket, tenant_id: str) -> None:
+    """
+    Stream order/position events per tenant.
+
+    Snapshot:
+        {"type": "snapshot", "orders": [...]}
+    Updates:
+        {"type": "update", "order": {...}}
+    """
+    hub = _market_hub
+
+    def snapshot_serializer(payload: Any) -> Dict[str, Any]:
+        orders = [
+            {
+                "tenantId": o.tenant_id,
+                "orderId": o.order_id,
+                "symbol": o.symbol,
+                "side": o.side,
+                "status": o.status,
+                "ts": o.ts,
+                "data": o.data,
+            }
+            for o in payload
+        ]
+        return {"type": "snapshot", "tenantId": tenant_id, "orders": orders}
+
+    def update_serializer(payload: Any) -> Dict[str, Any]:
+        o: OrderEvent = payload
+        return {
+            "type": "update",
+            "tenantId": o.tenant_id,
+            "order": {
+                "orderId": o.order_id,
+                "symbol": o.symbol,
+                "side": o.side,
+                "status": o.status,
+                "ts": o.ts,
+                "data": o.data,
+            },
+        }
+
+    await _stream_frames(ws, hub.subscribe_orders(tenant_id), snapshot_serializer, update_serializer)
 
 
 __all__ = ["router"]

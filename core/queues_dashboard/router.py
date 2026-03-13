@@ -22,25 +22,13 @@ from loguru import logger
 
 from configurations.jobs import JobsConfiguration
 from configurations.queues import QueuesConfiguration
+from core.utils.optional_imports import optional_import
 
-try:  # Optional
-    import boto3
-except Exception:  # pragma: no cover - optional
-    boto3 = None  # type: ignore
-
-try:
-    from celery import Celery
-except Exception:  # pragma: no cover - optional
-    Celery = None  # type: ignore
-
-try:
-    import rq
-    from redis import Redis
-    from rq.registry import FailedJobRegistry
-except Exception:  # pragma: no cover - optional
-    rq = None  # type: ignore
-    Redis = None  # type: ignore
-    FailedJobRegistry = None  # type: ignore
+boto3, _ = optional_import("boto3")
+_celery_mod, Celery = optional_import("celery", "Celery")
+rq, _ = optional_import("rq")
+_redis_mod, Redis = optional_import("redis", "Redis")
+_rq_registry_mod, FailedJobRegistry = optional_import("rq.registry", "FailedJobRegistry")
 
 
 router = APIRouter(prefix="/dashboard/queues", tags=["Queues Dashboard"])

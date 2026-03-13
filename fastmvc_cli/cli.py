@@ -170,6 +170,11 @@ def cli():
     help="Include Amazon SQS queue configuration and helpers (default: False)",
 )
 @click.option(
+    "--with-service-bus/--no-service-bus",
+    default=False,
+    help="Include Azure Service Bus queue configuration and helpers (default: False)",
+)
+@click.option(
     "--with-celery/--no-celery",
     default=False,
     help="Include Celery background worker configuration and helpers (default: False)",
@@ -229,6 +234,11 @@ def cli():
     default=False,
     help="Include identity provider / SSO configuration helpers (default: False)",
 )
+@click.option(
+    "--with-streams/--no-streams",
+    default=False,
+    help="Include market/event streams hub configuration and helpers (default: False)",
+)
 def generate(
     project_name: str,
     output_dir: str,
@@ -251,6 +261,7 @@ def generate(
     with_payments: bool,
     with_rabbitmq: bool,
     with_sqs: bool,
+    with_service_bus: bool,
     with_celery: bool,
     with_analytics: bool,
     with_vault: bool,
@@ -262,6 +273,7 @@ def generate(
     with_llm: bool,
     with_pinecone: bool,
     with_qdrant: bool,
+    with_streams: bool,
     with_identity: bool,
 ):
     """
@@ -319,6 +331,7 @@ def generate(
     generator.use_payments = with_payments
     generator.use_rabbitmq = with_rabbitmq
     generator.use_sqs = with_sqs
+    generator.use_service_bus = with_service_bus
     generator.use_celery = with_celery
     generator.use_analytics = with_analytics
     generator.use_vault = with_vault
@@ -330,6 +343,7 @@ def generate(
     generator.use_llm = with_llm
     generator.use_pinecone = with_pinecone
     generator.use_qdrant = with_qdrant
+    generator.use_streams = with_streams
     generator.use_identity = with_identity
 
     # Simple helpers for repo files
@@ -670,6 +684,7 @@ def init():
     use_payments = click.confirm("  Use Payments (Stripe/Razorpay/PayPal/PayU/Link)?", default=False)
     use_rabbitmq = click.confirm("  Use RabbitMQ for queues?", default=False)
     use_sqs = click.confirm("  Use Amazon SQS for queues?", default=False)
+    use_service_bus = click.confirm("  Use Azure Service Bus for queues?", default=False)
     use_celery = click.confirm("  Use Celery for background jobs?", default=False)
     use_s3 = click.confirm("  Use AWS S3 for file storage?", default=False)
     use_gcs = click.confirm("  Use Google Cloud Storage for file storage?", default=False)
@@ -681,6 +696,7 @@ def init():
     use_aws_secrets = click.confirm("  Use AWS Secrets Manager for secrets?", default=False)
     use_feature_flags = click.confirm("  Use feature flags (LaunchDarkly/Unleash)?", default=False)
     use_identity = click.confirm("  Use Identity providers / SSO (Google/GitHub/AzureAD/Okta/Auth0/SAML)?", default=False)
+    use_streams = click.confirm("  Use market/event streams hub?", default=False)
     click.echo()
 
     # Feature toggles and layout
@@ -831,6 +847,7 @@ def init():
     generator.use_payments = use_payments
     generator.use_rabbitmq = use_rabbitmq
     generator.use_sqs = use_sqs
+    generator.use_service_bus = use_service_bus
     generator.use_celery = use_celery
     generator.use_s3 = use_s3
     generator.use_gcs = use_gcs
@@ -842,6 +859,7 @@ def init():
     generator.use_aws_secrets = use_aws_secrets
     generator.use_feature_flags = use_feature_flags
     generator.use_identity = use_identity
+    generator.use_streams = use_streams
     generator.app_port = app_port
     generator.db_name = db_name
     generator.db_host = db_host
@@ -1078,6 +1096,7 @@ def add_entity(entity_name: str, tests: bool):
             "queues",
             "jobs",
             "storage",
+            "streams",
         ],
         case_sensitive=False,
     ),
@@ -1177,6 +1196,11 @@ def add_service(service_name: str):
         _copy_file("configurations/storage.py")
         _copy_file("dtos/configurations/storage.py")
         _copy_dir("services/storage")
+    elif service_name == "streams":
+        _copy_dir("config/streams")
+        _copy_file("configurations/streams.py")
+        _copy_file("dtos/configurations/streams.py")
+        _copy_dir("services/streams")
     elif service_name == "email":
         _copy_dir("config/email")
         _copy_file("configurations/email.py")

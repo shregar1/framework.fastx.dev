@@ -13,28 +13,13 @@ from typing import Any, Optional
 from loguru import logger
 
 from configurations.secrets import SecretsConfiguration
+from core.utils.optional_imports import optional_import
 
-try:  # Optional dependencies
-    import boto3
-except Exception:  # pragma: no cover - optional
-    boto3 = None  # type: ignore
-
-try:
-    import hvac
-except Exception:  # pragma: no cover - optional
-    hvac = None  # type: ignore
-
-try:
-    from google.cloud import secretmanager as gcp_secretmanager
-except Exception:  # pragma: no cover - optional
-    gcp_secretmanager = None  # type: ignore
-
-try:
-    from azure.identity import ClientSecretCredential
-    from azure.keyvault.secrets import SecretClient
-except Exception:  # pragma: no cover - optional
-    ClientSecretCredential = None  # type: ignore
-    SecretClient = None  # type: ignore
+boto3, _ = optional_import("boto3")
+hvac, _ = optional_import("hvac")
+gcp_secretmanager, _ = optional_import("google.cloud.secretmanager")
+_azure_identity, ClientSecretCredential = optional_import("azure.identity", "ClientSecretCredential")
+_azure_kv, SecretClient = optional_import("azure.keyvault.secrets", "SecretClient")
 
 
 class ISecretsBackend(ABC):

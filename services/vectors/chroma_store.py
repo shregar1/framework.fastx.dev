@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
 
-try:  # Optional dependency
-    import chromadb  # type: ignore[import]
-except Exception:  # pragma: no cover - optional
-    chromadb = None  # type: ignore[assignment]
+from core.utils.optional_imports import optional_import
+
+chromadb, _ = optional_import("chromadb")
 
 from .abstraction import IVectorStore
 

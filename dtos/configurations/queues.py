@@ -34,6 +34,12 @@ class NATSConfigDTO(BaseModel):
     subject: str = "events"
 
 
+class AzureServiceBusConfigDTO(BaseModel):
+    enabled: bool = False
+    connection_string: Optional[str] = None
+    queue_name: Optional[str] = None
+
+
 class QueuesConfigurationDTO(BaseModel):
     """
     Aggregated configuration for all queue backends.
@@ -42,12 +48,14 @@ class QueuesConfigurationDTO(BaseModel):
     rabbitmq: RabbitMQConfigDTO = RabbitMQConfigDTO()
     sqs: SQSConfigDTO = SQSConfigDTO()
     nats: NATSConfigDTO = NATSConfigDTO()
+    service_bus: AzureServiceBusConfigDTO = AzureServiceBusConfigDTO()
 
 
 __all__ = [
     "RabbitMQConfigDTO",
     "SQSConfigDTO",
     "NATSConfigDTO",
+    "AzureServiceBusConfigDTO",
     "QueuesConfigurationDTO",
 ]
 
