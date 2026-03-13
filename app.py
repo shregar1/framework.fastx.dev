@@ -41,8 +41,6 @@ from fastmiddleware import (
     RateLimitConfig,
     # Rate Limiting
     RateLimitMiddleware,
-    # Request Context & Tracking
-    RequestContextMiddleware,
     SecurityHeadersConfig,
     # Security
     SecurityHeadersMiddleware,
@@ -65,6 +63,7 @@ from errors.unexpected_response_error import UnexpectedResponseError
 
 # Custom authentication middleware (app-specific with user repository)
 from middlewares.authetication import AuthenticationMiddleware
+from middlewares.request_context import RequestContextMiddleware
 
 
 def _get_int_env(name: str, default: int) -> int:
@@ -238,6 +237,9 @@ async def health_check():
 
 logger.info("Initializing middleware stack with fastmiddleware")
 
+# Request Context Middleware - URN generation and request tracking (must be first)
+app.add_middleware(RequestContextMiddleware)
+
 # Trusted Host Middleware - Prevents host header attacks
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
 
@@ -292,9 +294,6 @@ app.add_middleware(
 
 # Authentication Middleware - JWT validation (custom, app-specific)
 app.add_middleware(AuthenticationMiddleware)
-
-# Request Context Middleware - URN generation and request tracking (must be first)
-app.add_middleware(RequestContextMiddleware)
 
 logger.info("Initialized middleware stack with fastmiddleware")
 

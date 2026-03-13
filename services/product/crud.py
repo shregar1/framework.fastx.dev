@@ -93,7 +93,7 @@ class ProductCRUDService(IProductService):
         self.logger.debug(f"Creating product: {request_dto.name}")
 
         record = Product(
-            urn=str(ulid.new()),
+            urn=str(ulid.ULID()),
             name=request_dto.name,
             description=request_dto.description,
             is_active=True,

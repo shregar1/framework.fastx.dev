@@ -122,7 +122,7 @@ class UserRegistrationService(IUserService):
 
         self.logger.debug("Preparing user data")
         user: User = User(
-            urn=str(ulid.new()),
+            urn=str(ULID()),
             email=email,
             password=bcrypt.hashpw(
                 password.encode("utf-8"),
