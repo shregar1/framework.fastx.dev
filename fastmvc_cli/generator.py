@@ -1212,9 +1212,45 @@ if __name__ == "__main__":
         docker_compose_path = self.project_path / "docker-compose.yml"
         if docker_compose_path.exists():
             content = docker_compose_path.read_text()
+
+            # Network and image names
             content = content.replace("fastmvc_net", f"{self.project_name}_net")
             content = content.replace("fastmvc:", f"{self.project_name}:")
             content = content.replace('POSTGRES_DB: fastmvc', f'POSTGRES_DB: {self.project_name}')
+
+            # Align exposed FastAPI port with selected APP_PORT if available
+            app_port = getattr(self, "app_port", 8000)
+            content = content.replace(
+                '      - "8003:8003"',
+                f'      - "{app_port}:{app_port}"',
+            )
+
+            # Respect selected backing services: Redis and Postgres
+            use_redis = getattr(self, "use_redis", True)
+            db_backend = getattr(self, "db_backend", "postgres")
+
+            # Helper to remove a whole service block by name (very simple text slicing)
+            def _remove_service_block(text: str, service_name: str) -> str:
+                marker = f"\n  {service_name}:"
+                start = text.find(marker)
+                if start == -1:
+                    return text
+                # Find the next top-level service or end of file
+                next_service_idx = text.find("\n  ", start + 1)
+                if next_service_idx == -1:
+                    return text[:start]
+                return text[:start] + text[next_service_idx:]
+
+            # Remove Redis service and dependency if Redis is not used
+            if not use_redis:
+                content = _remove_service_block(content, "redis")
+                content = content.replace("      - redis\n", "")
+
+            # If database backend is not Postgres (e.g. sqlite / mysql), drop Postgres
+            if db_backend != "postgres":
+                content = _remove_service_block(content, "postgres")
+                content = content.replace("      - postgres\n", "")
+
             docker_compose_path.write_text(content)
 
         # Update DB config for Alembic / runtime if present
