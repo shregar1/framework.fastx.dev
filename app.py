@@ -62,6 +62,7 @@ from core.api_dashboard import ApiDashboardRouter
 from core.queues_dashboard import QueuesDashboardRouter
 from core.tenants_dashboard import TenantsDashboardRouter
 from core.secrets_dashboard import SecretsDashboardRouter
+from core.websockets.router import router as WebSocketRouter
 from core.observability import configure_datadog, configure_otel
 from dtos.responses.base import BaseResponseDTO
 from errors.unexpected_response_error import UnexpectedResponseError
@@ -315,6 +316,7 @@ app.include_router(ApiDashboardRouter)
 app.include_router(QueuesDashboardRouter)
 app.include_router(SecretsDashboardRouter)
 app.include_router(TenantsDashboardRouter)
+app.include_router(WebSocketRouter)
 logger.info("Initialized routers")
 
 
