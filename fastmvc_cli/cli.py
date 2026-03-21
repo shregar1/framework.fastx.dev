@@ -31,8 +31,18 @@ import shutil
 import click
 
 from fastmvc_cli import __version__
+from fastmvc_cli.doctor import export_openapi_json, run_doctor
 from fastmvc_cli.entity_generator import EntityGenerator
 from fastmvc_cli.generator import ProjectGenerator
+from fastmvc_cli.presets import apply_template_pack
+from fastmvc_cli.scaffold_helpers import (
+    write_ci_workflow,
+    write_codeowners,
+    write_contributing,
+    write_license,
+    write_precommit,
+    write_pyproject,
+)
 
 
 @click.group()
@@ -249,6 +259,22 @@ def cli():
     default=False,
     help="Include market/event streams hub configuration and helpers (default: False)",
 )
+@click.option(
+    "--template-pack",
+    type=click.Choice(["minimal", "standard", "full"], case_sensitive=False),
+    default="standard",
+    help="Preset: minimal (lean API), standard (defaults), full (auth, jobs, queues, analytics, …).",
+)
+@click.option(
+    "--with-docker-compose/--no-docker-compose",
+    default=True,
+    help="Include docker-compose.yml and Dockerfile for Postgres + Redis (default: on).",
+)
+@click.option(
+    "--export-openapi/--no-export-openapi",
+    default=False,
+    help="After generation, write openapi.json (requires dependencies; use --install).",
+)
 def generate(
     project_name: str,
     output_dir: str,
@@ -287,6 +313,9 @@ def generate(
     with_qdrant: bool,
     with_streams: bool,
     with_identity: bool,
+    template_pack: str,
+    with_docker_compose: bool,
+    export_openapi: bool,
 ):
     """
     Generate a new project from the template.
@@ -360,243 +389,12 @@ def generate(
     generator.use_streams = with_streams
     generator.use_identity = with_identity
 
-    # Simple helpers for repo files
-    def _write_license(path: Path, license_key: str, project: str) -> None:
-        year = str(Path().stat().st_mtime_ns)[:4]
-        if license_key == "mit":
-            text = f"""MIT License
-
-Copyright (c) {year} {project}
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
-        elif license_key == "apache-2.0":
-            text = f"""Apache License 2.0
-
-Copyright (c) {year} {project}
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-        elif license_key == "gpl-3.0":
-            text = f"""GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
-
-Copyright (c) {year} {project}
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-"""
-        else:  # proprietary
-            text = f"""All Rights Reserved
-
-Copyright (c) {year} {project}
-
-This software is proprietary and confidential. Unauthorized copying of this
-file, via any medium is strictly prohibited.
-"""
-        path.write_text(text)
-
-    def _write_contributing(path: Path) -> None:
-        text = """# Contributing
-
-1. Fork the repository and create a feature branch.
-2. Install dependencies and pre-commit hooks.
-3. Run tests and linters before opening a pull request.
-
-```bash
-pip install -r requirements.txt
-pytest
-```
-"""
-        path.write_text(text)
-
-    def _write_codeowners(path: Path, owner: str) -> None:
-        if owner:
-            path.write_text(f"* {owner}\n")
-
-    def _write_pyproject(path: Path,
-                         use_ruff: bool,
-                         use_black: bool,
-                         use_isort: bool,
-                         use_mypy: bool) -> None:
-        """Create a minimal pyproject.toml with tool configs."""
-        lines: list[str] = []
-        if use_black:
-            lines.extend(
-                [
-                    "[tool.black]",
-                    'line-length = 88',
-                    'target-version = ["py310"]',
-                    "",
-                ]
-            )
-        if use_isort:
-            lines.extend(
-                [
-                    "[tool.isort]",
-                    'profile = "black"',
-                    "",
-                ]
-            )
-        if use_ruff:
-            lines.extend(
-                [
-                    "[tool.ruff]",
-                    "line-length = 88",
-                    'target-version = "py310"',
-                    "",
-                ]
-            )
-        if use_mypy:
-            lines.extend(
-                [
-                    "[tool.mypy]",
-                    "python_version = 3.10",
-                    "ignore_missing_imports = true",
-                    "",
-                ]
-            )
-        if lines:
-            path.write_text("\n".join(lines))
-
-    def _write_precommit(path: Path,
-                         use_ruff: bool,
-                         use_black: bool,
-                         use_isort: bool,
-                         use_mypy: bool) -> None:
-        """Create a basic .pre-commit-config.yaml."""
-        repos: list[str] = ["repos:"]
-        if use_black:
-            repos.extend(
-                [
-                    "- repo: https://github.com/psf/black",
-                    "  rev: 23.12.1",
-                    "  hooks:",
-                    "    - id: black",
-                    "",
-                ]
-            )
-        if use_ruff:
-            repos.extend(
-                [
-                    "- repo: https://github.com/astral-sh/ruff-pre-commit",
-                    "  rev: v0.5.0",
-                    "  hooks:",
-                    "    - id: ruff",
-                    "",
-                ]
-            )
-        if use_isort:
-            repos.extend(
-                [
-                    "- repo: https://github.com/pycqa/isort",
-                    "  rev: 5.13.2",
-                    "  hooks:",
-                    "    - id: isort",
-                    "",
-                ]
-            )
-        if use_mypy:
-            repos.extend(
-                [
-                    "- repo: https://github.com/pre-commit/mirrors-mypy",
-                    "  rev: v1.11.0",
-                    "  hooks:",
-                    "    - id: mypy",
-                    "",
-                ]
-            )
-        # Local pytest hook
-        repos.extend(
-            [
-                "- repo: local",
-                "  hooks:",
-                "    - id: pytest",
-                '      name: pytest',
-                '      entry: pytest',
-                "      language: system",
-                "      types: [python]",
-                "",
-            ]
-        )
-        path.write_text("\n".join(repos))
-
-    def _write_ci_workflow(path: Path,
-                           use_ruff: bool,
-                           use_black: bool,
-                           use_isort: bool,
-                           use_mypy: bool) -> None:
-        """Create a simple GitHub Actions CI workflow."""
-        steps_tools = []
-        if use_black:
-            steps_tools.append("black .")
-        if use_ruff:
-            steps_tools.append("ruff .")
-        if use_isort:
-            steps_tools.append("isort .")
-        if use_mypy:
-            steps_tools.append("mypy .")
-
-        tools_block = ""
-        if steps_tools:
-            joined = " && ".join(steps_tools)
-            tools_block = f"""
-      - name: Run linters/formatters
-        run: {joined}
-"""
-
-        workflow = f"""name: CI
-
-on:
-  push:
-  pull_request:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest pytest-cov ruff black isort mypy
-{tools_block}
-      - name: Run tests
-        run: pytest --cov=. --cov-report=term-missing
-"""
-        path.write_text(workflow)
+    generator.include_docker_compose = with_docker_compose
+    try:
+        apply_template_pack(generator, template_pack)
+    except ValueError as e:
+        click.secho(str(e), fg="red")
+        sys.exit(1)
 
     # Collect license / ownership details
     license_key = click.prompt(
@@ -626,6 +424,13 @@ jobs:
             shutil.rmtree(generator.project_path)
 
         generator.generate()
+
+        if export_openapi:
+            ok, msg = export_openapi_json(generator.project_path)
+            if ok:
+                click.secho(f"  ✓ OpenAPI schema written: {msg}", fg="green")
+            else:
+                click.secho(f"  ⚠ OpenAPI export skipped: {msg}", fg="yellow")
 
         # Create concrete .env from generated .env.example using wizard values
         env_example = generator.project_path / ".env.example"
@@ -686,6 +491,11 @@ def init():
 
     # Step 2: stack & presets
     click.secho("[2/4] Stack, presets & features", fg="yellow", bold=True)
+    template_pack = click.prompt(
+        "  Template pack",
+        type=click.Choice(["minimal", "standard", "full"], case_sensitive=False),
+        default="standard",
+    )
     api_preset = click.prompt(
         "  API preset",
         type=click.Choice(["auth_only", "crud", "admin"], case_sensitive=False),
@@ -824,6 +634,26 @@ def init():
         type=str,
     )
 
+    include_docker_compose = click.confirm(
+        "  Include docker-compose.yml for Postgres + Redis?",
+        default=True,
+    )
+    export_openapi_after = click.confirm(
+        "  Write openapi.json after generation (requires dependencies installed)?",
+        default=False,
+    )
+
+    license_key = click.prompt(
+        "  License",
+        type=click.Choice(["mit", "apache-2.0", "gpl-3.0", "proprietary"], case_sensitive=False),
+        default="mit",
+    ).lower()
+    code_owner = click.prompt(
+        "  CODEOWNERS handle/email (optional)",
+        default="",
+        show_default=False,
+    ).strip()
+
     click.echo()
     # Summary + confirmation
     click.secho("Review configuration", fg="yellow", bold=True)
@@ -832,6 +662,7 @@ def init():
     click.echo(f"  Git init     : {'yes' if init_git else 'no'}")
     click.echo(f"  Virtualenv   : {'yes' if create_venv else 'no'}")
     click.echo(f"  Install deps : {'yes' if install_deps else 'no'}")
+    click.echo(f"  Template pack: {template_pack}")
     click.echo(f"  API preset   : {api_preset}")
     click.echo(f"  DB backend   : {db_backend}")
     click.echo(f"  Use Redis    : {'yes' if use_redis else 'no'}")
@@ -911,6 +742,18 @@ def init():
     # runtime helpers enabled by default; could be toggled later
     generator.enable_runtime_helpers = True
 
+    generator.include_docker_compose = include_docker_compose
+    if template_pack != "standard":
+        if click.confirm(
+            f"  Apply '{template_pack}' template pack (overrides feature toggles)?",
+            default=True,
+        ):
+            try:
+                apply_template_pack(generator, template_pack)
+            except ValueError as e:
+                click.secho(str(e), fg="red")
+                sys.exit(1)
+
     try:
         # If target directory already exists, ask whether to overwrite
         if generator.project_path.exists():
@@ -928,6 +771,13 @@ def init():
 
         generator.generate()
 
+        if export_openapi_after:
+            ok, msg = export_openapi_json(generator.project_path)
+            if ok:
+                click.secho(f"  ✓ OpenAPI schema written: {msg}", fg="green")
+            else:
+                click.secho(f"  ⚠ OpenAPI export skipped: {msg}", fg="yellow")
+
         # Create concrete .env from example using wizard values
         env_example = generator.project_path / ".env.example"
         env_file = generator.project_path / ".env"
@@ -935,14 +785,14 @@ def init():
             shutil.copy2(env_example, env_file)
 
         # Write / override LICENSE, CONTRIBUTING.md, CODEOWNERS
-        _write_license(generator.project_path / "LICENSE", license_key, project_name)
-        _write_contributing(generator.project_path / "CONTRIBUTING.md")
+        write_license(generator.project_path / "LICENSE", license_key, project_name)
+        write_contributing(generator.project_path / "CONTRIBUTING.md")
         if code_owner:
-            _write_codeowners(generator.project_path / "CODEOWNERS", code_owner)
+            write_codeowners(generator.project_path / "CODEOWNERS", code_owner)
 
         # Write quality/tooling configs
         if generator.enable_ruff or generator.enable_black or generator.enable_isort or generator.enable_mypy:
-            _write_pyproject(
+            write_pyproject(
                 generator.project_path / "pyproject.toml",
                 generator.enable_ruff,
                 generator.enable_black,
@@ -950,7 +800,7 @@ def init():
                 generator.enable_mypy,
             )
         if generator.enable_precommit:
-            _write_precommit(
+            write_precommit(
                 generator.project_path / ".pre-commit-config.yaml",
                 generator.enable_ruff,
                 generator.enable_black,
@@ -960,7 +810,7 @@ def init():
         if generator.enable_ci:
             ci_dir = generator.project_path / ".github" / "workflows"
             ci_dir.mkdir(parents=True, exist_ok=True)
-            _write_ci_workflow(
+            write_ci_workflow(
                 ci_dir / "ci.yml",
                 generator.enable_ruff,
                 generator.enable_black,
@@ -1627,6 +1477,7 @@ def info():
     click.secho("CLI Commands:", fg="cyan", bold=True)
     click.secho("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━", fg="white", dim=True)
     click.echo("  fastmvc generate <name>          → Create new project")
+    click.echo("  fastmvc doctor [--check-db]      → Env / deps / optional DB check")
     click.echo("  fastmvc add entity <name>        → Add CRUD entity")
     click.echo("  fastmvc migrate generate <msg>   → Create migration")
     click.echo("  fastmvc migrate upgrade          → Apply migrations")
@@ -1640,6 +1491,39 @@ def info():
 def version():
     """Display the FastMVC version."""
     click.echo(f"FastMVC v{__version__}")
+
+
+@cli.command("doctor")
+@click.option(
+    "--project-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
+    default=None,
+    help="Project root (default: current directory).",
+)
+@click.option(
+    "--check-db/--no-check-db",
+    default=False,
+    help="Run SELECT 1 using DATABASE_URL or DATABASE_* (loads .env when present).",
+)
+@click.option(
+    "--no-dotenv",
+    is_flag=True,
+    default=False,
+    help="Do not load .env from the project directory.",
+)
+def doctor_cli(project_dir: Path | None, check_db: bool, no_dotenv: bool):
+    """
+    Check Python version, core imports, project files, and optionally database connectivity.
+
+    Run from a generated project root to validate .env and DATABASE_* settings.
+    """
+    sys.exit(
+        run_doctor(
+            project_dir=project_dir,
+            check_db=check_db,
+            load_dotenv_file=not no_dotenv,
+        )
+    )
 
 
 def main():

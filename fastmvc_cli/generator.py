@@ -110,6 +110,7 @@ class ProjectGenerator:
         self.init_git = init_git
         self.create_venv = create_venv
         self.install_deps = install_deps
+        self.include_docker_compose = True
 
         # Get the template path (FastMVC package location)
         self.template_path = self._get_template_path()
@@ -280,8 +281,15 @@ class ProjectGenerator:
             if src.exists() and src.is_dir():
                 self._copy_directory(src, dst)
 
-        # Copy individual files
-        for file_name in self.TEMPLATE_FILES:
+        # Copy individual files (optional Docker assets)
+        files_to_copy = list(self.TEMPLATE_FILES)
+        if not getattr(self, "include_docker_compose", True):
+            files_to_copy = [
+                f for f in files_to_copy
+                if f not in ("docker-compose.yml", "Dockerfile")
+            ]
+
+        for file_name in files_to_copy:
             src = self.template_path / file_name
             dst = self.project_path / file_name
 
@@ -1151,7 +1159,8 @@ This project is licensed under the MIT License.
         if not enable_helpers:
             return
 
-        makefile_content = """# Common developer commands
+        if getattr(self, "include_docker_compose", True):
+            makefile_content = """# Common developer commands
 
 .PHONY: dev test lint fmt migrate db-up db-down health
 
@@ -1180,12 +1189,37 @@ db-down:
 health:
 \tpython scripts/health_check.py
 """
+        else:
+            makefile_content = """# Common developer commands
+
+.PHONY: dev test lint fmt migrate health
+
+dev:
+\tuvicorn app:app --reload
+
+test:
+\tpytest
+
+lint:
+\truff . || true
+
+fmt:
+\tblack . || true
+\tisort . || true
+
+migrate:
+\tfastmvc migrate upgrade
+
+health:
+\tpython scripts/health_check.py
+"""
         (self.project_path / "Makefile").write_text(makefile_content)
 
         scripts_dir = self.project_path / "scripts"
         scripts_dir.mkdir(parents=True, exist_ok=True)
 
-        bootstrap_sh = """#!/usr/bin/env bash
+        if getattr(self, "include_docker_compose", True):
+            bootstrap_sh = """#!/usr/bin/env bash
 set -e
 
 echo "Starting local infrastructure (Postgres + Redis) with docker-compose..."
@@ -1195,6 +1229,13 @@ echo "Running database migrations..."
 fastmvc migrate upgrade || echo "fastmvc migrate upgrade failed or not configured."
 
 echo "Done."
+"""
+        else:
+            bootstrap_sh = """#!/usr/bin/env bash
+set -e
+echo "No docker-compose in this project (generated with --no-docker-compose)."
+echo "Run migrations when your database is available:"
+echo "  fastmvc migrate upgrade"
 """
         health_py = """import sys
 

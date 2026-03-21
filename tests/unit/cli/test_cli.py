@@ -47,6 +47,16 @@ class TestCLIInfo:
         assert 'FastMVC' in result.output
 
 
+class TestCLIDoctor:
+    """Tests for doctor command."""
+
+    def test_doctor_help(self):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["doctor", "--help"])
+        assert result.exit_code == 0
+        assert "doctor" in result.output.lower()
+
+
 class TestCLIGenerate:
     """Tests for generate command."""
 
@@ -56,6 +66,7 @@ class TestCLIGenerate:
         result = runner.invoke(cli, ['generate', '--help'])
         assert result.exit_code == 0
         assert 'project' in result.output.lower() or 'name' in result.output.lower()
+        assert "template-pack" in result.output.lower()
 
 
 class TestCLIAddEntity:

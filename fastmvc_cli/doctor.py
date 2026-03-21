@@ -157,10 +157,12 @@ def export_openapi_json(project_dir: Path, out_name: str = "openapi.json") -> tu
     Runs a subprocess so a broken app import does not crash the CLI process.
     """
     project_dir = project_dir.resolve()
+    out_path = project_dir / out_name
     script = (
-        "import json, pathlib; "
-        "from app import app; "
-        f"pathlib.Path({out_name!r}).write_text(json.dumps(app.openapi(), indent=2))"
+        "import json\n"
+        "from pathlib import Path\n"
+        "from app import app\n"
+        f"Path({str(out_path)!r}).write_text(json.dumps(app.openapi(), indent=2))\n"
     )
     try:
         import subprocess
@@ -175,9 +177,8 @@ def export_openapi_json(project_dir: Path, out_name: str = "openapi.json") -> tu
         )
         if r.returncode != 0:
             return False, (r.stderr or r.stdout or "unknown error").strip()
-        out = project_dir / out_name
-        if out.is_file():
-            return True, str(out)
+        if out_path.is_file():
+            return True, str(out_path)
         return False, "openapi file was not created"
     except Exception as e:
         return False, str(e)
