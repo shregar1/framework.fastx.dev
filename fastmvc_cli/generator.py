@@ -17,6 +17,34 @@ from pathlib import Path
 
 import click
 
+# Optional compose: Postgres + Redis with Docker healthchecks (CI / probes).
+DOCKER_HEALTH_YAML = """# Minimal Postgres + Redis for healthchecks / CI (no app container).
+# Usage: docker compose -f docker-compose.health.yml up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fastmvc
+      POSTGRES_PASSWORD: fastmvc
+      POSTGRES_DB: fastmvc
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fastmvc"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+"""
+
 
 class ProjectGenerator:
     """
@@ -227,6 +255,7 @@ class ProjectGenerator:
         # Copy template directories
         self._step("Copying template files")
         self._copy_template()
+        self._write_docker_health_compose()
 
         # Create .env.example
         self._step("Creating environment configuration")
@@ -295,6 +324,13 @@ class ProjectGenerator:
 
             if src.exists() and src.is_file():
                 shutil.copy2(src, dst)
+
+    def _write_docker_health_compose(self) -> None:
+        """Write ``docker-compose.health.yml`` (Postgres + Redis probes only)."""
+        if not getattr(self, "include_docker_compose", True):
+            return
+        path = self.project_path / "docker-compose.health.yml"
+        path.write_text(DOCKER_HEALTH_YAML, encoding="utf-8")
 
     def _copy_directory(self, src: Path, dst: Path):
         """

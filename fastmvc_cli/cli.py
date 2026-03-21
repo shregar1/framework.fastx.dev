@@ -8,7 +8,9 @@ Commands:
     generate: Create a new FastMVC project from template
     add: Add entities, migrations, etc. to existing project
     migrate: Database migration commands
-    version: Display the current FastMVC version
+    version: Display the current FastMVC version (optional PyPI check)
+    lint: Ruff and optional mypy for the project tree
+    run: pre_run hooks then uvicorn
     info: Display information about FastMVC
 
 Example:
@@ -16,6 +18,8 @@ Example:
     $ fastmvc add entity Product
     $ fastmvc migrate upgrade
     $ fastmvc version
+    $ fastmvc lint
+    $ fastmvc run
     $ fastmvc info
 """
 
@@ -27,13 +31,17 @@ import subprocess
 import sys
 from pathlib import Path
 import shutil
+from typing import Optional
 
 import click
 
 from fastmvc_cli import __version__
+from fastmvc_cli.alembic_utils import alembic_base_args, alembic_cwd, find_alembic_ini
 from fastmvc_cli.doctor import export_openapi_json, run_doctor
 from fastmvc_cli.entity_generator import EntityGenerator
 from fastmvc_cli.generator import ProjectGenerator
+from fastmvc_cli.hooks import run_post_generate, run_pre_run
+from fastmvc_cli.init_ci import run_init_ci
 from fastmvc_cli.presets import apply_template_pack
 from fastmvc_cli.scaffold_helpers import (
     write_ci_workflow,
@@ -275,6 +283,27 @@ def cli():
     default=False,
     help="After generation, write openapi.json (requires dependencies; use --install).",
 )
+@click.option(
+    "--ci",
+    is_flag=True,
+    help="Non-interactive: default license, skip prompts (use with --force to overwrite).",
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Overwrite existing project directory without confirmation.",
+)
+@click.option(
+    "--spdx-license",
+    default=None,
+    help="License when using --ci (default: mit).",
+)
+@click.option(
+    "--code-owner",
+    default="",
+    show_default=False,
+    help="CODEOWNERS line when using --ci.",
+)
 def generate(
     project_name: str,
     output_dir: str,
@@ -316,6 +345,10 @@ def generate(
     template_pack: str,
     with_docker_compose: bool,
     export_openapi: bool,
+    ci: bool,
+    force: bool,
+    spdx_license: Optional[str],
+    code_owner: str,
 ):
     """
     Generate a new project from the template.
@@ -397,16 +430,20 @@ def generate(
         sys.exit(1)
 
     # Collect license / ownership details
-    license_key = click.prompt(
-        "  License",
-        type=click.Choice(["mit", "apache-2.0", "gpl-3.0", "proprietary"], case_sensitive=False),
-        default="mit",
-    ).lower()
-    code_owner = click.prompt(
-        "  CODEOWNERS handle/email (optional)",
-        default="",
-        show_default=False,
-    ).strip()
+    if ci:
+        license_key = (spdx_license or "mit").lower()
+        code_owner = (code_owner or "").strip()
+    else:
+        license_key = click.prompt(
+            "  License",
+            type=click.Choice(["mit", "apache-2.0", "gpl-3.0", "proprietary"], case_sensitive=False),
+            default="mit",
+        ).lower()
+        code_owner = click.prompt(
+            "  CODEOWNERS handle/email (optional)",
+            default="",
+            show_default=False,
+        ).strip()
 
     try:
         # If target directory already exists, ask whether to overwrite
@@ -415,15 +452,29 @@ def generate(
                 f"Directory '{generator.project_path}' already exists.",
                 fg="yellow",
             )
-            if not click.confirm(
-                "Do you want to overwrite it? This will DELETE existing contents.",
-                default=False,
-            ):
-                click.secho("Aborting project generation.", fg="red")
-                sys.exit(1)
+            if not force:
+                if ci:
+                    click.secho("Aborting: pass --force to overwrite.", fg="red")
+                    sys.exit(1)
+                if not click.confirm(
+                    "Do you want to overwrite it? This will DELETE existing contents.",
+                    default=False,
+                ):
+                    click.secho("Aborting project generation.", fg="red")
+                    sys.exit(1)
             shutil.rmtree(generator.project_path)
 
         generator.generate()
+
+        write_license(generator.project_path / "LICENSE", license_key, project_name)
+        write_contributing(generator.project_path / "CONTRIBUTING.md")
+        if code_owner:
+            write_codeowners(generator.project_path / "CODEOWNERS", code_owner)
+        try:
+            run_post_generate(generator.project_path)
+        except subprocess.CalledProcessError as e:
+            click.secho(f"  ✗ post_generate hook failed (exit {e.returncode})", fg="red")
+            sys.exit(1)
 
         if export_openapi:
             ok, msg = export_openapi_json(generator.project_path)
@@ -469,13 +520,39 @@ def generate(
 
 
 @cli.command()
-def init():
+@click.argument("project_name", required=False)
+@click.option(
+    "--ci",
+    is_flag=True,
+    help="Non-interactive CI defaults (requires PROJECT_NAME). Use -o for output dir.",
+)
+@click.option(
+    "-o",
+    "--output-dir",
+    default=".",
+    show_default=True,
+    help="Output directory for generated project.",
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="With --ci: overwrite existing project directory without prompt.",
+)
+def init(project_name: Optional[str], ci: bool, output_dir: str, force: bool):
     """
     Interactive, multi-step project initializer with a TUI-style wizard.
 
     Guides you through project name, output directory, git, virtualenv,
     and dependency installation options, then generates the project.
+
+    Use ``--ci PROJECT_NAME`` for a non-interactive standard stack (CI / automation).
     """
+    if ci:
+        if not project_name:
+            raise click.UsageError("Usage: fastmvc init --ci PROJECT_NAME [-o DIR] [--force]")
+        run_init_ci(project_name, output_dir, force=force)
+        return
+
     # Clear screen for a simple CLI "GUI"
     click.clear()
     click.secho("┌─────────────────────────────────────────────┐", fg="cyan")
@@ -485,8 +562,12 @@ def init():
 
     # Step 1: basic info
     click.secho("[1/4] Project details", fg="yellow", bold=True)
-    project_name = click.prompt("  Project name", type=str)
-    output_dir = click.prompt("  Output directory", default=".", type=str)
+    project_name = click.prompt(
+        "  Project name",
+        type=str,
+        default=(project_name or "") or None,
+    )
+    output_dir = click.prompt("  Output directory", default=output_dir or ".", type=str)
     click.echo()
 
     # Step 2: stack & presets
@@ -789,6 +870,12 @@ def init():
         write_contributing(generator.project_path / "CONTRIBUTING.md")
         if code_owner:
             write_codeowners(generator.project_path / "CODEOWNERS", code_owner)
+
+        try:
+            run_post_generate(generator.project_path)
+        except subprocess.CalledProcessError as e:
+            click.secho(f"✗ post_generate hook failed (exit {e.returncode})", fg="red")
+            sys.exit(1)
 
         # Write quality/tooling configs
         if generator.enable_ruff or generator.enable_black or generator.enable_isort or generator.enable_mypy:
@@ -1218,6 +1305,46 @@ def remove_service(service_name: str):
 # MIGRATE COMMAND GROUP
 # ============================================================================
 
+
+def _alembic_run(argv: list[str]) -> subprocess.CompletedProcess:
+    """Run Alembic with resolved ``alembic.ini`` (walks up from cwd)."""
+    ini = find_alembic_ini()
+    cwd = alembic_cwd(ini)
+    cmd = alembic_base_args(ini) + argv
+    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+
+
+def _require_alembic_ini() -> None:
+    if find_alembic_ini() is None:
+        click.secho("✗ alembic.ini not found. Are you in a FastMVC project?", fg="red")
+        sys.exit(1)
+
+
+def _find_project_root() -> Path:
+    """Directory containing ``fastmvc.toml`` or ``pyproject.toml``, else cwd."""
+    cur = Path.cwd().resolve()
+    for directory in [cur, *cur.parents]:
+        if (directory / "fastmvc.toml").is_file():
+            return directory
+        if (directory / "pyproject.toml").is_file():
+            return directory
+    return cur
+
+
+def _pyproject_has_mypy_section(pyproject: Path) -> bool:
+    try:
+        raw = pyproject.read_bytes()
+        if sys.version_info >= (3, 11):
+            import tomllib
+        else:
+            import tomli as tomllib  # type: ignore[import-not-found]
+
+        data = tomllib.loads(raw.decode("utf-8"))
+    except Exception:
+        return False
+    return "mypy" in (data.get("tool") or {})
+
+
 @cli.group()
 def migrate():
     """
@@ -1264,18 +1391,17 @@ def migrate_generate(message: str, autogenerate: bool):
     """
     click.secho(f"→ Generating migration: {message}", fg="blue")
 
-    # Check for alembic.ini
-    if not Path("alembic.ini").exists():
+    if find_alembic_ini() is None:
         click.secho("✗ alembic.ini not found. Are you in a FastMVC project?", fg="red")
         sys.exit(1)
 
     try:
-        cmd = ["alembic", "revision"]
+        cmd = ["revision"]
         if autogenerate:
             cmd.append("--autogenerate")
         cmd.extend(["-m", message])
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = _alembic_run(cmd)
 
         if result.returncode == 0:
             click.secho("✓ Migration generated successfully!", fg="green")
@@ -1307,12 +1433,9 @@ def migrate_upgrade(revision: str):
     """
     click.secho(f"→ Upgrading database to: {revision}", fg="blue")
 
+    _require_alembic_ini()
     try:
-        result = subprocess.run(
-            ["alembic", "upgrade", revision],
-            capture_output=True,
-            text=True
-        )
+        result = _alembic_run(["upgrade", revision])
 
         if result.returncode == 0:
             click.secho("✓ Database upgraded successfully!", fg="green")
@@ -1345,12 +1468,9 @@ def migrate_downgrade(revision: str):
     """
     click.secho(f"→ Downgrading database to: {revision}", fg="yellow")
 
+    _require_alembic_ini()
     try:
-        result = subprocess.run(
-            ["alembic", "downgrade", revision],
-            capture_output=True,
-            text=True
-        )
+        result = _alembic_run(["downgrade", revision])
 
         if result.returncode == 0:
             click.secho("✓ Database downgraded successfully!", fg="green")
@@ -1374,12 +1494,9 @@ def migrate_status():
     """
     click.secho("→ Checking migration status...", fg="blue")
 
+    _require_alembic_ini()
     try:
-        result = subprocess.run(
-            ["alembic", "current"],
-            capture_output=True,
-            text=True
-        )
+        result = _alembic_run(["current"])
 
         if result.returncode == 0:
             click.secho("Current revision:", fg="cyan", bold=True)
@@ -1401,12 +1518,13 @@ def migrate_history(verbose: bool):
     """
     click.secho("→ Migration history:", fg="blue")
 
+    _require_alembic_ini()
     try:
-        cmd = ["alembic", "history"]
+        cmd = ["history"]
         if verbose:
             cmd.append("--verbose")
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = _alembic_run(cmd)
 
         if result.returncode == 0:
             click.echo(result.stdout or "  No migrations found")
@@ -1483,14 +1601,85 @@ def info():
     click.echo("  fastmvc migrate upgrade          → Apply migrations")
     click.echo("  fastmvc migrate downgrade        → Rollback migrations")
     click.echo("  fastmvc migrate status           → Show current status")
-    click.echo("  fastmvc version                  → Show version")
+    click.echo("  fastmvc version [--check-pypi]   → Show version / PyPI latest")
+    click.echo("  fastmvc lint                     → Ruff (+ mypy if configured)")
+    click.echo("  fastmvc run                      → pre_run hooks + uvicorn")
     click.echo()
 
 
 @cli.command()
-def version():
-    """Display the FastMVC version."""
+@click.option(
+    "--check-pypi",
+    is_flag=True,
+    help="Show latest pyfastmvc version on PyPI (also if FASTMVC_CHECK_PYPI=1).",
+)
+def version(check_pypi: bool):
+    """Display the FastMVC version; optional PyPI latest for update hints."""
     click.echo(f"FastMVC v{__version__}")
+    if check_pypi or os.environ.get("FASTMVC_CHECK_PYPI") == "1":
+        from fastmvc_cli.pypi_version import fetch_pypi_latest_version
+
+        latest = fetch_pypi_latest_version()
+        if latest:
+            click.echo(f"PyPI latest: {latest}")
+            if latest != __version__:
+                click.secho("Update: pip install -U pyfastmvc", fg="yellow")
+        else:
+            click.secho("(Could not reach PyPI for version check.)", dim=True)
+
+
+@cli.command()
+@click.option(
+    "--no-mypy",
+    is_flag=True,
+    help="Skip mypy even when [tool.mypy] is present in pyproject.toml.",
+)
+def lint(no_mypy: bool):
+    """
+    Run Ruff on the project tree; run mypy when ``[tool.mypy]`` exists in pyproject.toml.
+
+    Uses the nearest project root (directory with fastmvc.toml or pyproject.toml).
+    """
+    root = _find_project_root()
+    try:
+        ruff = subprocess.run(["ruff", "check", "."], cwd=root)
+    except FileNotFoundError:
+        click.secho("✗ ruff not found. Install with: pip install ruff", fg="red")
+        sys.exit(1)
+    if ruff.returncode != 0:
+        sys.exit(ruff.returncode)
+
+    pp = root / "pyproject.toml"
+    if no_mypy or not pp.is_file() or not _pyproject_has_mypy_section(pp):
+        return
+    try:
+        mypy = subprocess.run([sys.executable, "-m", "mypy", "."], cwd=root)
+    except FileNotFoundError:
+        click.secho("✗ mypy not found. Install with: pip install mypy", fg="red")
+        sys.exit(1)
+    sys.exit(mypy.returncode)
+
+
+@cli.command()
+@click.option("--app", default="app:app", show_default=True, help="ASGI app import string.")
+@click.option("--host", default="127.0.0.1", show_default=True)
+@click.option("--port", default=8000, type=int, show_default=True)
+@click.option("--reload/--no-reload", default=True, help="Dev auto-reload (default: on).")
+def run(app: str, host: str, port: int, reload: bool):
+    """
+    Run ``pre_run`` hooks from fastmvc.toml / pyproject, then start uvicorn.
+
+    Example: ``fastmvc run`` (same as ``python -m uvicorn app:app --reload``).
+    """
+    project_root = _find_project_root()
+    try:
+        run_pre_run(project_root)
+    except subprocess.CalledProcessError as e:
+        sys.exit(e.returncode)
+    cmd = [sys.executable, "-m", "uvicorn", app, "--host", host, "--port", str(port)]
+    if reload:
+        cmd.append("--reload")
+    sys.exit(subprocess.run(cmd).returncode)
 
 
 @cli.command("doctor")
