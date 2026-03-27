@@ -4,6 +4,9 @@ This module defines logical key constants for identifying API operations
 throughout the application. These keys are used for routing, logging,
 metrics collection, and operation identification.
 
+Route metadata for HTTP handlers lives in :class:`APIDefinition` entries
+nested under :class:`APILK` (e.g. :attr:`APILK.Product.FETCH`).
+
 Usage:
     >>> from constants.api_lk import APILK
     >>> if api_name == APILK.LOGIN:
@@ -11,7 +14,34 @@ Usage:
     ...     pass
 """
 
-from typing import Final
+from http import HTTPStatus
+from typing import Final, NamedTuple
+
+
+class APIDefinition(NamedTuple):
+    """Metadata for a single HTTP route (one logical API, one method).
+
+    ``NAME`` and ``METHOD`` are required. ``PATH`` is the path segment on the
+    parent :class:`~fastapi.APIRouter` (e.g. ``\"/fetch\"``).
+
+    ``SUMMARY``, ``TAGS``, and ``STATUS_CODE`` may be ``None`` when unused.
+
+    Attributes:
+        NAME: FastAPI operation name (``name=`` on the route).
+        METHOD: Upper-case HTTP verb (e.g. ``\"GET\"``); exactly one method per API.
+        PATH: Path relative to the parent router.
+        SUMMARY: OpenAPI summary, or None.
+        TAGS: Route tags, or None.
+        STATUS_CODE: Response status code, or None for framework default.
+
+    """
+
+    NAME: str
+    METHOD: str
+    PATH: str
+    SUMMARY: str | None = None
+    TAGS: tuple[str, ...] | None = None
+    STATUS_CODE: int | None = None
 
 
 class APILK:
@@ -52,3 +82,15 @@ class APILK:
 
     REFRESH: Final[str] = "REFRESH"
     """Logical key for token refresh operations."""
+
+    class PRODUCT:
+        """Route definitions for ``apis/product/...``."""
+
+        FETCH: Final[APIDefinition] = APIDefinition(
+            NAME="apis_product_fetch",
+            METHOD="GET",
+            PATH="/fetch",
+            SUMMARY="Product fetch (apis/product/fetch)",
+            TAGS=("apis-product-fetch",),
+            STATUS_CODE=HTTPStatus.OK,
+        )
