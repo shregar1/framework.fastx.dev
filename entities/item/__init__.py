@@ -1,5 +1,5 @@
 """Item domain entity."""
 
-from entities.item.item_entity import ItemEntity
+from models.item import Item
 
-__all__ = ["ItemEntity"]
+__all__ = ["Item"]

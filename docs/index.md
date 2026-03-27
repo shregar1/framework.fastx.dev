@@ -37,8 +37,8 @@ my-project/
 ├── config/                # Configuration
 │   ├── settings.py        # Settings management
 │   └── validator.py       # Environment validation
-├── entities/item/         # Sample Item domain entity
-├── repositories/item/     # Item data access
+├── models/item.py         # Sample Item domain model (Item)
+├── repositories/item.py   # Item data access
 ├── services/item/         # Item business logic
 ├── controllers/apis/v1/item/  # Item HTTP routes
 ├── testing/item/          # Item test factories & fixtures

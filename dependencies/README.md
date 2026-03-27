@@ -8,9 +8,9 @@ This layer **wires** the hexagonal architecture: it connects **`abstractions`** 
 
 ## Layout (conceptual)
 
-```
+```text
 dependencies/
-├── repositories/           # Repository factories (e.g. example/example_repository_dependency.py)
+├── repositories/           # e.g. item.py (ItemRepositoryDependency), example/example_repository_dependency.py
 ├── services/               # Service factories, often versioned
 │   └── v1/
 │       ├── user/           # e.g. fetch.py — FetchUserServiceDependency
@@ -36,7 +36,7 @@ The `dependencies` module provides FastAPI dependency injection components for t
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Controller                               │
 │            (uses Depends() to inject)                        │
@@ -221,7 +221,7 @@ class UserLoginController(IUserController):
 
 ## File Structure
 
-```
+```text
 dependencies/
 ├── __init__.py
 ├── README.md
@@ -265,4 +265,3 @@ def mock_user_repo_factory():
 # Override in tests
 app.dependency_overrides[UserRepositoryDependency.derive] = mock_user_repo_factory
 ```
-

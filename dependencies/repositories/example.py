@@ -3,7 +3,7 @@
 from fastapi import Request
 
 from dependencies.repositories.abstraction import IRepositoryDependency
-from repositories.example.example_repository import ExampleRepository
+from repositories.example import ExampleRepository
 
 
 class ExampleRepositoryDependency(IRepositoryDependency):

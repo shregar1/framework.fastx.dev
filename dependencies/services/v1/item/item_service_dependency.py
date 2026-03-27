@@ -2,11 +2,9 @@
 
 from fastapi import Depends, Request
 
-from dependencies.repositories.item.item_repository_dependency import (
-    ItemRepositoryDependency,
-)
+from dependencies.repositories.item import ItemRepositoryDependency
 from dependencies.services.v1.item.abstraction import IItemServiceDependency
-from repositories.item.item_repository import ItemRepository
+from repositories.item import ItemRepository
 from services.item.item_service import ItemService
 
 

@@ -9,6 +9,7 @@ fastmvc generate
 ```
 
 Follow the prompts to customize your project:
+
 - Project name
 - Location
 - Author details
@@ -22,6 +23,7 @@ fastmvc quickstart my-project
 ```
 
 This creates a project with sensible defaults:
+
 - Project name: `my-project`
 - Location: current directory
 - Virtual environment: `.venv`
@@ -40,6 +42,7 @@ make dev
 ```
 
 Your API will be available at:
+
 - Application: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
@@ -72,14 +75,14 @@ curl -X DELETE http://localhost:8000/items/1
 
 ## Project Structure
 
-```
+```text
 my-project/
 ├── app.py                 # Application entry point
 ├── config/                # Configuration
 │   ├── settings.py
 │   └── validator.py
-├── entities/item/         # Sample Item entity
-├── repositories/item/
+├── models/item.py         # Sample Item model (Item)
+├── repositories/item.py   # ItemRepository
 ├── services/item/
 ├── controllers/apis/v1/item/
 ├── testing/item/

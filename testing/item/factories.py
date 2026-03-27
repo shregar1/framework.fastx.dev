@@ -3,29 +3,33 @@
 Uses Faker for realistic test data generation.
 """
 
+from __future__ import annotations
+
 from datetime import datetime
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
+
+if TYPE_CHECKING:
+    from faker import Faker  # pyright: ignore[reportMissingImports]
 
 # Try to import faker, provide fallback if not available
+fake: Faker | None = None
 try:
-    from faker import Faker
+    from faker import Faker as _Faker  # pyright: ignore[reportMissingImports]
 
-    HAS_FAKER = True
-    fake = Faker()
+    fake = _Faker()
 except ImportError:
-    HAS_FAKER = False
-    fake = None
+    pass
 
 from dtos.requests.item import CreateItemRequestDTO, UpdateItemRequestDTO
 from dtos.responses.item.item_response_dto import ItemResponseDTO
-from entities.item.item_entity import ItemEntity
+from models.item import Item
 
 
 class ItemFactory:
     """Factory for generating fake Item data.
 
     Provides methods to create:
-    - ItemEntity instances
+    - Item instances
     - Request DTOs
     - Response DTOs
     - Dictionary payloads for API tests
@@ -54,7 +58,7 @@ class ItemFactory:
     @classmethod
     def _generate_fake_data(cls, **overrides) -> dict[str, Any]:
         """Generate fake data for an item."""
-        if HAS_FAKER:
+        if fake is not None:
             name = fake.sentence(nb_words=3)[:-1]  # Remove period
             description = fake.paragraph(nb_sentences=2)
         else:
@@ -65,7 +69,7 @@ class ItemFactory:
 
         data = {
             "id": overrides.get("id")
-            or (fake.uuid4() if HAS_FAKER else f"test-{datetime.utcnow().timestamp()}"),
+            or (fake.uuid4() if fake is not None else f"test-{datetime.utcnow().timestamp()}"),
             "name": overrides.get("name", name),
             "description": overrides.get("description", description),
             "completed": overrides.get("completed", cls.DEFAULTS["completed"]),
@@ -76,14 +80,14 @@ class ItemFactory:
         return data
 
     @classmethod
-    def create(cls, **overrides) -> ItemEntity:
-        """Create an ItemEntity instance.
+    def create(cls, **overrides) -> Item:
+        """Create an Item instance.
 
         Args:
             **overrides: Field values to override defaults
 
         Returns:
-            ItemEntity instance
+            Item instance
 
         Examples:
             >>> item = ItemFactory.create()
@@ -91,7 +95,7 @@ class ItemFactory:
 
         """
         data = cls._generate_fake_data(**overrides)
-        return ItemEntity(
+        return Item(
             id=data["id"],
             name=data["name"],
             description=data["description"],
@@ -101,15 +105,15 @@ class ItemFactory:
         )
 
     @classmethod
-    def create_batch(cls, count: int, **overrides) -> list[ItemEntity]:
-        """Create multiple ItemEntity instances.
+    def create_batch(cls, count: int, **overrides) -> list[Item]:
+        """Create multiple Item instances.
 
         Args:
             count: Number of items to create
             **overrides: Field values to override defaults
 
         Returns:
-            List of ItemEntity instances
+            List of Item instances
 
         Examples:
             >>> items = ItemFactory.create_batch(5)
@@ -210,7 +214,7 @@ class ItemFactory:
         )
 
     @classmethod
-    def completed(cls, **overrides) -> ItemEntity:
+    def completed(cls, **overrides) -> Item:
         """Create a completed item.
 
         Convenience method for creating completed items.
@@ -219,13 +223,13 @@ class ItemFactory:
             **overrides: Field values to override defaults
 
         Returns:
-            Completed ItemEntity instance
+            Completed Item instance
 
         """
         return cls.create(completed=True, **overrides)
 
     @classmethod
-    def pending(cls, **overrides) -> ItemEntity:
+    def pending(cls, **overrides) -> Item:
         """Create a pending (not completed) item.
 
         Convenience method for creating pending items.
@@ -234,40 +238,40 @@ class ItemFactory:
             **overrides: Field values to override defaults
 
         Returns:
-            Pending ItemEntity instance
+            Pending Item instance
 
         """
         return cls.create(completed=False, **overrides)
 
     @classmethod
-    def with_long_name(cls, **overrides) -> ItemEntity:
+    def with_long_name(cls, **overrides) -> Item:
         """Create an item with a long name (boundary testing).
 
         Args:
             **overrides: Field values to override defaults
 
         Returns:
-            ItemEntity with long name
+            Item with long name
 
         """
-        if HAS_FAKER:
+        if fake is not None:
             long_name = " ".join([fake.word() for _ in range(15)])[:100]
         else:
             long_name = "A" * 100
         return cls.create(name=long_name, **overrides)
 
     @classmethod
-    def with_long_description(cls, **overrides) -> ItemEntity:
+    def with_long_description(cls, **overrides) -> Item:
         """Create an item with a long description (boundary testing).
 
         Args:
             **overrides: Field values to override defaults
 
         Returns:
-            ItemEntity with long description
+            Item with long description
 
         """
-        if HAS_FAKER:
+        if fake is not None:
             long_desc = fake.paragraph(nb_sentences=20)[:500]
         else:
             long_desc = "B" * 500

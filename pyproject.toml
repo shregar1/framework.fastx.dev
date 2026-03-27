@@ -86,10 +86,9 @@ dependencies = [
     "httpx>=0.24.0,<1.0.0",
     "cachetools>=5.0.0,<6.0.0",
     "mako>=1.2.0,<2.0.0",
-    "fast-middleware>=0.6.2,<1.0.0",
+    "fast-middleware>=0.6.2,<2.0.0",
     "cryptography>=41.0.0,<44.0.0",
-    "fast-platform>=0.13.0,<1.0.0",
-    "fast-dataI>=0.1.0,<1.0.0",
+    "fast-platform>=0.13.0,<2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -112,7 +111,8 @@ docs = [
 interactive = [
     "questionary>=2.0.0",
 ]
-# Core platform services - fast-platform and fast-dataI are now mandatory dependencies
+# Core platform services - fast-platform is mandatory.
+# fast-dataI is optional at runtime (see `abstractions/repository.py` fallback).
 # Individual service categories (require fast-platform extras)
 notifications = ["fast-platform[notifications]>=0.13.0"]
 storage = ["fast-platform[storage]>=0.13.0"]

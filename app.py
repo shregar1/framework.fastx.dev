@@ -42,23 +42,25 @@ Example API (if example module is available):
 
 import os
 from http import HTTPStatus
+from importlib.metadata import PackageNotFoundError, version
+from typing import cast
 
-import uvicorn
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+import uvicorn  # pyright: ignore[reportMissingImports]
+from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 # Import middlewares from fast-middleware package
-from fastmiddleware import (
+from fastmiddleware import (  # pyright: ignore[reportMissingImports]
     CORSMiddleware,
     LoggingMiddleware,
     RateLimitConfig,
     RateLimitMiddleware,
     RequestContextMiddleware,
+    ResponseTimingMiddleware,
     SecurityHeadersConfig,
     SecurityHeadersMiddleware,
-    ResponseTimingMiddleware,
     TrustedHostMiddleware,
 )
 from loguru import logger
@@ -68,7 +70,7 @@ from constants.default import Default
 
 # Optional example controllers (can be removed for minimal core)
 try:
-    from controllers.user import router as UserRouter
+    from controllers.user import router as UserRouter  # noqa: I001  # pyright: ignore[reportMissingImports]
 except ImportError:
     UserRouter = None  # type: ignore
 
@@ -86,26 +88,29 @@ except ImportError:
 
 # Optional observability (requires fast-platform)
 try:
-    from fast_platform.observability import configure_datadog, configure_otel
+    from fast_platform.observability import (  # pyright: ignore[reportMissingImports]
+        configure_datadog,
+        configure_otel,
+    )
 except ImportError:
     configure_datadog = None  # type: ignore
     configure_otel = None  # type: ignore
 
 # Optional routers (require corresponding fast_* packages)
 try:
-    from fast_dashboards import DashboardRouter
+    from fast_dashboards import DashboardRouter  # noqa: I001  # pyright: ignore[reportMissingImports, reportAttributeAccessIssue]
 except ImportError:
     DashboardRouter = None  # type: ignore[assignment]
 try:
-    from controllers.channels import router as ChannelsRouter
+    from controllers.channels import router as ChannelsRouter  # noqa: I001  # pyright: ignore[reportMissingImports]
 except ImportError:
     ChannelsRouter = None  # type: ignore[assignment]
 try:
-    from controllers.notifications import router as NotificationsRouter
+    from controllers.notifications import router as NotificationsRouter  # noqa: I001  # pyright: ignore[reportMissingImports]
 except ImportError:
     NotificationsRouter = None  # type: ignore[assignment]
 try:
-    from apis import router as MainApiRouter
+    from apis import router as MainApiRouter  # pyright: ignore[reportMissingImports]
 except ImportError:
     MainApiRouter = None
 
@@ -116,7 +121,7 @@ from dtos.responses.I import IResponseDTO
 
 # Domain errors (requires pyfastmvc[platform])
 try:
-    from fast_platform.errors import (
+    from fast_platform.errors import (  # pyright: ignore[reportMissingImports]
         BadInputError,
         ConflictError,
         ForbiddenError,
@@ -467,13 +472,15 @@ async def health_check():
     """
     from datetime import datetime, timezone
 
-    # Import version
-    from __init__ import __version__
+    try:
+        api_version = version("pyfastmvc")
+    except PackageNotFoundError:
+        api_version = "1.5.0"
 
     # Health check results
-    health_status = {
+    health_status: dict[str, str | int] = {
         "status": "healthy",
-        "version": __version__,
+        "version": api_version,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -718,7 +725,7 @@ if NotificationsRouter is not None:
 if ChannelsRouter is not None:
     app.include_router(ChannelsRouter)
 if DashboardRouter is not None:
-    app.include_router(DashboardRouter)
+    app.include_router(cast(APIRouter, DashboardRouter))
 if MainApiRouter is not None:
     app.include_router(MainApiRouter)
     logger.info("Nested Production API enabled at /api/v1/examples")

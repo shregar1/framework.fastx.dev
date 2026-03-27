@@ -2,17 +2,26 @@
 
 FastMVC includes a complete Docker Compose stack with PostgreSQL, Redis, and the FastAPI application.
 
+## Prerequisites
+
+1. **Docker** — [Docker Desktop](https://docs.docker.com/get-docker/) (macOS/Windows) or Docker Engine + Compose v2 on Linux. The daemon must be **running** (`docker info` should succeed).
+2. **Secrets** — Compose sets a **development-only** default `JWT_SECRET_KEY` (32+ characters, meets app validation). For any real deployment, set **`JWT_SECRET_KEY`** and **`SECRET_KEY`** in a `.env` file next to `docker-compose.yml` and never commit production values.
+
 ## Quick Start
 
 ```bash
-# Start the full stack
-docker-compose up -d
+# From the repository root (fast_mvc/)
+docker compose up -d --build
+
+# Legacy Compose v1 alias (if installed)
+docker-compose up -d --build
 
 # Or use make
 make docker-up
 ```
 
 This starts:
+
 - **PostgreSQL** (port 5432)
 - **Redis** (port 6379)
 - **FastAPI app** (port 8000) with auto-migrations
@@ -155,10 +164,13 @@ docker-compose exec app alembic upgrade head
 
 1. **Modify models** in your code
 2. **Generate migration** (outside Docker):
+
    ```bash
    fastmvc db migrate -m "Add users table"
    ```
+
 3. **Rebuild and restart**:
+
    ```bash
    docker-compose down
    docker-compose up -d --build
@@ -173,6 +185,7 @@ docker-compose --profile dev up -d pgadmin
 ```
 
 Access at http://localhost:5050
+
 - Email: `admin@example.com` (from `.env`)
 - Password: `admin` (from `.env`)
 
@@ -193,13 +206,11 @@ docker-compose --profile nginx up -d
 ```
 
 Place SSL certificates in `_maint/nginx/ssl/`:
-```
 _maint/nginx/
 ├── nginx.conf
 └── ssl/
     ├── cert.pem
     └── key.pem
-```
 
 ### Environment for Production
 

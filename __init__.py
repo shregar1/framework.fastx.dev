@@ -18,7 +18,7 @@ Sample Item API (included):
     app.include_router(item_router)
 
     # Or use components directly:
-    from fast_mvc import ItemEntity, ItemService, ItemRepository
+    from fast_mvc import Item, ItemService, ItemRepository
 
     service = ItemService()
     result = await service.create_item("Buy milk", "Get from store")
@@ -46,7 +46,7 @@ Modules:
     - abstractions: I interfaces (Controller, Service, Repository, etc.)
     - dtos: Data Transfer Objects and validation
     - dependencies: DI container and utilities
-    - entities, services, repositories: sample Item API (see docs/guide/new-api-scaffolding.md)
+    - models, services, repositories: sample Item API (see docs/guide/new-api-scaffolding.md)
 
 Optional Integrations (via fast-platform):
     - notifications: Email, SMS, Chat, Push notifications
@@ -86,7 +86,7 @@ try:
         ItemResponseDTO,
         ItemStatsResponseDTO,
     )
-    from entities.item import ItemEntity
+    from models.item import Item
     from repositories.item import ItemRepository
     from services.item import ItemService
 
@@ -127,7 +127,7 @@ if _EXAMPLE_AVAILABLE:
     __all__.extend(
         [
             # Example Entity
-            "ItemEntity",
+            "Item",
             # Example Repository
             "ItemRepository",
             # Example Service

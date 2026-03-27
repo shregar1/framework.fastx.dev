@@ -4,7 +4,7 @@ Understanding the FastMVC project layout and organization.
 
 ## Directory Overview
 
-```
+```text
 my-project/
 ├── app.py                      # Application entry point
 ├── pyproject.toml             # Project metadata and dependencies
@@ -59,7 +59,7 @@ my-project/
 │   ├── request.py            # Request DTOs
 │   └── response.py           # Response DTOs
 │
-├── entities/                  # Domain entities (e.g. entities/item/)
+├── models/                    # Domain models (e.g. models/item.py for Item)
 ├── controllers/apis/v1/       # Versioned HTTP controllers (e.g. item/, example/)
 ├── testing/                   # Pytest factories/fixtures per domain (e.g. testing/item/)
 │
@@ -122,9 +122,9 @@ Shared utilities and infrastructure:
 
 Each feature follows the MVC pattern across packages, for example the **Item** sample:
 
-```
-entities/item/              # ItemEntity
-repositories/item/          # ItemRepository
+```text
+models/item.py              # Item (domain model for Item)
+repositories/item.py        # ItemRepository (inherits IRepository directly)
 services/item/              # ItemService
 controllers/apis/v1/item/   # Router + ItemController
 dtos/requests/item/         # create.py, update.py — one concrete class per file (nested helpers optional)
@@ -139,6 +139,7 @@ See [**New API scaffolding**](new-api-scaffolding.md) for a generator-oriented c
 ### Separation of Concerns
 
 Each layer has a single responsibility:
+
 - **Controller**: Handles HTTP requests/responses
 - **Service**: Contains business logic
 - **Repository**: Handles data persistence
@@ -177,63 +178,69 @@ async def list_items(
 To add a new feature (e.g., `users`):
 
 1. **Create the feature directory**:
-```bash
-mkdir users
-touch users/__init__.py
-```
+
+   ```bash
+   mkdir users
+   touch users/__init__.py
+   ```
 
 2. **Define the entity**:
-```python
-# users/entity.py
-from abstractions.entity import IEntity
 
-class User(IEntity):
-    id: int
-    email: str
-    name: str
-```
+   ```python
+   # users/entity.py
+   from abstractions.entity import IEntity
+
+   class User(IEntity):
+       id: int
+       email: str
+       name: str
+   ```
 
 3. **Create the repository**:
-```python
-# users/repository.py
-from abstractions.repository import IRepository
-from users.entity import User
 
-class UserRepository(IRepository[User]):
-    pass
-```
+   ```python
+   # users/repository.py
+   from abstractions.repository import IRepository
+   from users.entity import User
+
+   class UserRepository(IRepository[User]):
+       pass
+   ```
 
 4. **Create the service**:
-```python
-# users/service.py
-from abstractions.service import IService
-from users.repository import UserRepository
 
-class UserService(IService[User]):
-    def __init__(self, repository: UserRepository):
-        super().__init__(repository)
-```
+   ```python
+   # users/service.py
+   from abstractions.service import IService
+   from users.repository import UserRepository
+
+   class UserService(IService[User]):
+       def __init__(self, repository: UserRepository):
+           super().__init__(repository)
+   ```
 
 5. **Create the controller**:
-```python
-# users/controller.py
-from fastapi import APIRouter
-from abstractions.controller import IController
-from users.service import UserService
 
-router = APIRouter(prefix="/users")
-controller = IController(UserService, User)
+   ```python
+   # users/controller.py
+   from fastapi import APIRouter
+   from abstractions.controller import IController
+   from users.service import UserService
 
-@router.get("")
-async def list_users():
-    return await controller.list()
-```
+   router = APIRouter(prefix="/users")
+   controller = IController(UserService, User)
+
+   @router.get("")
+   async def list_users():
+       return await controller.list()
+   ```
 
 6. **Register in app.py**:
-```python
-from users.controller import router as users_router
-app.include_router(users_router, tags=["users"])
-```
+
+   ```python
+   from users.controller import router as users_router
+   app.include_router(users_router, tags=["users"])
+   ```
 
 ## Best Practices
 

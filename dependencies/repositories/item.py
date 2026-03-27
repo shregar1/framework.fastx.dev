@@ -1,9 +1,9 @@
-"""FastAPI dependency for :class:`repositories.item.item_repository.ItemRepository`."""
+"""FastAPI dependency for :class:`repositories.item.ItemRepository`."""
 
 from fastapi import Request
 
 from dependencies.repositories.abstraction import IRepositoryDependency
-from repositories.item.item_repository import ItemRepository
+from repositories.item import ItemRepository
 
 
 class ItemRepositoryDependency(IRepositoryDependency):

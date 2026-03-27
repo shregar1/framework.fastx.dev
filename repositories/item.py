@@ -1,24 +1,19 @@
-"""Module item_repository.py."""
+"""Item repository — in-memory sample; production uses dataI/SQLAlchemy as needed."""
 
-"""
-Item Repository - Example repository implementation.
-
-Demonstrates the Repository pattern with in-memory storage.
-For production, replace with dataI-backed implementation.
-"""
-
-from typing import Any, Self
 from datetime import datetime
+from typing import Any
 
-from abstractions.result import Result, success, failure
-from entities.item.item_entity import ItemEntity
-from repositories.item.abstraction import IItemRepository
+from abstractions.result import Result, failure, success
+from models.item import Item
+from repositories.abstraction import IRepository
 
 
-class ItemRepository(IItemRepository):
-    """Repository for ItemEntity with in-memory storage.
+class ItemRepository(IRepository):
+    """Repository for :class:`Item` with in-memory storage.
 
-    In production, replace the _storage dict with actual dataI calls.
+    Inherits :class:`repositories.abstraction.IRepository` directly (no separate
+    ``IItemRepository`` abstraction). Replace ``_storage`` with real persistence
+    when wired to the database.
 
     Example:
         repo = ItemRepository()
@@ -39,17 +34,17 @@ class ItemRepository(IItemRepository):
         self._counter += 1
         return f"item_{self._counter}"
 
-    def _to_entity(self, data: dict[str, Any]) -> ItemEntity:
+    def _to_entity(self, data: dict[str, Any]) -> Item:
         """Convert stored data to entity."""
-        return ItemEntity.from_dict(data)
+        return Item.from_dict(data)
 
-    def _from_entity(self, entity: ItemEntity) -> dict[str, Any]:
+    def _from_entity(self, entity: Item) -> dict[str, Any]:
         """Convert entity to stored data."""
         return entity.to_dict()
 
     # CRUD Operations
 
-    async def create(self, entity: ItemEntity) -> Result[ItemEntity, Any]:
+    async def create(self, entity: Item) -> Result[Item, Any]:
         """Create a new item.
 
         Args:
@@ -72,7 +67,7 @@ class ItemRepository(IItemRepository):
         except Exception as e:
             return failure(f"Failed to create item: {str(e)}")
 
-    async def get_by_id(self, id: str) -> Result[ItemEntity | None, Any]:
+    async def get_by_id(self, id: str) -> Result[Item | None, Any]:
         """Get item by ID.
 
         Args:
@@ -90,7 +85,7 @@ class ItemRepository(IItemRepository):
         except Exception as e:
             return failure(f"Failed to get item: {str(e)}")
 
-    async def get_all(self) -> Result[list[ItemEntity, Any], Any]:
+    async def get_all(self) -> Result[list[Item], Any]:
         """Get all items.
 
         Returns:
@@ -103,7 +98,7 @@ class ItemRepository(IItemRepository):
         except Exception as e:
             return failure(f"Failed to get items: {str(e)}")
 
-    async def update(self, entity: ItemEntity) -> Result[ItemEntity, Any]:
+    async def update(self, entity: Item) -> Result[Item, Any]:
         """Update existing item.
 
         Args:
@@ -145,7 +140,7 @@ class ItemRepository(IItemRepository):
 
     # Query Operations
 
-    async def find_by_name(self, name: str) -> Result[list[ItemEntity, Any], Any]:
+    async def find_by_name(self, name: str) -> Result[list[Item], Any]:
         """Find items by name (partial match).
 
         Args:
@@ -165,7 +160,7 @@ class ItemRepository(IItemRepository):
         except Exception as e:
             return failure(f"Failed to search items: {str(e)}")
 
-    async def find_completed(self) -> Result[list[ItemEntity, Any], Any]:
+    async def find_completed(self) -> Result[list[Item], Any]:
         """Find all completed items.
 
         Returns:
@@ -182,7 +177,7 @@ class ItemRepository(IItemRepository):
         except Exception as e:
             return failure(f"Failed to get completed items: {str(e)}")
 
-    async def find_pending(self) -> Result[list[ItemEntity, Any], Any]:
+    async def find_pending(self) -> Result[list[Item], Any]:
         """Find all pending (not completed) items.
 
         Returns:

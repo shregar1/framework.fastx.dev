@@ -27,7 +27,6 @@ from unittest.mock import Mock, patch
 # Try to import FastAPI testing dependencies
 try:
     from fastapi.testclient import TestClient
-    from httpx import AsyncClient
 
     HAS_FASTAPI_TEST = True
 except ImportError:
@@ -41,7 +40,7 @@ try:
 except ImportError:
     HAS_PYTEST = False
 
-from entities.item.item_entity import ItemEntity
+from models.item import Item
 from testing.item.factories import ItemFactory
 
 
@@ -81,14 +80,14 @@ def item_repository(item_db):
         Mocked repository instance.
 
     """
-    from repositories.item.item_repository import ItemRepository
+    from repositories.item import ItemRepository
 
     repo = Mock(spec=ItemRepository)
 
     # Mock storage
     _storage = item_db["items"]
 
-    async def mock_create(entity: ItemEntity) -> ItemEntity:
+    async def mock_create(entity: Item) -> Item:
         """Execute mock_create operation.
 
         Args:
@@ -103,7 +102,7 @@ def item_repository(item_db):
         _storage[entity_id] = entity
         return entity
 
-    async def mock_get_by_id(item_id: str) -> ItemEntity | None:
+    async def mock_get_by_id(item_id: str) -> Item | None:
         """Execute mock_get_by_id operation.
 
         Args:
@@ -114,7 +113,7 @@ def item_repository(item_db):
         """
         return _storage.get(item_id)
 
-    async def mock_get_all() -> list[ItemEntity]:
+    async def mock_get_all() -> list[Item]:
         """Execute mock_get_all operation.
 
         Returns:
@@ -122,7 +121,7 @@ def item_repository(item_db):
         """
         return list(_storage.values())
 
-    async def mock_update(entity: ItemEntity) -> ItemEntity:
+    async def mock_update(entity: Item) -> Item:
         """Execute mock_update operation.
 
         Args:
@@ -202,7 +201,7 @@ def item_client(app) -> Generator[TestClient, None, None]:
 
 
 @pytest.fixture
-async def async_item_client(app) -> AsyncClient:
+async def async_item_client(app) -> Any:
     """Provide an async HTTPX client for testing.
 
     Yields:
@@ -217,7 +216,12 @@ async def async_item_client(app) -> AsyncClient:
     if not HAS_FASTAPI_TEST:
         pytest.skip("httpx not installed")
 
-    async with AsyncClient(app=app, I_url="http://test") as client:
+    from httpx import ASGITransport, AsyncClient
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
         yield client
 
 
@@ -351,11 +355,11 @@ def mock_expired_token():
 
 
 @pytest.fixture
-def test_item() -> ItemEntity:
+def test_item() -> Item:
     """Provide a single test item.
 
     Returns:
-        ItemEntity instance with default test data.
+        Item instance with default test data.
 
     Example:
         def test_update_item(item_client, test_item):
@@ -375,11 +379,11 @@ def test_item() -> ItemEntity:
 
 
 @pytest.fixture
-def test_items() -> list[ItemEntity]:
+def test_items() -> list[Item]:
     """Provide multiple test items.
 
     Returns:
-        List of 5 ItemEntity instances with varied states.
+        List of 5 Item instances with varied states.
 
     Example:
         def test_list_items(item_client, test_items):
@@ -399,22 +403,22 @@ def test_items() -> list[ItemEntity]:
 
 
 @pytest.fixture
-def completed_items() -> list[ItemEntity]:
+def completed_items() -> list[Item]:
     """Provide completed test items.
 
     Returns:
-        List of 3 completed ItemEntity instances.
+        List of 3 completed Item instances.
 
     """
     return ItemFactory.create_batch(3, completed=True)
 
 
 @pytest.fixture
-def pending_items() -> list[ItemEntity]:
+def pending_items() -> list[Item]:
     """Provide pending (not completed) test items.
 
     Returns:
-        List of 3 pending ItemEntity instances.
+        List of 3 pending Item instances.
 
     """
     return ItemFactory.create_batch(3, completed=False)
@@ -493,7 +497,7 @@ def freezer():
 
     """
     try:
-        from freezegun import freeze_time
+        from freezegun import freeze_time  # pyright: ignore[reportMissingImports]
 
         with freeze_time("2024-01-01 12:00:00") as frozen:
             yield frozen

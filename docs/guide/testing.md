@@ -20,7 +20,7 @@ pip install -r requirements-dev.txt
 
 The **`tests/`** tree **mirrors** the application layout (controllers, services, dtos, factories, middlewares, repositories, etc.). Put each test module next to the same path as the code under test (for example, `tests/example/test_example_item.py` for Item API tests, `tests/factories/apis/v1/example/` for DTO factory tests).
 
-```
+```text
 my-project/
 ├── tests/
 │   ├── conftest.py                    # Shared fixtures
@@ -66,7 +66,7 @@ long_name_item = ItemFactory.with_long_name()
 
 | Method | Description |
 |--------|-------------|
-| `create(**overrides)` | Create ItemEntity |
+| `create(**overrides)` | Create Item |
 | `create_batch(n)` | Create n items |
 | `create_dict()` | Create API payload dict |
 | `completed()` | Create completed item |
@@ -248,10 +248,10 @@ Test individual components in isolation:
 @pytest.mark.unit
 def test_entity_validation():
     """Test entity validation logic."""
-    from entities.item import ItemEntity
+    from models.item import Item
     
     with pytest.raises(ValueError):
-        ItemEntity(name="")  # Empty name should fail
+        Item(name="")  # Empty name should fail
 ```
 
 ### Integration Tests
@@ -370,6 +370,7 @@ The `.vscode/` folder includes:
 - **Task shortcuts**: Run tests from command palette
 
 Shortcuts:
+
 - `Cmd+Shift+T` - Run tests
 - `F5` - Debug test at cursor
 - Click play button in test explorer

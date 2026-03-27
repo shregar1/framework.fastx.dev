@@ -1,6 +1,7 @@
-"""Item Entity - Example domain entity.
+"""Item domain model (sample).
 
-Demonstrates FastMVC entity patterns with validation and business logic.
+Maps to persistence via ``repositories.item.ItemRepository``; keep validation and
+serialization here.
 """
 
 from datetime import datetime
@@ -9,7 +10,7 @@ from typing import Any, Self
 from abstractions.entity import Entity
 
 
-class ItemEntity(Entity):
+class Item(Entity):
     """Item domain entity representing a todo/task item.
 
     Attributes:
@@ -162,7 +163,7 @@ class ItemEntity(Entity):
         Returns:
             The result of the operation.
         """
-        return f"ItemEntity(id={self.id}, name={self.name}, completed={self.completed})"
+        return f"Item(id={self.id}, name={self.name}, completed={self.completed})"
 
     def __eq__(self, other: object) -> bool:
         """Execute __eq__ operation.
@@ -173,7 +174,7 @@ class ItemEntity(Entity):
         Returns:
             The result of the operation.
         """
-        if not isinstance(other, ItemEntity):
+        if not isinstance(other, Item):
             return False
         return self.id == other.id
 

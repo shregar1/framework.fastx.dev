@@ -8,7 +8,7 @@ This guide describes how a **new HTTP API resource** is laid out in FastMVC so y
 |--------|---------|
 | **API version** | Usually `v1`, reflected under `controllers/apis/v1/`, `dependencies/services/v1/`, and optionally `dtos/requests/apis/v1/`. |
 | **Segment / area** | A folder name for a feature slice (`user`, `item`, `example` for DTO demos). |
-| **Resource slug** | Plural route prefix (e.g. `items`) and singular PascalCase names (`Item`, `ItemEntity`). |
+| **Resource slug** | Plural route prefix (e.g. `items`) and singular PascalCase names (`Item`, `Item`). |
 | **Operation** | For small APIs, one controller file may hold all routes; for larger APIs, split by verb (`create.py`, `fetch.py`) like `controllers/auth/fetch.py`. |
 
 ### Leaf file naming (nested folders)
@@ -48,30 +48,29 @@ flowchart LR
 - **Router**: `APIRouter` with `prefix` and `tags`.
 - **Controller**: `IController` subclass; validates/coerces, calls **service**, maps to **response DTOs**.
 - **Service**: `IService` / `I*Service` subclass; business rules; calls **repository**.
-- **Repository**: `IRepository` / `I*Repository` subclass; persistence.
-- **Entity** (optional): domain model under `entities/<segment>/`.
+- **Repository**: concrete class subclassing `IRepository` (optional `I*Repository` only when needed); persistence.
+- **Model** (optional): domain model under `models/<segment>.py` (one file per resource, e.g. `item.py` for `Item`).
 - **DTOs**: request bodies under `dtos/requests/...`, responses under `dtos/responses/...`.
 
 ## Directory checklist (generator output)
 
 Use **`<segment>`** (e.g. `item`, `product`) and **`<Ver>`** (e.g. `v1`). Paths are relative to the application package root (e.g. `fast_mvc/`).
 
-### 1. Domain entity (optional but typical)
+### 1. Domain model (optional but typical)
 
-```
-entities/
-└── <segment>/
-    ├── __init__.py
-    └── item_entity.py            # or short leaf e.g. entity.py if one entity per segment
+```text
+models/
+├── __init__.py
+└── <segment>.py                  # e.g. item.py → class Item (model for that resource)
 ```
 
 - Inherit from `abstractions.entity.Entity` (or `IEntity`).
 - Keep validation and `to_dict` / `from_dict` here.
-- If the segment folder contains **only one** entity, a **short** leaf name (`entity.py`) is acceptable; otherwise use a disambiguating name (`item_entity.py`).
+- **One model file per resource** (`item.py`, `product.py`); the filename matches the resource slug where practical. No extra folder under `models/` is required for a single aggregate.
 
 ### 2. DTOs
 
-```
+```text
 dtos/
 ├── requests/
 │   └── <segment>/                # or requests/apis/<Ver>/<segment>/ for versioned APIs
@@ -92,17 +91,18 @@ dtos/
 
 ### 3. Repository
 
-```
+```text
 repositories/
-└── <segment>/
-    ├── __init__.py
-    ├── abstraction.py            # class I<Segment>Repository(IRepository)
-    └── <segment>_repository.py   # concrete implementation
+├── abstraction.py              # app-level IRepository base (existing)
+└── <segment>.py                # e.g. item.py — class <Segment>Repository(IRepository)
 ```
+
+- The concrete repository **inherits `repositories.abstraction.IRepository` directly** unless you truly need a dedicated `I<Segment>Repository`; then you may add `repositories/<segment>/abstraction.py` + impl (optional pattern).
+- **Do not** require a subfolder per resource for the common case: one Python file per model (`item.py`, `example.py`) keeps the tree flat and maps 1:1 with `models/<segment>.py`.
 
 ### 4. Service
 
-```
+```text
 services/
 └── <segment>/
     ├── __init__.py
@@ -114,12 +114,10 @@ services/
 
 ### 5. Dependencies (FastAPI `Depends`)
 
-```
+```text
 dependencies/
 ├── repositories/
-│   └── <segment>/
-│       ├── __init__.py
-│       └── <segment>_repository_dependency.py   # class *RepositoryDependency(IRepositoryDependency)
+│   └── <segment>.py            # e.g. item.py — ItemRepositoryDependency(IRepositoryDependency)
 └── services/
     └── <Ver>/
         └── <segment>/
@@ -133,7 +131,7 @@ dependencies/
 
 ### 6. Controller + router
 
-```
+```text
 controllers/
 └── apis/
     └── <Ver>/
@@ -154,7 +152,7 @@ controllers/
 
 ### 8. Factories (tests / local tooling)
 
-```
+```text
 factories/
 └── apis/
     └── <Ver>/
@@ -170,7 +168,7 @@ factories/
 
 ### 9. Test support (pytest)
 
-```
+```text
 testing/
 └── <segment>/
     ├── __init__.py
@@ -182,11 +180,11 @@ testing/
 
 ### 10. Tests (mirror production tree)
 
-```
+```text
 tests/
 ├── controllers/apis/<Ver>/<segment>/   # HTTP tests
 ├── services/<segment>/
-├── repositories/<segment>/
+├── repositories/                       # optional unit tests, e.g. test_item.py (not a folder per resource required)
 └── factories/apis/<Ver>/<segment>/
 ```
 
@@ -196,13 +194,13 @@ Your generator should collect at least:
 
 | Prompt | Used for |
 |--------|----------|
-| Resource name (singular, PascalCase) | Class names: `Product`, `ProductEntity` |
+| Resource name (singular, PascalCase) | Class names: `Product`, `ProductEntity` (model in `models/product.py`) |
 | Resource name (plural, snake_case) | Module segments, table prefixes: `products` |
 | API version string | `v1` → folder `apis/v1/` |
 | URL prefix (no leading slash) | `products` → `APIRouter(prefix="/products")` |
 | OpenAPI tags | Usually same as plural resource |
 | Operations list | `create`, `read`, `update`, `delete`, `list`, custom actions |
-| Use entity layer? | If yes, generate `entities/<segment>/` |
+| Use domain model layer? | If yes, generate `models/<segment>.py` |
 | Persistence style | `memory`, `sqlalchemy`, `stub` — affects repository template |
 | Auth required? | Wire `Depends` / middleware flags in router |
 
@@ -210,12 +208,12 @@ Your generator should collect at least:
 
 For a CRUD resource similar to **Item**, emit roughly:
 
-1. `entities/<segment>/<entity>.py`
+1. `models/<segment>.py` (domain model class, e.g. `Item` in `models/item.py`)
 2. `dtos/requests/<segment>/create.py`, `update.py`, … (+ `__init__.py`) — short leaf names; see [Leaf file naming](#leaf-file-naming-nested-folders)
 3. `dtos/responses/<segment>/` (+ `__init__.py`) — response modules (naming as per segment conventions)
-4. `repositories/<segment>/abstraction.py`, `<segment>_repository.py`, `__init__.py`
+4. `repositories/<segment>.py` — `<Segment>Repository(IRepository)` (add `repositories/<segment>/` + `abstraction.py` only if you need `I<Segment>Repository`)
 5. `services/<segment>/abstraction.py`, `<segment>_service.py`, `__init__.py`
-6. `dependencies/repositories/<segment>/<segment>_repository_dependency.py`, `__init__.py`
+6. `dependencies/repositories/<segment>.py` — `*RepositoryDependency`
 7. `dependencies/services/<Ver>/<segment>/abstraction.py`, `<segment>_service_dependency.py`, `__init__.py`
 8. `controllers/apis/<Ver>/<segment>/<segment>_controller.py`, `__init__.py`
 9. `testing/<segment>/factories.py`, `fixtures.py`, `__init__.py`
@@ -226,14 +224,14 @@ For a CRUD resource similar to **Item**, emit roughly:
 
 - **One primary class per file** for dependencies and services where possible.
 - **Class-based DI**: `SomeDependency.derive` instead of loose module functions (see `dependencies/services/v1/user/fetch.py` and `dependencies/services/v1/item/`).
-- **Layered abstractions**: `I*Repository` / `I*Service` / `I*APIController` under each segment.
-- **Imports**: prefer explicit package paths (`from entities.item.item_entity import ItemEntity`) over deep star imports.
+- **Layered abstractions**: `I*Service` / `I*APIController` under each segment as needed; **repositories** often implement `IRepository` directly (no `I*Repository` unless complexity warrants it).
+- **Imports**: prefer explicit package paths (`from models.item import Item`, `from repositories.item import ItemRepository`) over deep star imports.
 - **Nested leaf paths**: short **module** filenames (`create.py`, `update.py`); **explicit** **class** names (`CreateItemRequestDTO`). See [Leaf file naming](#leaf-file-naming-nested-folders).
 - **One concrete DTO class per file** (nested Pydantic helpers may share a file with their parent). See [One concrete class per file](#one-concrete-class-per-file-dtos).
 
 ## Reference implementation in this repo
 
-- **Item CRUD**: `controllers/apis/v1/item/item_controller.py`, `services/item/`, `repositories/item/`, `entities/item/`, `dtos/requests/item/`, `dtos/responses/item/`, `testing/item/`.
+- **Item CRUD**: `controllers/apis/v1/item/item_controller.py`, `services/item/`, `repositories/item.py`, `models/item.py`, `dtos/requests/item/`, `dtos/responses/item/`, `dependencies/repositories/item.py`, `testing/item/`.
 - **Minimal “example” DTO flow** (separate from Item): `controllers/apis/v1/example/create.py`, `dtos/requests/example/` (`create.py`, `update.py`, `delete.py`, `abstraction.py`), `services/example/`, `repositories/example/`.
 
 Use Item as the **full-stack** template; use `example` as a **thin** DTO + service + repository demo if you need a smaller generated footprint.

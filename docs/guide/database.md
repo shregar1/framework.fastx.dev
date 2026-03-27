@@ -11,6 +11,7 @@ pip install alembic
 ```
 
 The project template includes:
+
 - `alembic.ini` - Alembic configuration
 - `migrations/` - Migration scripts directory
 
@@ -29,11 +30,13 @@ fastmvc db migrate -m "Create indexes" --no-autogenerate
 ```
 
 **Options:**
+
 - `-m, --message` (required): Migration description
 - `--autogenerate/--no-autogenerate`: Auto-generate from models (default: True)
 
 **Output:**
-```
+
+```text
 ✓ Migration created successfully!
 
 Migration file: migrations/versions/20240101_120000_add_users_table.py
@@ -62,10 +65,12 @@ fastmvc db upgrade --revision abc123
 ```
 
 **Options:**
+
 - `-r, --revision`: Target revision (default: head)
 
 **Output:**
-```
+
+```text
 ✓ DataI upgraded successfully!
 
 Previous: None (I)
@@ -104,6 +109,7 @@ fastmvc db reset --seed
 ⚠️ **Danger:** This deletes all data! Requires typing "RESET" to confirm.
 
 **What it does:**
+
 1. Rollback all migrations (drop all tables)
 2. Re-apply all migrations (recreate tables)
 3. Optionally run `_maint/scripts/seed.py` to populate initial data
@@ -117,7 +123,8 @@ fastmvc db status
 ```
 
 **Output:**
-```
+
+```text
 Current: abc1234_add_users_table (head)
 Latest:  abc1234_add_users_table
 
@@ -125,7 +132,8 @@ Status:  ✓ DataI is up to date
 ```
 
 Or if pending migrations exist:
-```
+
+```text
 Current: abc1234_add_users_table
 Latest:  def5678_add_posts_table
 
@@ -147,7 +155,8 @@ fastmvc db history --verbose
 ```
 
 **Output:**
-```
+
+```text
 ▶ abc1234_add_users_table (current) → Add users table
   def5678_add_posts_table → Add posts table
   head
@@ -157,40 +166,56 @@ fastmvc db history --verbose
 
 ### Development Workflow
 
-1. **Modify models** in `entities/<your_domain>/` or your entity files
+1. **Modify domain models** in `models/<your_resource>.py` (or your ORM layer, depending on project conventions)
+
 2. **Generate migration:**
+
    ```bash
    fastmvc db migrate -m "Add email field to users"
    ```
+
 3. **Review the migration file** in `migrations/versions/`
+
 4. **Apply migration:**
+
    ```bash
    fastmvc db upgrade
    ```
+
 5. **Test your changes**
 
 ### Team Workflow
 
 1. Pull latest code with new migrations
+
 2. Check status:
+
    ```bash
    fastmvc db status
    ```
+
 3. Apply migrations:
+
    ```bash
    fastmvc db upgrade
    ```
+
 4. If conflicts occur, consult with team member who created migration
 
 ### Production Deployment
 
 1. **Backup dataI** before running migrations
+
 2. **Test migrations** on staging environment
+
 3. **Run migrations** during deployment:
+
    ```bash
    fastmvc db upgrade
    ```
+
 4. **Verify** with health check:
+
    ```bash
    curl http://localhost:8000/health
    ```
@@ -200,6 +225,7 @@ fastmvc db history --verbose
 ### "Alembic not found"
 
 Install Alembic in your virtual environment:
+
 ```bash
 source .venv/bin/activate
 pip install alembic

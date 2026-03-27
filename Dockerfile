@@ -13,9 +13,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt requirements-dev.txt ./
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Install Python dependencies from pyproject (includes alembic, fastapi, etc.)
+# We copy the full source so pip can resolve the package metadata and dependencies.
+COPY . .
+# Install the `jobs` extra so worker/scheduler containers have Celery installed.
+RUN pip install --no-cache-dir --user '.[jobs]' \
+    && pip install --no-cache-dir --user celery
 
 # Stage 2: Production
 FROM python:3.11-slim

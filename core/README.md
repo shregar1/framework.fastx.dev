@@ -4,11 +4,11 @@
 
 The **`core`** package provides **cross-cutting infrastructure** shared by the whole app: request **context** (URN, user), **logging**, **testing** helpers (factories, mocks, fixtures), **documentation** helpers, **taxonomy** labels, and optional subsystems such as **WebSockets** routing. It sits **below** controllers/services in the sense that features **import** from `core` for shared behavior, not the other way around.
 
-This is not where business rules live—that remains in **`services/`** and **`entities/`**. `core` is for **plumbing** that every layer can rely on.
+This is not where business rules live—that remains in **`services/`** and **`models/`** (domain models). `core` is for **plumbing** that every layer can rely on.
 
 ---
 
-# FastMVC Core Module
+## FastMVC Core Module
 
 Production-grade features for enterprise FastAPI applications.
 
@@ -213,7 +213,7 @@ async def test_payment():
 
 ## 📁 Module Structure
 
-```
+```text
 core/
 ├── __init__.py          # Main exports
 ├── health/              # Health checks
@@ -250,10 +250,11 @@ core/
 
 The core module requires these additional packages:
 
-```
+```text
 cryptography>=41.0.0  # For field encryption
 ```
 
 Optional dependencies for specific features:
+
 - `opentelemetry-*`: For production tracing export
 - `prometheus-client`: Alternative metrics library

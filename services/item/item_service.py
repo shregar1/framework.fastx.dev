@@ -1,10 +1,10 @@
 """Item application service."""
 
-from typing import Any
+from typing import Any, cast
 
 from abstractions.result import Result, failure, success
-from entities.item.item_entity import ItemEntity
-from repositories.item.item_repository import ItemRepository
+from models.item import Item
+from repositories.item import ItemRepository
 from services.item.abstraction import IItemService
 
 
@@ -30,7 +30,7 @@ class ItemService(IItemService):
 
     async def create_item(
         self, name: str, description: str = ""
-    ) -> Result[ItemEntity, Any]:
+    ) -> Result[Item, Any]:
         """Create a new item.
 
         Args:
@@ -47,7 +47,7 @@ class ItemService(IItemService):
                 return failure("Item name is required")
 
             # Create entity
-            item = ItemEntity(
+            item = Item(
                 name=name.strip(),
                 description=description.strip(),
             )
@@ -59,12 +59,14 @@ class ItemService(IItemService):
         except Exception as e:
             return failure(f"Failed to create item: {str(e)}")
 
-    async def create(self, entity: ItemEntity) -> ItemEntity:
+    async def create(self, entity: Item) -> Item:
         """Compatibility wrapper used by tests/legacy service callers."""
-        created = await self._repository.create(entity)
-        return created
+        result = await self._repository.create(entity)
+        if result.is_failure:
+            raise ValueError(str(result.error))
+        return cast(Item, result.value)
 
-    async def get_item(self, item_id: str) -> Result[ItemEntity | None, Any]:
+    async def get_item(self, item_id: str) -> Result[Item | None, Any]:
         """Get item by ID.
 
         Args:
@@ -76,12 +78,14 @@ class ItemService(IItemService):
         """
         return await self._repository.get_by_id(item_id)
 
-    async def get_by_id(self, item_id: str) -> ItemEntity | None:
+    async def get_by_id(self, item_id: str) -> Item | None:
         """Compatibility wrapper used by tests/legacy service callers."""
         result = await self._repository.get_by_id(item_id)
-        return result.value if hasattr(result, "value") else result
+        if result.is_failure:
+            return None
+        return cast(Item | None, result.value)
 
-    async def get_all_items(self) -> Result[list[ItemEntity], Any]:
+    async def get_all_items(self) -> Result[list[Item], Any]:
         """Get all items.
 
         Returns:
@@ -95,7 +99,7 @@ class ItemService(IItemService):
         item_id: str,
         name: str | None = None,
         description: str | None = None,
-    ) -> Result[ItemEntity, Any]:
+    ) -> Result[Item, Any]:
         """Update an item.
 
         Args:
@@ -111,7 +115,10 @@ class ItemService(IItemService):
             # Get existing
             get_result = await self._repository.get_by_id(item_id)
             if get_result.is_failure:
-                return get_result
+                return cast(
+                    Result[Item, Any],
+                    failure(get_result.error),
+                )
 
             item = get_result.value
             if item is None:
@@ -142,7 +149,7 @@ class ItemService(IItemService):
         """
         return await self._repository.delete(item_id)
 
-    async def complete_item(self, item_id: str) -> Result[ItemEntity, Any]:
+    async def complete_item(self, item_id: str) -> Result[Item, Any]:
         """Mark item as completed.
 
         Args:
@@ -155,7 +162,10 @@ class ItemService(IItemService):
         try:
             get_result = await self._repository.get_by_id(item_id)
             if get_result.is_failure:
-                return get_result
+                return cast(
+                    Result[Item, Any],
+                    failure(get_result.error),
+                )
 
             item = get_result.value
             if item is None:
@@ -166,7 +176,7 @@ class ItemService(IItemService):
         except Exception as e:
             return failure(f"Failed to complete item: {str(e)}")
 
-    async def uncomplete_item(self, item_id: str) -> Result[ItemEntity, Any]:
+    async def uncomplete_item(self, item_id: str) -> Result[Item, Any]:
         """Mark item as not completed.
 
         Args:
@@ -179,7 +189,10 @@ class ItemService(IItemService):
         try:
             get_result = await self._repository.get_by_id(item_id)
             if get_result.is_failure:
-                return get_result
+                return cast(
+                    Result[Item, Any],
+                    failure(get_result.error),
+                )
 
             item = get_result.value
             if item is None:
@@ -190,7 +203,7 @@ class ItemService(IItemService):
         except Exception as e:
             return failure(f"Failed to uncomplete item: {str(e)}")
 
-    async def toggle_item(self, item_id: str) -> Result[ItemEntity, Any]:
+    async def toggle_item(self, item_id: str) -> Result[Item, Any]:
         """Toggle item completion status.
 
         Args:
@@ -203,7 +216,10 @@ class ItemService(IItemService):
         try:
             get_result = await self._repository.get_by_id(item_id)
             if get_result.is_failure:
-                return get_result
+                return cast(
+                    Result[Item, Any],
+                    failure(get_result.error),
+                )
 
             item = get_result.value
             if item is None:
@@ -216,7 +232,7 @@ class ItemService(IItemService):
 
     # Query Operations
 
-    async def search_items(self, query: str) -> Result[list[ItemEntity], Any]:
+    async def search_items(self, query: str) -> Result[list[Item], Any]:
         """Search items by name.
 
         Args:
@@ -230,7 +246,7 @@ class ItemService(IItemService):
             return await self._repository.get_all()
         return await self._repository.find_by_name(query)
 
-    async def get_completed_items(self) -> Result[list[ItemEntity], Any]:
+    async def get_completed_items(self) -> Result[list[Item], Any]:
         """Get all completed items.
 
         Returns:
@@ -239,7 +255,7 @@ class ItemService(IItemService):
         """
         return await self._repository.find_completed()
 
-    async def get_pending_items(self) -> Result[list[ItemEntity], Any]:
+    async def get_pending_items(self) -> Result[list[Item], Any]:
         """Get all pending items.
 
         Returns:
@@ -248,7 +264,7 @@ class ItemService(IItemService):
         """
         return await self._repository.find_pending()
 
-    async def get_statistics(self) -> Result[dict, Any]:
+    async def get_statistics(self) -> Result[dict[str, Any], Any]:
         """Get item statistics.
 
         Returns:
@@ -258,7 +274,10 @@ class ItemService(IItemService):
         try:
             all_result = await self._repository.get_all()
             if all_result.is_failure:
-                return all_result
+                return cast(
+                    Result[dict[str, Any], Any],
+                    failure(all_result.error),
+                )
 
             items = all_result.value
             completed = sum(1 for item in items if item.completed)
@@ -287,7 +306,10 @@ class ItemService(IItemService):
         try:
             pending_result = await self._repository.find_pending()
             if pending_result.is_failure:
-                return pending_result
+                return cast(
+                    Result[int, Any],
+                    failure(pending_result.error),
+                )
 
             pending = pending_result.value
             count = 0

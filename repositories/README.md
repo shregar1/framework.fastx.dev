@@ -17,16 +17,19 @@ Repositories are the **only** place that should know about persistence details (
 
 ## Layout (conceptual)
 
-```
+```text
 repositories/
 ├── abstraction.py            # App-level repository base (extends framework IRepository)
+├── item.py                   # Example: ItemRepository(IRepository) — one file per resource model
 ├── example/                  # Example/stub domain (abstraction.py, example_repository.py)
 └── user/                     # Feature-specific repositories (e.g. user/fetch)
 ```
 
+For a simple resource, use a **single module** per model (e.g. `item.py`, `product.py`) whose repository class inherits **`IRepository`** directly. Reserve a subfolder + `abstraction.py` only when you need a dedicated `I*Repository` interface.
+
 ## How it fits in the stack
 
-```
+```text
 Controller → Service → Repository → Database (SQLAlchemy / fast_database)
 ```
 
