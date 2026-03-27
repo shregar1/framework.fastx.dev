@@ -1,5 +1,4 @@
-"""
-Middleware package.
+"""Middleware package.
 
 Exports app-specific JWT authentication wired to ``fast_middleware``.
 

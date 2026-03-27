@@ -1,5 +1,4 @@
-"""
-Basic WebSocket support for FastMVC.
+"""Basic WebSocket support for FastMVC.
 
 Provides:
 - An echo endpoint at `/ws/echo` for quick testing
@@ -32,8 +31,7 @@ async def _stream_frames(
     snapshot_serializer: callable,
     update_serializer: callable,
 ) -> None:
-    """
-    Helper to stream snapshot + update frames over a WebSocket.
+    """Helper to stream snapshot + update frames over a WebSocket.
 
     Expects the generator to yield (frame_type, payload) tuples where
     frame_type is "snapshot" or "update".
@@ -51,9 +49,7 @@ async def _stream_frames(
 
 @router.websocket("/ws/echo")
 async def websocket_echo(ws: WebSocket) -> None:
-    """
-    Simple echo WebSocket endpoint for smoke testing.
-    """
+    """Simple echo WebSocket endpoint for smoke testing."""
     await ws.accept()
     try:
         while True:
@@ -65,8 +61,7 @@ async def websocket_echo(ws: WebSocket) -> None:
 
 @router.websocket("/ws/rooms/{room_id}")
 async def websocket_room(ws: WebSocket, room_id: str) -> None:
-    """
-    Basic room WebSocket endpoint.
+    """Basic room WebSocket endpoint.
 
     The client should send an initial JSON message like:
         {"type": "join", "userId": "user-123"}
@@ -118,8 +113,7 @@ async def websocket_room(ws: WebSocket, room_id: str) -> None:
 
 @router.websocket("/ws/market/{symbol}")
 async def websocket_market(ws: WebSocket, symbol: str) -> None:
-    """
-    Low-latency market data feed for a given symbol.
+    """Low-latency market data feed for a given symbol.
 
     Sends an initial snapshot frame:
         {"type": "snapshot", "ticks": [...]}
@@ -130,6 +124,14 @@ async def websocket_market(ws: WebSocket, symbol: str) -> None:
     hub = _market_hub
 
     def snapshot_serializer(payload: Any) -> Dict[str, Any]:
+        """Execute snapshot_serializer operation.
+
+        Args:
+            payload: The payload parameter.
+
+        Returns:
+            The result of the operation.
+        """
         ticks = [
             {
                 "symbol": t.symbol,
@@ -143,6 +145,14 @@ async def websocket_market(ws: WebSocket, symbol: str) -> None:
         return {"type": "snapshot", "symbol": symbol, "ticks": ticks}
 
     def update_serializer(payload: Any) -> Dict[str, Any]:
+        """Execute update_serializer operation.
+
+        Args:
+            payload: The payload parameter.
+
+        Returns:
+            The result of the operation.
+        """
         t: Tick = payload
         return {
             "type": "update",
@@ -155,13 +165,14 @@ async def websocket_market(ws: WebSocket, symbol: str) -> None:
             },
         }
 
-    await _stream_frames(ws, hub.subscribe_ticks(symbol), snapshot_serializer, update_serializer)
+    await _stream_frames(
+        ws, hub.subscribe_ticks(symbol), snapshot_serializer, update_serializer
+    )
 
 
 @router.websocket("/ws/orders/{tenant_id}")
 async def websocket_orders(ws: WebSocket, tenant_id: str) -> None:
-    """
-    Stream order/position events per tenant.
+    """Stream order/position events per tenant.
 
     Snapshot:
         {"type": "snapshot", "orders": [...]}
@@ -171,6 +182,14 @@ async def websocket_orders(ws: WebSocket, tenant_id: str) -> None:
     hub = _market_hub
 
     def snapshot_serializer(payload: Any) -> Dict[str, Any]:
+        """Execute snapshot_serializer operation.
+
+        Args:
+            payload: The payload parameter.
+
+        Returns:
+            The result of the operation.
+        """
         orders = [
             {
                 "tenantId": o.tenant_id,
@@ -186,6 +205,14 @@ async def websocket_orders(ws: WebSocket, tenant_id: str) -> None:
         return {"type": "snapshot", "tenantId": tenant_id, "orders": orders}
 
     def update_serializer(payload: Any) -> Dict[str, Any]:
+        """Execute update_serializer operation.
+
+        Args:
+            payload: The payload parameter.
+
+        Returns:
+            The result of the operation.
+        """
         o: OrderEvent = payload
         return {
             "type": "update",
@@ -200,8 +227,9 @@ async def websocket_orders(ws: WebSocket, tenant_id: str) -> None:
             },
         }
 
-    await _stream_frames(ws, hub.subscribe_orders(tenant_id), snapshot_serializer, update_serializer)
+    await _stream_frames(
+        ws, hub.subscribe_orders(tenant_id), snapshot_serializer, update_serializer
+    )
 
 
 __all__ = ["router"]
-

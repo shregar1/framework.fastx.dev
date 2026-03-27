@@ -1,5 +1,4 @@
-"""
-Error Abstraction Module.
+"""Error Abstraction Module.
 
 This module defines the base error class that all custom application errors
 should inherit from. It provides structured error handling with request
@@ -11,6 +10,7 @@ Example:
     ...         super().__init__(urn=urn)
     ...         self.resource = resource
     ...         self.message = f"{resource} not found"
+
 """
 
 from typing import Any
@@ -21,8 +21,7 @@ from core.utils.context import ContextMixin
 
 
 class IError(Exception, ContextMixin):
-    """
-    Base exception class for all application-specific errors.
+    """Base exception class for all application-specific errors.
 
     The IError class provides a standardized error interface with built-in
     support for request context tracking and structured logging. All custom
@@ -48,6 +47,7 @@ class IError(Exception, ContextMixin):
         ...         self.message = message
         ...
         >>> raise ValidationError("email", "Invalid format", urn="req-123")
+
     """
 
     def __init__(
@@ -58,8 +58,7 @@ class IError(Exception, ContextMixin):
         user_id: str | None = None,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize the error with request context.
+        """Initialize the error with request context.
 
         Args:
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
@@ -67,6 +66,7 @@ class IError(Exception, ContextMixin):
             api_name (str, optional): Name of the API endpoint. Defaults to None.
             user_id (str, optional): Database ID of the user. Defaults to None.
             **kwargs: Additional arguments for parent classes.
+
         """
         # Initialize Exception without arguments
         super(Exception, self).__init__()
@@ -78,5 +78,5 @@ class IError(Exception, ContextMixin):
             api_name=api_name,
             user_id=user_id,
             logger=logger,
-            **kwargs
+            **kwargs,
         )

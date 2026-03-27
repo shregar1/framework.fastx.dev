@@ -1,5 +1,4 @@
-"""
-Logical layout of the ``pyfastmvc`` application tree (aligned with ``fast_platform.taxonomy``).
+"""Logical layout of the ``pyfastmvc`` application tree (aligned with ``fast_platform.taxonomy``).
 
 The framework uses familiar top-level folders:
 
@@ -29,6 +28,8 @@ __all__ = ["MvcSection", "FOLDER_TO_SECTION"]
 
 
 class MvcSection(str, Enum):
+    """Represents the MvcSection class."""
+
     CORE = "core"
     ABSTRACTIONS = "abstractions"
     CONTROLLERS = "controllers"

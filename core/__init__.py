@@ -1,5 +1,4 @@
-"""
-Application core integration layer (FastAPI wiring, optional services).
+"""Application core integration layer (FastAPI wiring, optional services).
 
 This module provides re-exports for optional fast_platform services.
 Each import is wrapped in try/except to allow the core to work without
@@ -8,7 +7,7 @@ the optional dependencies.
 Usage:
     # Core only (no optional dependencies)
     from core import app
-    
+
     # With optional services (requires fast-platform)
     from core import CircuitBreaker, Metrics
 """

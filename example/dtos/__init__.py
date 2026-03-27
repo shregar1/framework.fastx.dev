@@ -9,7 +9,7 @@ from example.dtos.item_dtos import (
 
 __all__ = [
     "CreateItemRequest",
-    "UpdateItemRequest", 
+    "UpdateItemRequest",
     "ItemResponse",
     "ItemListResponse",
 ]

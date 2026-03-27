@@ -1,5 +1,4 @@
-"""
-Database table name constants.
+"""Database table name constants.
 
 Re-exports Table from fast_db for backward compatibility.
 

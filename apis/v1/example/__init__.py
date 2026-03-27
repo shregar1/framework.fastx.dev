@@ -1,6 +1,4 @@
-"""
-V1 API Examples Router.
-"""
+"""V1 API Examples Router."""
 
 from fastapi import APIRouter
 from apis.v1.example.get import GetExampleController

@@ -1,5 +1,4 @@
-"""
-Example service dependencies.
+"""Example service dependencies.
 
 Demonstrates FastMVC dependency injection patterns.
 """
@@ -18,11 +17,11 @@ _item_service: ItemService | None = None
 
 
 def get_item_repository() -> ItemRepository:
-    """
-    Get or create item repository singleton.
-    
+    """Get or create item repository singleton.
+
     Returns:
         ItemRepository instance
+
     """
     global _item_repository
     if _item_repository is None:
@@ -31,11 +30,11 @@ def get_item_repository() -> ItemRepository:
 
 
 def get_item_service() -> ItemService:
-    """
-    Get or create item service singleton.
-    
+    """Get or create item service singleton.
+
     Returns:
         ItemService instance
+
     """
     global _item_service
     if _item_service is None:

@@ -1,5 +1,4 @@
-"""
-Core utilities for FastMVC.
+"""Core utilities for FastMVC.
 
 This module provides utility classes and helpers used throughout
 the FastMVC framework.

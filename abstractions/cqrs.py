@@ -1,5 +1,4 @@
-"""
-Command Query Responsibility Segregation (CQRS) Pattern.
+"""Command Query Responsibility Segregation (CQRS) Pattern.
 
 Separates read (query) and write (command) operations
 for better scalability and optimization.
@@ -27,8 +26,7 @@ TResult = TypeVar("TResult")
 
 @dataclass
 class ICommand:
-    """
-    Base command interface.
+    """Base command interface.
 
     Commands represent intent to change system state.
     They should be named in imperative form (CreateUser, UpdateOrder).
@@ -47,8 +45,7 @@ class ICommand:
 
 @dataclass
 class IQuery(Generic[TResult]):
-    """
-    Base query interface.
+    """Base query interface.
 
     Queries represent requests for data.
     They should be named as questions (GetUserById, ListActiveOrders).
@@ -68,8 +65,7 @@ class IQuery(Generic[TResult]):
 
 
 class ICommandHandler(ABC, Generic[TCommand]):
-    """
-    Command handler interface.
+    """Command handler interface.
 
     Processes a specific command type and modifies system state.
 
@@ -83,21 +79,20 @@ class ICommandHandler(ABC, Generic[TCommand]):
 
     @abstractmethod
     async def handle(self, command: TCommand) -> Any:
-        """
-        Handle the command.
+        """Handle the command.
 
         Args:
             command: Command to process.
 
         Returns:
             Result of command execution.
+
         """
         pass
 
 
 class IQueryHandler(ABC, Generic[TQuery, TResult]):
-    """
-    Query handler interface.
+    """Query handler interface.
 
     Processes a specific query type and returns data.
 
@@ -109,21 +104,20 @@ class IQueryHandler(ABC, Generic[TQuery, TResult]):
 
     @abstractmethod
     async def handle(self, query: TQuery) -> TResult:
-        """
-        Handle the query.
+        """Handle the query.
 
         Args:
             query: Query to process.
 
         Returns:
             Query result.
+
         """
         pass
 
 
 class CommandBus:
-    """
-    Command dispatcher/bus.
+    """Command dispatcher/bus.
 
     Routes commands to their appropriate handlers.
 
@@ -138,6 +132,7 @@ class CommandBus:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._handlers: Dict[Type[ICommand], ICommandHandler] = {}
         self._middlewares: List[Callable] = []
 
@@ -154,8 +149,7 @@ class CommandBus:
         self._middlewares.append(middleware)
 
     async def dispatch(self, command: ICommand) -> Any:
-        """
-        Dispatch a command to its handler.
+        """Dispatch a command to its handler.
 
         Args:
             command: Command to dispatch.
@@ -165,6 +159,7 @@ class CommandBus:
 
         Raises:
             ValueError: If no handler is registered.
+
         """
         handler = self._handlers.get(type(command))
         if handler is None:
@@ -172,6 +167,11 @@ class CommandBus:
 
         # Apply middlewares
         async def execute():
+            """Execute execute operation.
+
+            Returns:
+                The result of the operation.
+            """
             return await handler.handle(command)
 
         result = execute
@@ -182,8 +182,7 @@ class CommandBus:
 
 
 class QueryBus:
-    """
-    Query dispatcher/bus.
+    """Query dispatcher/bus.
 
     Routes queries to their appropriate handlers.
 
@@ -195,6 +194,7 @@ class QueryBus:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._handlers: Dict[Type[IQuery], IQueryHandler] = {}
         self._middlewares: List[Callable] = []
 
@@ -211,8 +211,7 @@ class QueryBus:
         self._middlewares.append(middleware)
 
     async def dispatch(self, query: IQuery[TResult]) -> TResult:
-        """
-        Dispatch a query to its handler.
+        """Dispatch a query to its handler.
 
         Args:
             query: Query to dispatch.
@@ -222,6 +221,7 @@ class QueryBus:
 
         Raises:
             ValueError: If no handler is registered.
+
         """
         handler = self._handlers.get(type(query))
         if handler is None:
@@ -229,6 +229,11 @@ class QueryBus:
 
         # Apply middlewares
         async def execute():
+            """Execute execute operation.
+
+            Returns:
+                The result of the operation.
+            """
             return await handler.handle(query)
 
         result = execute
@@ -239,8 +244,7 @@ class QueryBus:
 
 
 class Mediator:
-    """
-    Combined mediator for commands and queries.
+    """Combined mediator for commands and queries.
 
     Provides a unified interface for dispatching both.
 
@@ -257,6 +261,7 @@ class Mediator:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._command_bus = CommandBus()
         self._query_bus = QueryBus()
 
@@ -277,14 +282,14 @@ class Mediator:
         self._query_bus.register(query_type, handler)
 
     async def send(self, message: Any) -> Any:
-        """
-        Send a command or query.
+        """Send a command or query.
 
         Args:
             message: Command or query to dispatch.
 
         Returns:
             Result from handler.
+
         """
         if isinstance(message, ICommand):
             return await self._command_bus.dispatch(message)

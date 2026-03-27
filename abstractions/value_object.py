@@ -1,5 +1,4 @@
-"""
-Value Object Pattern.
+"""Value Object Pattern.
 
 Immutable objects that are defined by their attributes,
 not by an identity. Used for domain modeling.
@@ -25,8 +24,7 @@ T = TypeVar("T")
 
 
 class ValueObject(ABC, Generic[T]):
-    """
-    Abstract base class for value objects.
+    r"""Abstract base class for value objects.
 
     Value objects are immutable and compared by value, not identity.
 
@@ -52,18 +50,30 @@ class ValueObject(ABC, Generic[T]):
         pass
 
     def __eq__(self, other: Any) -> bool:
+        """Execute __eq__ operation.
+
+        Args:
+            other: The other parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if not isinstance(other, self.__class__):
             return False
         return self.value == other.value
 
     def __hash__(self) -> int:
+        """Execute __hash__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return hash(self.value)
 
 
 @dataclass(frozen=True)
 class Email:
-    """
-    Email value object with validation.
+    """Email value object with validation.
 
     Usage:
         email = Email("user@example.com")
@@ -74,10 +84,20 @@ class Email:
     address: str
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         if not self._is_valid():
             raise ValueError(f"Invalid email address: {self.address}")
 
     def _is_valid(self) -> bool:
+        """Execute _is_valid operation.
+
+        Returns:
+            The result of the operation.
+        """
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return bool(re.match(pattern, self.address))
 
@@ -92,13 +112,17 @@ class Email:
         return self.address.split("@")[1]
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self.address
 
 
 @dataclass(frozen=True)
 class Money:
-    """
-    Money value object with currency support.
+    """Money value object with currency support.
 
     Usage:
         price = Money(Decimal("99.99"), "USD")
@@ -110,24 +134,63 @@ class Money:
     currency: str = "USD"
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         # Ensure amount is Decimal
         if not isinstance(self.amount, Decimal):
             object.__setattr__(self, "amount", Decimal(str(self.amount)))
 
     def __add__(self, other: "Money") -> "Money":
+        """Execute __add__ operation.
+
+        Args:
+            other: The other parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if other.currency != self.currency:
-            raise ValueError(f"Cannot add different currencies: {self.currency} and {other.currency}")
+            raise ValueError(
+                f"Cannot add different currencies: {self.currency} and {other.currency}"
+            )
         return Money(self.amount + other.amount, self.currency)
 
     def __sub__(self, other: "Money") -> "Money":
+        """Execute __sub__ operation.
+
+        Args:
+            other: The other parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if other.currency != self.currency:
             raise ValueError(f"Cannot subtract different currencies")
         return Money(self.amount - other.amount, self.currency)
 
     def __mul__(self, factor: Decimal) -> "Money":
+        """Execute __mul__ operation.
+
+        Args:
+            factor: The factor parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Money(self.amount * Decimal(str(factor)), self.currency)
 
     def __truediv__(self, divisor: Decimal) -> "Money":
+        """Execute __truediv__ operation.
+
+        Args:
+            divisor: The divisor parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Money(self.amount / Decimal(str(divisor)), self.currency)
 
     def round(self, places: int = 2) -> "Money":
@@ -136,24 +199,43 @@ class Money:
 
     @property
     def is_positive(self) -> bool:
+        """Execute is_positive operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self.amount > 0
 
     @property
     def is_negative(self) -> bool:
+        """Execute is_negative operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self.amount < 0
 
     @property
     def is_zero(self) -> bool:
+        """Execute is_zero operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self.amount == 0
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return f"{self.currency} {self.amount:.2f}"
 
 
 @dataclass(frozen=True)
 class PhoneNumber:
-    """
-    Phone number value object.
+    """Phone number value object.
 
     Usage:
         phone = PhoneNumber("+1", "555", "1234567")
@@ -165,6 +247,11 @@ class PhoneNumber:
     number: str
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         # Validate
         if not self.country_code.startswith("+"):
             object.__setattr__(self, "country_code", f"+{self.country_code}")
@@ -172,6 +259,11 @@ class PhoneNumber:
             raise ValueError(f"Invalid phone number")
 
     def _is_valid(self) -> bool:
+        """Execute _is_valid operation.
+
+        Returns:
+            The result of the operation.
+        """
         return (
             len(self.area_code) >= 2
             and len(self.number) >= 6
@@ -185,13 +277,17 @@ class PhoneNumber:
         return f"{self.country_code} ({self.area_code}) {self.number[:3]}-{self.number[3:]}"
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self.formatted
 
 
 @dataclass(frozen=True)
 class Address:
-    """
-    Address value object.
+    """Address value object.
 
     Usage:
         address = Address(
@@ -221,13 +317,17 @@ class Address:
         return "\n".join(parts)
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return f"{self.street}, {self.city}, {self.state} {self.postal_code}"
 
 
 @dataclass(frozen=True)
 class DateRange:
-    """
-    Date range value object.
+    """Date range value object.
 
     Usage:
         range = DateRange(start=date(2024, 1, 1), end=date(2024, 12, 31))
@@ -241,10 +341,23 @@ class DateRange:
     end: date_type
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         if self.start > self.end:
             raise ValueError("Start date must be before end date")
 
     def __contains__(self, date: date_type) -> bool:
+        """Execute __contains__ operation.
+
+        Args:
+            date: The date parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self.start <= date <= self.end
 
     @property
@@ -259,8 +372,7 @@ class DateRange:
 
 @dataclass(frozen=True)
 class Percentage:
-    """
-    Percentage value object.
+    """Percentage value object.
 
     Usage:
         discount = Percentage(15)  # 15%
@@ -271,6 +383,11 @@ class Percentage:
     value: float
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         if not 0 <= self.value <= 100:
             raise ValueError(f"Percentage must be between 0 and 100: {self.value}")
 
@@ -289,13 +406,17 @@ class Percentage:
         return amount * self.as_decimal
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return f"{self.value}%"
 
 
 @dataclass(frozen=True)
 class Slug:
-    """
-    URL-safe slug value object.
+    """URL-safe slug value object.
 
     Usage:
         slug = Slug.from_text("Hello World!")
@@ -315,4 +436,9 @@ class Slug:
         return cls(slug)
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self.value

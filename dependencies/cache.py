@@ -1,5 +1,4 @@
-"""
-Cache Dependency Module.
+"""Cache Dependency Module.
 
 This module provides FastAPI dependency injection for Redis cache sessions.
 It enables controllers to access the shared Redis connection pool.
@@ -18,8 +17,7 @@ from start_utils import logger, redis_session
 
 
 class CacheDependency:
-    """
-    FastAPI dependency provider for Redis cache sessions.
+    """FastAPI dependency provider for Redis cache sessions.
 
     This class provides a static method that returns the shared Redis
     session instance for use in FastAPI dependency injection.
@@ -41,12 +39,12 @@ class CacheDependency:
     Note:
         The Redis session is a connection pool, so it's safe to use
         across multiple concurrent requests.
+
     """
 
     @staticmethod
     def derive() -> Redis:
-        """
-        Provide the shared Redis session instance.
+        """Provide the shared Redis session instance.
 
         This method is designed to be used with FastAPI's Depends()
         for dependency injection.
@@ -58,6 +56,7 @@ class CacheDependency:
             >>> cache = CacheDependency.derive()
             >>> cache.set("user:123", '{"name": "John"}', ex=3600)
             >>> cache.get("user:123")
+
         """
         logger.debug("CacheDependency: returning redis_session instance")
         return redis_session

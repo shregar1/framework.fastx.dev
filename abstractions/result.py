@@ -1,5 +1,4 @@
-"""
-Result/Either Pattern.
+"""Result/Either Pattern.
 
 Provides explicit error handling without exceptions,
 making success/failure paths visible in type signatures.
@@ -25,8 +24,7 @@ U = TypeVar("U")  # Mapped type
 
 
 class Result(ABC, Generic[T, E]):
-    """
-    Result type representing either success or failure.
+    """Result type representing either success or failure.
 
     Usage:
         def divide(a: int, b: int) -> Result[float, str]:
@@ -113,29 +111,81 @@ class Success(Result[T, E]):
 
     @property
     def is_success(self) -> bool:
+        """Execute is_success operation.
+
+        Returns:
+            The result of the operation.
+        """
         return True
 
     @property
     def value(self) -> T:
+        """Execute value operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._value
 
     @property
     def error(self) -> E:
+        """Execute error operation.
+
+        Returns:
+            The result of the operation.
+        """
         raise ValueError("Cannot get error from Success")
 
     def map(self, func: Callable[[T], U]) -> Result[U, E]:
+        """Execute map operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Success(func(self._value))
 
     def map_error(self, func: Callable[[E], U]) -> Result[T, U]:
+        """Execute map_error operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Success(self._value)
 
     def flat_map(self, func: Callable[[T], Result[U, E]]) -> Result[U, E]:
+        """Execute flat_map operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return func(self._value)
 
     def get_or_else(self, default: T) -> T:
+        """Execute get_or_else operation.
+
+        Args:
+            default: The default parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._value
 
     def get_or_raise(self) -> T:
+        """Execute get_or_raise operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._value
 
 
@@ -147,29 +197,81 @@ class Failure(Result[T, E]):
 
     @property
     def is_success(self) -> bool:
+        """Execute is_success operation.
+
+        Returns:
+            The result of the operation.
+        """
         return False
 
     @property
     def value(self) -> T:
+        """Execute value operation.
+
+        Returns:
+            The result of the operation.
+        """
         raise ValueError(f"Cannot get value from Failure: {self._error}")
 
     @property
     def error(self) -> E:
+        """Execute error operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._error
 
     def map(self, func: Callable[[T], U]) -> Result[U, E]:
+        """Execute map operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Failure(self._error)
 
     def map_error(self, func: Callable[[E], U]) -> Result[T, U]:
+        """Execute map_error operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Failure(func(self._error))
 
     def flat_map(self, func: Callable[[T], Result[U, E]]) -> Result[U, E]:
+        """Execute flat_map operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return Failure(self._error)
 
     def get_or_else(self, default: T) -> T:
+        """Execute get_or_else operation.
+
+        Args:
+            default: The default parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return default
 
     def get_or_raise(self) -> T:
+        """Execute get_or_raise operation.
+
+        Returns:
+            The result of the operation.
+        """
         if isinstance(self._error, Exception):
             raise self._error
         raise ValueError(str(self._error))
@@ -187,8 +289,7 @@ def failure(error: E) -> Result[Any, E]:
 
 
 def try_catch(func: Callable[[], T]) -> Result[T, Exception]:
-    """
-    Execute a function and catch exceptions as Result.
+    """Execute a function and catch exceptions as Result.
 
     Usage:
         result = try_catch(lambda: risky_operation())
@@ -203,6 +304,7 @@ async def try_catch_async(func: Callable[[], T]) -> Result[T, Exception]:
     """Async version of try_catch."""
     try:
         import asyncio
+
         if asyncio.iscoroutinefunction(func):
             return Success(await func())
         return Success(func())
@@ -211,8 +313,7 @@ async def try_catch_async(func: Callable[[], T]) -> Result[T, Exception]:
 
 
 class ValidationResult(Generic[T]):
-    """
-    Result type for validation with multiple errors.
+    """Result type for validation with multiple errors.
 
     Usage:
         def validate_user(data: dict) -> ValidationResult[User]:
@@ -232,32 +333,77 @@ class ValidationResult(Generic[T]):
         value: Optional[T] = None,
         errors: Optional[List[str]] = None,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            value: The value parameter.
+            errors: The errors parameter.
+        """
         self._value = value
         self._errors = errors or []
 
     @property
     def is_valid(self) -> bool:
+        """Execute is_valid operation.
+
+        Returns:
+            The result of the operation.
+        """
         return len(self._errors) == 0
 
     @property
     def value(self) -> T:
+        """Execute value operation.
+
+        Returns:
+            The result of the operation.
+        """
         if not self.is_valid:
             raise ValueError(f"Validation failed: {self._errors}")
         return self._value  # type: ignore
 
     @property
     def errors(self) -> List[str]:
+        """Execute errors operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._errors
 
     @classmethod
     def valid(cls, value: T) -> "ValidationResult[T]":
+        """Execute valid operation.
+
+        Args:
+            value: The value parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return cls(value=value)
 
     @classmethod
     def invalid(cls, errors: List[str]) -> "ValidationResult[T]":
+        """Execute invalid operation.
+
+        Args:
+            errors: The errors parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return cls(errors=errors)
 
     def map(self, func: Callable[[T], U]) -> "ValidationResult[U]":
+        """Execute map operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if self.is_valid:
             return ValidationResult.valid(func(self._value))  # type: ignore
         return ValidationResult.invalid(self._errors)
@@ -272,8 +418,7 @@ class ValidationResult(Generic[T]):
 
 @dataclass
 class Error:
-    """
-    Structured error for Result pattern.
+    """Structured error for Result pattern.
 
     Usage:
         def process() -> Result[Data, Error]:
@@ -290,4 +435,9 @@ class Error:
     details: Optional[dict] = None
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return f"[{self.code}] {self.message}"

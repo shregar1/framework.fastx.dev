@@ -1,5 +1,4 @@
-"""
-API Status Constants Module.
+"""API Status Constants Module.
 
 This module defines status constants for API responses. These standardized
 status values ensure consistent response formatting across all endpoints.
@@ -13,8 +12,7 @@ from typing import Final
 
 
 class APIStatus:
-    """
-    Standardized status values for API responses.
+    """Standardized status values for API responses.
 
     These constants provide consistent status indicators for API responses,
     making it easier for clients to parse and handle different response states.
@@ -46,6 +44,7 @@ class APIStatus:
         These status values are distinct from HTTP status codes. HTTP codes
         indicate transport-level success/failure, while these indicate
         business-logic success/failure.
+
     """
 
     SUCCESS: Final[str] = "SUCCESS"

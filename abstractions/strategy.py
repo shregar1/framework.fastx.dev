@@ -1,5 +1,4 @@
-"""
-Strategy Pattern.
+"""Strategy Pattern.
 
 Defines a family of algorithms, encapsulates each one,
 and makes them interchangeable at runtime.
@@ -23,8 +22,7 @@ TOutput = TypeVar("TOutput")
 
 
 class IStrategy(ABC, Generic[TInput, TOutput]):
-    """
-    Abstract strategy interface.
+    """Abstract strategy interface.
 
     Usage:
         class PaymentStrategy(IStrategy[Order, PaymentResult]):
@@ -43,14 +41,14 @@ class IStrategy(ABC, Generic[TInput, TOutput]):
 
     @abstractmethod
     def execute(self, input: TInput) -> TOutput:
-        """
-        Execute the strategy.
+        """Execute the strategy.
 
         Args:
             input: Input data for the strategy.
 
         Returns:
             Strategy result.
+
         """
         pass
 
@@ -65,8 +63,7 @@ class IAsyncStrategy(ABC, Generic[TInput, TOutput]):
 
 
 class StrategyContext(Generic[TInput, TOutput]):
-    """
-    Context for executing strategies.
+    """Context for executing strategies.
 
     Usage:
         context = StrategyContext()
@@ -79,6 +76,11 @@ class StrategyContext(Generic[TInput, TOutput]):
     """
 
     def __init__(self, strategy: Optional[IStrategy[TInput, TOutput]] = None):
+        """Execute __init__ operation.
+
+        Args:
+            strategy: The strategy parameter.
+        """
         self._strategy = strategy
 
     def set_strategy(self, strategy: IStrategy[TInput, TOutput]) -> None:
@@ -93,8 +95,7 @@ class StrategyContext(Generic[TInput, TOutput]):
 
 
 class StrategyRegistry(Generic[TInput, TOutput]):
-    """
-    Registry for named strategies.
+    """Registry for named strategies.
 
     Usage:
         registry = StrategyRegistry()
@@ -111,6 +112,7 @@ class StrategyRegistry(Generic[TInput, TOutput]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._strategies: Dict[str, IStrategy[TInput, TOutput]] = {}
         self._default: Optional[str] = None
 
@@ -148,8 +150,7 @@ class StrategyRegistry(Generic[TInput, TOutput]):
 
 
 class ConditionalStrategy(IStrategy[TInput, TOutput]):
-    """
-    Strategy that selects based on conditions.
+    """Strategy that selects based on conditions.
 
     Usage:
         strategy = ConditionalStrategy()
@@ -161,6 +162,7 @@ class ConditionalStrategy(IStrategy[TInput, TOutput]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._conditions: list = []
         self._default: Optional[IStrategy[TInput, TOutput]] = None
 
@@ -194,8 +196,7 @@ class ConditionalStrategy(IStrategy[TInput, TOutput]):
 
 
 class CompositeStrategy(IStrategy[TInput, list]):
-    """
-    Executes multiple strategies and combines results.
+    """Executes multiple strategies and combines results.
 
     Usage:
         composite = CompositeStrategy([
@@ -208,6 +209,11 @@ class CompositeStrategy(IStrategy[TInput, list]):
     """
 
     def __init__(self, strategies: list):
+        """Execute __init__ operation.
+
+        Args:
+            strategies: The strategies parameter.
+        """
         self._strategies = strategies
 
     def execute(self, input: TInput) -> list:
@@ -216,8 +222,7 @@ class CompositeStrategy(IStrategy[TInput, list]):
 
 
 class FallbackStrategy(IStrategy[TInput, TOutput]):
-    """
-    Tries strategies in order until one succeeds.
+    """Tries strategies in order until one succeeds.
 
     Usage:
         strategy = FallbackStrategy([
@@ -234,6 +239,12 @@ class FallbackStrategy(IStrategy[TInput, TOutput]):
         strategies: list,
         error_handler: Optional[Callable[[Exception], None]] = None,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            strategies: The strategies parameter.
+            error_handler: The error_handler parameter.
+        """
         self._strategies = strategies
         self._error_handler = error_handler
 
@@ -254,8 +265,7 @@ class FallbackStrategy(IStrategy[TInput, TOutput]):
 
 
 class LambdaStrategy(IStrategy[TInput, TOutput]):
-    """
-    Strategy from a lambda function.
+    """Strategy from a lambda function.
 
     Usage:
         strategy = LambdaStrategy(lambda x: x * 2)
@@ -263,15 +273,27 @@ class LambdaStrategy(IStrategy[TInput, TOutput]):
     """
 
     def __init__(self, func: Callable[[TInput], TOutput]):
+        """Execute __init__ operation.
+
+        Args:
+            func: The func parameter.
+        """
         self._func = func
 
     def execute(self, input: TInput) -> TOutput:
+        """Execute execute operation.
+
+        Args:
+            input: The input parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._func(input)
 
 
 def strategy(name: str):
-    """
-    Decorator to register a strategy.
+    """Decorator to register a strategy.
 
     Usage:
         @strategy("credit_card")
@@ -279,7 +301,14 @@ def strategy(name: str):
             def execute(self, order: Order) -> PaymentResult:
                 ...
     """
+
     def decorator(cls: Type[IStrategy]) -> Type[IStrategy]:
+        """Execute decorator operation.
+
+        Returns:
+            The result of the operation.
+        """
         cls._strategy_name = name
         return cls
+
     return decorator

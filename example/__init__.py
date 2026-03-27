@@ -1,16 +1,15 @@
-"""
-FastMVC Example API - Item Management
+"""FastMVC Example API - Item Management.
 
 A complete example demonstrating FastMVC patterns:
 - Entity with validation
-- Repository pattern  
+- Repository pattern
 - Service layer
 - Controller with CRUD endpoints
 - DTOs for type safety
 
 Usage:
     from fast_mvc.example import ItemEntity, ItemService, ItemController
-    
+
     # Or import all example components
     from fast_mvc.example import *
 """
@@ -46,6 +45,7 @@ try:
         test_item,
         test_items,
     )
+
     _TESTING_AVAILABLE = True
 except ImportError:
     _TESTING_AVAILABLE = False
@@ -69,12 +69,14 @@ __all__ = [
 
 # Add testing exports if available
 if _TESTING_AVAILABLE:
-    __all__.extend([
-        "ItemFactory",
-        "item_client",
-        "item_db",
-        "mock_auth",
-        "mock_user",
-        "test_item",
-        "test_items",
-    ])
+    __all__.extend(
+        [
+            "ItemFactory",
+            "item_client",
+            "item_db",
+            "mock_auth",
+            "mock_user",
+            "test_item",
+            "test_items",
+        ]
+    )

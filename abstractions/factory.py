@@ -1,5 +1,4 @@
-"""
-Factory Abstraction Module.
+"""Factory Abstraction Module.
 
 This module defines the base factory interface for implementing the
 Factory design pattern. Factories are responsible for creating and
@@ -12,6 +11,7 @@ Example:
     ...             urn=self.urn,
     ...             repository=self.create_repository()
     ...         )
+
 """
 
 from abc import ABC
@@ -20,8 +20,7 @@ from loguru import logger
 
 
 class IFactory(ABC):
-    """
-    Abstract base class for implementing the Factory pattern.
+    """Abstract base class for implementing the Factory pattern.
 
     The IFactory class provides a standardized interface for object creation
     in the FastMVC framework. Factories encapsulate the complexity of object
@@ -51,6 +50,7 @@ class IFactory(ABC):
         ...             session=self.session,
         ...             urn=self.urn
         ...         )
+
     """
 
     def __init__(
@@ -60,14 +60,14 @@ class IFactory(ABC):
         api_name: str = None,
         user_id: str = None,
     ) -> None:
-        """
-        Initialize the factory with request context.
+        """Initialize the factory with request context.
 
         Args:
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
             user_id (str, optional): Database ID of the user. Defaults to None.
+
         """
         self._urn = urn
         self._user_urn = user_urn

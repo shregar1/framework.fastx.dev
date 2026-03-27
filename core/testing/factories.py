@@ -1,5 +1,4 @@
-"""
-Factory Pattern for Test Data.
+"""Factory Pattern for Test Data.
 
 Provides a flexible factory pattern for generating test data.
 """
@@ -15,8 +14,7 @@ T = TypeVar("T")
 
 
 class FactoryField:
-    """
-    Factory field definition.
+    """Factory field definition.
 
     Defines how a field value is generated.
     """
@@ -28,14 +26,14 @@ class FactoryField:
         sequence: bool = False,
         lazy: bool = False,
     ):
-        """
-        Initialize factory field.
+        """Initialize factory field.
 
         Args:
             generator: Function to generate value.
             default: Default value.
             sequence: Use sequence counter.
             lazy: Generate value lazily.
+
         """
         self._generator = generator
         self._default = default
@@ -68,8 +66,25 @@ class FakerGenerators:
     @staticmethod
     def name() -> str:
         """Generate random name."""
-        first_names = ["John", "Jane", "Bob", "Alice", "Charlie", "Diana", "Eve", "Frank"]
-        last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller"]
+        first_names = [
+            "John",
+            "Jane",
+            "Bob",
+            "Alice",
+            "Charlie",
+            "Diana",
+            "Eve",
+            "Frank",
+        ]
+        last_names = [
+            "Smith",
+            "Johnson",
+            "Williams",
+            "Brown",
+            "Jones",
+            "Garcia",
+            "Miller",
+        ]
         return f"{random.choice(first_names)} {random.choice(last_names)}"
 
     @staticmethod
@@ -131,7 +146,9 @@ class FakerGenerators:
         return random.randint(min_val, max_val)
 
     @staticmethod
-    def decimal(min_val: float = 0.0, max_val: float = 1000.0, decimals: int = 2) -> float:
+    def decimal(
+        min_val: float = 0.0, max_val: float = 1000.0, decimals: int = 2
+    ) -> float:
         """Generate random decimal."""
         return round(random.uniform(min_val, max_val), decimals)
 
@@ -156,8 +173,7 @@ class FakerGenerators:
 
 
 class Factory(Generic[T]):
-    """
-    Factory base class for generating test data.
+    """Factory base class for generating test data.
 
     Usage:
         class UserFactory(Factory[User]):
@@ -183,8 +199,7 @@ class Factory(Generic[T]):
 
     @classmethod
     def faker(cls, name: str, **kwargs: Any) -> FactoryField:
-        """
-        Create a faker field.
+        """Create a faker field.
 
         Args:
             name: Name of faker generator (email, name, uuid, etc.).
@@ -192,6 +207,7 @@ class Factory(Generic[T]):
 
         Returns:
             FactoryField with faker generator.
+
         """
         generator = getattr(FakerGenerators, name, None)
         if generator is None:
@@ -226,14 +242,22 @@ class Factory(Generic[T]):
         return field
 
     @classmethod
-    def _build_kwargs(cls, overrides: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _build_kwargs(
+        cls, overrides: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Build kwargs for model creation."""
         overrides = overrides or {}
         kwargs = {}
 
         # Get all class attributes that aren't special
         for name in dir(cls):
-            if name.startswith("_") or name in ("model", "create", "create_batch", "build", "build_batch"):
+            if name.startswith("_") or name in (
+                "model",
+                "create",
+                "create_batch",
+                "build",
+                "build_batch",
+            ):
                 continue
 
             attr = getattr(cls, name)
@@ -247,8 +271,7 @@ class Factory(Generic[T]):
 
     @classmethod
     async def create(cls, **overrides: Any) -> T:
-        """
-        Create and persist an instance.
+        """Create and persist an instance.
 
         Override this in subclasses to add persistence logic.
         """
@@ -281,8 +304,7 @@ define = Factory
 
 
 class RelatedFactory:
-    """
-    Factory for related objects.
+    """Factory for related objects.
 
     Usage:
         class OrderFactory(Factory[Order]):
@@ -295,6 +317,12 @@ class RelatedFactory:
         size: int = 1,
         **kwargs: Any,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            factory: The factory parameter.
+            size: The size parameter.
+        """
         self._factory = factory
         self._size = size
         self._kwargs = kwargs

@@ -1,29 +1,28 @@
-"""
-FastMVC - Minimal Core Framework
+"""FastMVC - Minimal Core Framework.
 
 A production-grade MVC framework for FastAPI with clean architecture,
 dependency injection, and modular service integration.
 
 Basic Usage:
     from fast_mvc import FastMVCApp, Controller, Service, Repository
-    
+
     app = FastMVCApp()
     app.run()
 
 Example API (Included):
     # The example module demonstrates FastMVC patterns with a complete Item API:
-    
+
     from fast_mvc import item_router  # FastAPI router
-    
+
     # Add to your app:
     app.include_router(item_router)
-    
+
     # Or use components directly:
     from fast_mvc import ItemEntity, ItemService, ItemRepository
-    
+
     service = ItemService()
     result = await service.create_item("Buy milk", "Get from store")
-    
+
     # Available example endpoints:
     # POST   /items              - Create item
     # GET    /items              - List all items
@@ -88,6 +87,7 @@ try:
         ItemResponse,
         ItemListResponse,
     )
+
     _EXAMPLE_AVAILABLE = True
 except ImportError:
     _EXAMPLE_AVAILABLE = False
@@ -99,7 +99,7 @@ __all__ = [
     "__version__",
     # Core abstractions
     "IController",
-    "IService", 
+    "IService",
     "IRepository",
     "Entity",
     "IEntity",
@@ -122,19 +122,21 @@ __all__ = [
 
 # Add example exports if available
 if _EXAMPLE_AVAILABLE:
-    __all__.extend([
-        # Example Entity
-        "ItemEntity",
-        # Example Repository
-        "ItemRepository",
-        # Example Service
-        "ItemService",
-        # Example Controller
-        "ItemController",
-        "item_router",
-        # Example DTOs
-        "CreateItemRequest",
-        "UpdateItemRequest",
-        "ItemResponse",
-        "ItemListResponse",
-    ])
+    __all__.extend(
+        [
+            # Example Entity
+            "ItemEntity",
+            # Example Repository
+            "ItemRepository",
+            # Example Service
+            "ItemService",
+            # Example Controller
+            "ItemController",
+            "item_router",
+            # Example DTOs
+            "CreateItemRequest",
+            "UpdateItemRequest",
+            "ItemResponse",
+            "ItemListResponse",
+        ]
+    )

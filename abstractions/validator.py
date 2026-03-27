@@ -1,5 +1,4 @@
-"""
-Validator Pattern.
+"""Validator Pattern.
 
 Encapsulates validation logic for complex business rules
 beyond simple field validation.
@@ -33,13 +32,17 @@ class ValidationError:
     value: Any = None
 
     def __str__(self) -> str:
+        """Execute __str__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         return f"{self.field}: {self.message}"
 
 
 @dataclass
 class ValidationResult:
-    """
-    Result of validation operation.
+    """Result of validation operation.
 
     Usage:
         result = validator.validate(data)
@@ -88,8 +91,7 @@ class ValidationResult:
 
 
 class IValidator(ABC, Generic[T]):
-    """
-    Abstract validator interface.
+    """Abstract validator interface.
 
     Usage:
         class UserValidator(IValidator[User]):
@@ -104,14 +106,14 @@ class IValidator(ABC, Generic[T]):
 
     @abstractmethod
     def validate(self, obj: T) -> ValidationResult:
-        """
-        Validate an object.
+        """Validate an object.
 
         Args:
             obj: Object to validate.
 
         Returns:
             Validation result with any errors.
+
         """
         pass
 
@@ -126,8 +128,7 @@ class IAsyncValidator(ABC, Generic[T]):
 
 
 class FluentValidator(IValidator[T]):
-    """
-    Fluent validation builder.
+    """Fluent validation builder.
 
     Usage:
         validator = FluentValidator[User]()
@@ -143,6 +144,7 @@ class FluentValidator(IValidator[T]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._rules: List[Callable[[T], ValidationResult]] = []
         self._current_field: Optional[str] = None
         self._current_getter: Optional[Callable[[T], Any]] = None
@@ -163,6 +165,14 @@ class FluentValidator(IValidator[T]):
         getter = self._current_getter
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if not value:
@@ -178,6 +188,14 @@ class FluentValidator(IValidator[T]):
         getter = self._current_getter
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             if getter(obj) is None:
                 result.add_error(field, message, "NULL", None)
@@ -197,6 +215,14 @@ class FluentValidator(IValidator[T]):
         msg = message or f"Must be at least {length} characters"
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if value and len(str(value)) < length:
@@ -217,6 +243,14 @@ class FluentValidator(IValidator[T]):
         msg = message or f"Must be at most {length} characters"
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if value and len(str(value)) > length:
@@ -233,10 +267,19 @@ class FluentValidator(IValidator[T]):
     ) -> "FluentValidator[T]":
         """Must match regex pattern."""
         import re
+
         field = self._current_field
         getter = self._current_getter
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if value and not re.match(pattern, str(value)):
@@ -257,6 +300,14 @@ class FluentValidator(IValidator[T]):
         msg = message or f"Must be greater than {min_value}"
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if value is not None and value <= min_value:
@@ -277,6 +328,14 @@ class FluentValidator(IValidator[T]):
         msg = message or f"Must be less than {max_value}"
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if value is not None and value >= max_value:
@@ -297,6 +356,14 @@ class FluentValidator(IValidator[T]):
         msg = message or f"Must be one of: {', '.join(str(v) for v in allowed)}"
 
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             value = getter(obj)
             if value is not None and value not in allowed:
@@ -313,7 +380,16 @@ class FluentValidator(IValidator[T]):
         field: str = "_",
     ) -> "FluentValidator[T]":
         """Custom validation rule."""
+
         def rule(obj: T) -> ValidationResult:
+            """Execute rule operation.
+
+            Args:
+                obj: The obj parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = ValidationResult()
             if not predicate(obj):
                 result.add_error(field, message, "CUSTOM")
@@ -331,8 +407,7 @@ class FluentValidator(IValidator[T]):
 
 
 class CompositeValidator(IValidator[T]):
-    """
-    Combines multiple validators.
+    """Combines multiple validators.
 
     Usage:
         composite = CompositeValidator([
@@ -344,9 +419,22 @@ class CompositeValidator(IValidator[T]):
     """
 
     def __init__(self, validators: List[IValidator[T]]):
+        """Execute __init__ operation.
+
+        Args:
+            validators: The validators parameter.
+        """
         self._validators = validators
 
     def validate(self, obj: T) -> ValidationResult:
+        """Execute validate operation.
+
+        Args:
+            obj: The obj parameter.
+
+        Returns:
+            The result of the operation.
+        """
         result = ValidationResult()
         for validator in self._validators:
             result.merge(validator.validate(obj))
@@ -354,8 +442,7 @@ class CompositeValidator(IValidator[T]):
 
 
 class ConditionalValidator(IValidator[T]):
-    """
-    Validates only when condition is met.
+    """Validates only when condition is met.
 
     Usage:
         validator = ConditionalValidator(
@@ -369,18 +456,31 @@ class ConditionalValidator(IValidator[T]):
         condition: Callable[[T], bool],
         validator: IValidator[T],
     ):
+        """Execute __init__ operation.
+
+        Args:
+            condition: The condition parameter.
+            validator: The validator parameter.
+        """
         self._condition = condition
         self._validator = validator
 
     def validate(self, obj: T) -> ValidationResult:
+        """Execute validate operation.
+
+        Args:
+            obj: The obj parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if self._condition(obj):
             return self._validator.validate(obj)
         return ValidationResult()
 
 
 def validate(obj: T, validator: IValidator[T]) -> T:
-    """
-    Validate object and raise if invalid.
+    """Validate object and raise if invalid.
 
     Usage:
         validated_user = validate(user, UserValidator())

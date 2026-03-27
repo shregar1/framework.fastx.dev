@@ -1,5 +1,4 @@
-"""
-Presenter/ViewModel Pattern.
+"""Presenter/ViewModel Pattern.
 
 Separates presentation logic from domain logic,
 formatting data for display in views.
@@ -25,8 +24,7 @@ TViewModel = TypeVar("TViewModel")
 
 
 class IPresenter(ABC, Generic[TData, TViewModel]):
-    """
-    Abstract presenter interface.
+    """Abstract presenter interface.
 
     Transforms domain data into view-appropriate format.
 
@@ -43,14 +41,14 @@ class IPresenter(ABC, Generic[TData, TViewModel]):
 
     @abstractmethod
     def present(self, data: TData) -> TViewModel:
-        """
-        Present data as view model.
+        """Present data as view model.
 
         Args:
             data: Domain data to present.
 
         Returns:
             View model for display.
+
         """
         pass
 
@@ -61,8 +59,7 @@ class IPresenter(ABC, Generic[TData, TViewModel]):
 
 @dataclass
 class ViewModel:
-    """
-    Base view model class.
+    """Base view model class.
 
     View models contain display-ready data.
 
@@ -80,8 +77,7 @@ class ViewModel:
 
 @dataclass
 class PaginatedViewModel(Generic[TViewModel]):
-    """
-    View model for paginated data.
+    """View model for paginated data.
 
     Usage:
         paginated = PaginatedViewModel(
@@ -112,8 +108,7 @@ class PaginatedViewModel(Generic[TViewModel]):
 
 @dataclass
 class ApiResponse(Generic[TData]):
-    """
-    Standard API response wrapper.
+    """Standard API response wrapper.
 
     Usage:
         response = ApiResponse.success(user_data)
@@ -159,8 +154,7 @@ class ApiResponse(Generic[TData]):
 
 
 class ResponseBuilder(Generic[TData]):
-    """
-    Fluent response builder.
+    """Fluent response builder.
 
     Usage:
         response = (
@@ -173,6 +167,7 @@ class ResponseBuilder(Generic[TData]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._data: Optional[TData] = None
         self._metadata: Dict[str, Any] = {}
         self._links: Dict[str, str] = {}
@@ -212,8 +207,7 @@ class ResponseBuilder(Generic[TData]):
 
 
 class JsonPresenter(IPresenter[TData, dict]):
-    """
-    Generic JSON presenter.
+    """Generic JSON presenter.
 
     Usage:
         presenter = JsonPresenter(
@@ -229,6 +223,13 @@ class JsonPresenter(IPresenter[TData, dict]):
         exclude: Optional[List[str]] = None,
         transforms: Optional[Dict[str, Callable]] = None,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            fields: The fields parameter.
+            exclude: The exclude parameter.
+            transforms: The transforms parameter.
+        """
         self._fields = fields
         self._exclude = exclude or []
         self._transforms = transforms or {}
@@ -264,8 +265,7 @@ class JsonPresenter(IPresenter[TData, dict]):
 
 
 class HtmlPresenter(IPresenter[TData, str]):
-    """
-    HTML presenter for server-side rendering.
+    """HTML presenter for server-side rendering.
 
     Usage:
         presenter = HtmlPresenter(template="<h1>{title}</h1><p>{content}</p>")
@@ -277,6 +277,12 @@ class HtmlPresenter(IPresenter[TData, str]):
         template: str,
         escape_html: bool = True,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            template: The template parameter.
+            escape_html: The escape_html parameter.
+        """
         self._template = template
         self._escape = escape_html
 
@@ -291,14 +297,14 @@ class HtmlPresenter(IPresenter[TData, str]):
 
         if self._escape:
             import html
+
             values = {k: html.escape(str(v)) for k, v in values.items()}
 
         return self._template.format(**values)
 
 
 class CompositePresenter(IPresenter[TData, TViewModel]):
-    """
-    Combines multiple presenters.
+    """Combines multiple presenters.
 
     Usage:
         presenter = CompositePresenter([
@@ -309,6 +315,11 @@ class CompositePresenter(IPresenter[TData, TViewModel]):
     """
 
     def __init__(self, presenters: List[IPresenter]):
+        """Execute __init__ operation.
+
+        Args:
+            presenters: The presenters parameter.
+        """
         self._presenters = presenters
 
     def present(self, data: TData) -> dict:

@@ -1,5 +1,4 @@
-"""
-FastMVC Application Entry Point.
+"""FastMVC Application Entry Point.
 
 This is the main FastAPI application module that initializes the web server,
 configures middleware, registers routes, and handles application lifecycle events.
@@ -25,7 +24,7 @@ Endpoints:
     POST /user/login - User authentication
     POST /user/register - New user registration
     POST /user/logout - Session termination
-    
+
 Example API (if example module is available):
     GET    /items          - List all items
     POST   /items          - Create new item
@@ -66,6 +65,7 @@ from loguru import logger
 
 from constants.api_status import APIStatus
 from constants.default import Default
+
 # Optional example controllers (can be removed for minimal core)
 try:
     from controllers.user import router as UserRouter
@@ -117,9 +117,16 @@ from dtos.responses.base import BaseResponseDTO
 # Domain errors (requires pyfastmvc[platform])
 try:
     from fast_platform.errors import (
-        BadInputError, ConflictError, ForbiddenError, NotFoundError,
-        RateLimitError, ServiceUnavailableError, UnauthorizedError, UnexpectedResponseError
+        BadInputError,
+        ConflictError,
+        ForbiddenError,
+        NotFoundError,
+        RateLimitError,
+        ServiceUnavailableError,
+        UnauthorizedError,
+        UnexpectedResponseError,
     )
+
     HAS_PLATFORM_ERRORS = True
 except ImportError:
     HAS_PLATFORM_ERRORS = False
@@ -132,6 +139,7 @@ from middlewares import AuthenticationMiddleware
 try:
     if os.getenv("VALIDATE_CONFIG", "true").lower() not in ("false", "0", "no", "off"):
         from config.validator import validate_config_or_exit
+
         validate_config_or_exit()
 except ImportError:
     # Config validator is optional
@@ -139,6 +147,15 @@ except ImportError:
 
 
 def _get_int_env(name: str, default: int) -> int:
+    """Execute _get_int_env operation.
+
+    Args:
+        name: The name parameter.
+        default: The default parameter.
+
+    Returns:
+        The result of the operation.
+    """
     value = os.getenv(name)
     if value is None:
         return default
@@ -164,6 +181,7 @@ app = FastAPI(
 # Setup custom FastMVC branded documentation
 try:
     from core.docs import setup_custom_docs
+
     setup_custom_docs(app)
 except ImportError:
     # Fallback to default docs if custom setup fails
@@ -194,17 +212,24 @@ RATE_LIMIT_BURST_LIMIT: int = _get_int_env(
 )
 
 # Optional Datadog / OpenTelemetry integration (requires fast-platform)
-if configure_datadog and os.getenv("DATADOG_ENABLED", "").lower() in {"1", "true", "yes"}:
+if configure_datadog and os.getenv("DATADOG_ENABLED", "").lower() in {
+    "1",
+    "true",
+    "yes",
+}:
     configure_datadog()
 
-if configure_otel and os.getenv("TELEMETRY_ENABLED", "").lower() in {"1", "true", "yes"}:
+if configure_otel and os.getenv("TELEMETRY_ENABLED", "").lower() in {
+    "1",
+    "true",
+    "yes",
+}:
     configure_otel(app)
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """
-    Global exception handler for request validation errors.
+    """Global exception handler for request validation errors.
 
     Transforms Pydantic validation errors into a structured JSON response
     format consistent with the application's error handling pattern.
@@ -223,6 +248,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "responseKey": "error_bad_input",
             "errors": [{"loc": [...], "msg": "...", "type": "..."}]
         }
+
     """
     logger.error(f"Validation error: {exc.errors()}")
     # Remove internal context from error messages
@@ -241,10 +267,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 
-def _app_error_response(request: Request, exc, log_level: str = "warning") -> JSONResponse:
-    """
-    Build a JSONResponse for application error types (Unauthorized, Forbidden, etc.).
-    """
+def _app_error_response(
+    request: Request, exc, log_level: str = "warning"
+) -> JSONResponse:
+    """Build a JSONResponse for application error types (Unauthorized, Forbidden, etc.)."""
     urn = getattr(request.state, "urn", None) or ""
     try:
         getattr(logger, log_level)(
@@ -253,64 +279,137 @@ def _app_error_response(request: Request, exc, log_level: str = "warning") -> JS
         )
     except Exception:
         pass
-    
+
     response_dto = BaseResponseDTO(
         transactionUrn=urn,
         status=APIStatus.FAILED,
-        responseMessage=getattr(exc, 'responseMessage', str(exc)),
-        responseKey=getattr(exc, 'responseKey', 'error_unknown'),
+        responseMessage=getattr(exc, "responseMessage", str(exc)),
+        responseKey=getattr(exc, "responseKey", "error_unknown"),
         data={},
         errors=None,
     )
     return JSONResponse(
-        status_code=getattr(exc, 'httpStatusCode', HTTPStatus.INTERNAL_SERVER_ERROR),
+        status_code=getattr(exc, "httpStatusCode", HTTPStatus.INTERNAL_SERVER_ERROR),
         content=response_dto.model_dump(),
     )
 
 
 if HAS_PLATFORM_ERRORS:
+
     @app.exception_handler(UnexpectedResponseError)
-    async def unexpected_response_error_handler(request: Request, exc: UnexpectedResponseError):
+    async def unexpected_response_error_handler(
+        request: Request, exc: UnexpectedResponseError
+    ):
+        """Execute unexpected_response_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="error")
 
     @app.exception_handler(BadInputError)
     async def bad_input_error_handler(request: Request, exc: BadInputError):
+        """Execute bad_input_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(NotFoundError)
     async def not_found_error_handler(request: Request, exc: NotFoundError):
+        """Execute not_found_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="info")
 
     @app.exception_handler(UnauthorizedError)
     async def unauthorized_error_handler(request: Request, exc: UnauthorizedError):
+        """Execute unauthorized_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(ForbiddenError)
     async def forbidden_error_handler(request: Request, exc: ForbiddenError):
+        """Execute forbidden_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(ConflictError)
     async def conflict_error_handler(request: Request, exc: ConflictError):
+        """Execute conflict_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(RateLimitError)
     async def rate_limit_error_handler(request: Request, exc: RateLimitError):
+        """Execute rate_limit_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="info")
 
     @app.exception_handler(ServiceUnavailableError)
-    async def service_unavailable_error_handler(request: Request, exc: ServiceUnavailableError):
+    async def service_unavailable_error_handler(
+        request: Request, exc: ServiceUnavailableError
+    ):
+        """Execute service_unavailable_error_handler operation.
+
+        Args:
+            request: The request parameter.
+            exc: The exc parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return _app_error_response(request, exc, log_level="error")
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """
-    Catch-all handler for unhandled exceptions to avoid leaking internals.
-    """
+    """Catch-all handler for unhandled exceptions to avoid leaking internals."""
     urn = getattr(request.state, "urn", None) or ""
-    logger.exception(
-        "Unhandled exception occurred while processing request.", urn=urn
-    )
+    logger.exception("Unhandled exception occurred while processing request.", urn=urn)
     response_dto = BaseResponseDTO(
         transactionUrn=urn,
         status=APIStatus.FAILED,
@@ -327,8 +426,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 @app.get("/health", tags=["Health"])
 async def health_check():
-    """
-    Production health check endpoint with dependency status.
+    """Production health check endpoint with dependency status.
 
     Performs comprehensive health checks on:
     - Application status
@@ -356,28 +454,31 @@ async def health_check():
     HTTP Status Codes:
         200: All systems healthy
         503: One or more dependencies unhealthy
+
     """
     from datetime import datetime, timezone
-    
+
     # Import version
     from __init__ import __version__
-    
+
     # Health check results
     health_status = {
         "status": "healthy",
         "version": __version__,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
-    
+
     # Check database connectivity
     db_status: str = "not_configured"
     try:
         from start_utils import db_session
+
         if db_session is not None:
             # Try to execute a simple query to verify connectivity
-            if hasattr(db_session, 'execute'):
+            if hasattr(db_session, "execute"):
                 # SQLAlchemy session
                 from sqlalchemy import text
+
                 db_session.execute(text("SELECT 1"))
                 db_status = "connected"
             else:
@@ -388,16 +489,17 @@ async def health_check():
         db_status = f"disconnected: {str(e)}"
         health_status["status"] = "unhealthy"
         logger.error(f"Health check: Database connection failed - {e}")
-    
+
     health_status["database"] = db_status
-    
+
     # Check Redis connectivity
     redis_status: str = "not_configured"
     try:
         from start_utils import redis_session
+
         if redis_session is not None:
             # Try a ping to verify connectivity
-            if hasattr(redis_session, 'ping'):
+            if hasattr(redis_session, "ping"):
                 redis_session.ping()
                 redis_status = "connected"
             else:
@@ -408,33 +510,35 @@ async def health_check():
         redis_status = f"disconnected: {str(e)}"
         health_status["status"] = "unhealthy"
         logger.error(f"Health check: Redis connection failed - {e}")
-    
+
     health_status["redis"] = redis_status
-    
+
     # Add uptime if available (requires app start time tracking)
-    if hasattr(app.state, 'start_time'):
-        uptime_seconds = (datetime.now(timezone.utc) - app.state.start_time).total_seconds()
+    if hasattr(app.state, "start_time"):
+        uptime_seconds = (
+            datetime.now(timezone.utc) - app.state.start_time
+        ).total_seconds()
         health_status["uptime_seconds"] = int(uptime_seconds)
-    
+
     # Log health check result
     logger.info(
         f"Health check: status={health_status['status']}, "
         f"database={db_status}, redis={redis_status}"
     )
-    
+
     # Return appropriate HTTP status code
-    status_code = HTTPStatus.OK if health_status["status"] == "healthy" else HTTPStatus.SERVICE_UNAVAILABLE
-    
-    return JSONResponse(
-        status_code=status_code,
-        content=health_status
+    status_code = (
+        HTTPStatus.OK
+        if health_status["status"] == "healthy"
+        else HTTPStatus.SERVICE_UNAVAILABLE
     )
+
+    return JSONResponse(status_code=status_code, content=health_status)
 
 
 @app.get("/health/live", tags=["Health"])
 async def liveness_probe():
-    """
-    Kubernetes liveness probe endpoint.
+    """Kubernetes liveness probe endpoint.
 
     Lightweight check that indicates the application is running.
     If this fails, Kubernetes will restart the container.
@@ -445,14 +549,14 @@ async def liveness_probe():
     Example:
         >>> curl http://localhost:8000/health/live
         {"status": "alive"}
+
     """
     return {"status": "alive"}
 
 
 @app.get("/health/ready", tags=["Health"])
 async def readiness_probe():
-    """
-    Kubernetes readiness probe endpoint.
+    """Kubernetes readiness probe endpoint.
 
     Checks if the application is ready to receive traffic.
     Includes dependency health checks (database, Redis).
@@ -473,17 +577,20 @@ async def readiness_probe():
     HTTP Status Codes:
         200: Application is ready to receive traffic
         503: Application is not ready (dependencies unavailable)
+
     """
     from datetime import datetime, timezone
-    
+
     checks = {}
     is_ready = True
-    
+
     # Check database
     try:
         from start_utils import db_session
-        if db_session is not None and hasattr(db_session, 'execute'):
+
+        if db_session is not None and hasattr(db_session, "execute"):
             from sqlalchemy import text
+
             db_session.execute(text("SELECT 1"))
             checks["database"] = "connected"
         else:
@@ -491,11 +598,12 @@ async def readiness_probe():
     except Exception as e:
         checks["database"] = f"disconnected: {str(e)}"
         is_ready = False
-    
+
     # Check Redis
     try:
         from start_utils import redis_session
-        if redis_session is not None and hasattr(redis_session, 'ping'):
+
+        if redis_session is not None and hasattr(redis_session, "ping"):
             redis_session.ping()
             checks["redis"] = "connected"
         else:
@@ -503,17 +611,17 @@ async def readiness_probe():
     except Exception as e:
         checks["redis"] = f"disconnected: {str(e)}"
         is_ready = False
-    
+
     status = "ready" if is_ready else "not_ready"
     status_code = HTTPStatus.OK if is_ready else HTTPStatus.SERVICE_UNAVAILABLE
-    
+
     return JSONResponse(
         status_code=status_code,
         content={
             "status": status,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "checks": checks
-        }
+            "checks": checks,
+        },
     )
 
 
@@ -611,10 +719,10 @@ logger.info("Initialized routers")
 # LIFECYCLE EVENTS
 # =============================================================================
 
+
 @app.on_event("startup")
 async def on_startup():
-    """
-    Application startup event handler.
+    """Application startup event handler.
 
     Called when the FastAPI application starts. Use for:
     - Initializing database connections
@@ -623,10 +731,10 @@ async def on_startup():
     - Logging startup information
     """
     from datetime import datetime, timezone
-    
+
     # Track application start time for uptime calculation
     app.state.start_time = datetime.now(timezone.utc)
-    
+
     logger.info("Application startup event triggered")
     logger.info(f"FastMVC API starting on {HOST}:{PORT}")
     logger.info("Using fast-middleware for request processing")
@@ -634,8 +742,7 @@ async def on_startup():
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    """
-    Application shutdown event handler.
+    """Application shutdown event handler.
 
     Called when the FastAPI application shuts down. Use for:
     - Closing database connections

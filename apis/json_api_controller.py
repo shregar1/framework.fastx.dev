@@ -1,6 +1,4 @@
-"""
-JSON API controller base: shared structured responses and exception handling.
-"""
+"""JSON API controller base: shared structured responses and exception handling."""
 
 from __future__ import annotations
 from http import HTTPStatus
@@ -31,8 +29,7 @@ TResponse = TypeVar("TResponse", bound=Response)
 
 
 class JSONAPIController(IController):
-    """
-    Base for API controllers that emit structured JSON.
+    """Base for API controllers that emit structured JSON.
 
     Provides:
         - _to_json_response success DTO -> JSONResponse
@@ -48,9 +45,24 @@ class JSONAPIController(IController):
         api_name: str | None = None,
         user_id: int | None = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
-        super().__init__(urn=urn, user_urn=user_urn, api_name=api_name, user_id=user_id, *args, **kwargs)
+        """Execute __init__ operation.
+
+        Args:
+            urn: The urn parameter.
+            user_urn: The user_urn parameter.
+            api_name: The api_name parameter.
+            user_id: The user_id parameter.
+        """
+        super().__init__(
+            urn=urn,
+            user_urn=user_urn,
+            api_name=api_name,
+            user_id=user_id,
+            *args,
+            **kwargs,
+        )
 
     @staticmethod
     def _transaction_urn_from_request(request: Request) -> str:
@@ -66,11 +78,11 @@ class JSONAPIController(IController):
         status_code: int,
         dictionary_utility: Optional[DictionaryUtility] = None,
     ) -> JSONResponse:
-        """
-        Build a JSONResponse from a BaseResponseDTO.
-        """
+        """Build a JSONResponse from a BaseResponseDTO."""
         content = (
-            dictionary_utility.convert_dict_keys_to_camel_case(response_dto.model_dump())
+            dictionary_utility.convert_dict_keys_to_camel_case(
+                response_dto.model_dump()
+            )
             if dictionary_utility is not None
             else response_dto.model_dump()
         )
@@ -82,9 +94,7 @@ class JSONAPIController(IController):
         transaction_urn: str,
         dictionary_utility: Optional[DictionaryUtility] = None,
     ) -> JSONResponse:
-        """
-        Convert a known domain error into a standardized JSON error response.
-        """
+        """Convert a known domain error into a standardized JSON error response."""
         known_error_types = (
             BadInputError,
             ConflictError,
@@ -104,7 +114,9 @@ class JSONAPIController(IController):
                 responseKey=getattr(err, "responseKey", "error_unknown"),
                 data={},
             )
-            status_code = getattr(err, "httpStatusCode", HTTPStatus.INTERNAL_SERVER_ERROR)
+            status_code = getattr(
+                err, "httpStatusCode", HTTPStatus.INTERNAL_SERVER_ERROR
+            )
         else:
             response_dto = BaseResponseDTO(
                 transactionUrn=transaction_urn,
@@ -116,7 +128,9 @@ class JSONAPIController(IController):
             status_code = HTTPStatus.INTERNAL_SERVER_ERROR
 
         content = (
-            dictionary_utility.convert_dict_keys_to_camel_case(response_dto.model_dump())
+            dictionary_utility.convert_dict_keys_to_camel_case(
+                response_dto.model_dump()
+            )
             if dictionary_utility is not None
             else response_dto.model_dump()
         )
@@ -128,9 +142,7 @@ class JSONAPIController(IController):
         err: Exception,
         dictionary_utility: Optional[DictionaryUtility] = None,
     ) -> JSONResponse:
-        """
-        Log the exception and return a standardized JSON error response.
-        """
+        """Log the exception and return a standardized JSON error response."""
         transaction_urn = self._transaction_urn_from_request(request)
         self.logger.error(
             f"{err.__class__.__name__} unhandled controller exception; "
@@ -149,9 +161,7 @@ class JSONAPIController(IController):
         *,
         dictionary_utility: Optional[DictionaryUtility] = None,
     ) -> Response:
-        """
-        Template method: run async endpoint logic and map failures to JSON errors.
-        """
+        """Template method: run async endpoint logic and map failures to JSON errors."""
         try:
             return await action()
         except Exception as err:

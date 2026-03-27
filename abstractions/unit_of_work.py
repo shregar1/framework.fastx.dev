@@ -1,5 +1,4 @@
-"""
-Unit of Work Pattern.
+"""Unit of Work Pattern.
 
 Manages transactions across multiple repositories, ensuring
 all operations succeed or fail together.
@@ -23,8 +22,7 @@ T = TypeVar("T")
 
 
 class IUnitOfWork(ABC):
-    """
-    Abstract Unit of Work interface.
+    """Abstract Unit of Work interface.
 
     Coordinates multiple repository operations within a single transaction.
 
@@ -61,24 +59,48 @@ class ISyncUnitOfWork(ABC):
 
     @abstractmethod
     def __enter__(self) -> "ISyncUnitOfWork":
+        """Execute __enter__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         pass
 
     @abstractmethod
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        """Execute __exit__ operation.
+
+        Args:
+            exc_type: The exc_type parameter.
+            exc_val: The exc_val parameter.
+            exc_tb: The exc_tb parameter.
+
+        Returns:
+            The result of the operation.
+        """
         pass
 
     @abstractmethod
     def commit(self) -> None:
+        """Execute commit operation.
+
+        Returns:
+            The result of the operation.
+        """
         pass
 
     @abstractmethod
     def rollback(self) -> None:
+        """Execute rollback operation.
+
+        Returns:
+            The result of the operation.
+        """
         pass
 
 
 class BaseUnitOfWork(IUnitOfWork):
-    """
-    Base Unit of Work implementation.
+    """Base Unit of Work implementation.
 
     Subclass this to add your repositories as properties.
 
@@ -91,14 +113,15 @@ class BaseUnitOfWork(IUnitOfWork):
             @property
             def orders(self) -> OrderRepository:
                 return OrderRepository(self._session)
+
     """
 
     def __init__(self, session_factory: Any):
-        """
-        Initialize Unit of Work.
+        """Initialize Unit of Work.
 
         Args:
             session_factory: Factory for creating database sessions.
+
         """
         self._session_factory = session_factory
         self._session: Optional[Any] = None
@@ -139,14 +162,14 @@ class BaseUnitOfWork(IUnitOfWork):
                 await result
 
     def get_repository(self, repo_class: Type[T]) -> T:
-        """
-        Get or create a repository instance.
+        """Get or create a repository instance.
 
         Args:
             repo_class: Repository class to instantiate.
 
         Returns:
             Repository instance using current session.
+
         """
         class_name = repo_class.__name__
         if class_name not in self._repositories:
@@ -155,8 +178,7 @@ class BaseUnitOfWork(IUnitOfWork):
 
 
 class UnitOfWorkManager:
-    """
-    Factory for creating Unit of Work instances.
+    """Factory for creating Unit of Work instances.
 
     Usage:
         manager = UnitOfWorkManager(session_factory)
@@ -170,6 +192,12 @@ class UnitOfWorkManager:
         session_factory: Any,
         uow_class: Type[BaseUnitOfWork] = BaseUnitOfWork,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            session_factory: The session_factory parameter.
+            uow_class: The uow_class parameter.
+        """
         self._session_factory = session_factory
         self._uow_class = uow_class
 

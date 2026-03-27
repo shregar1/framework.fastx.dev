@@ -1,5 +1,4 @@
-"""
-Specification Pattern.
+"""Specification Pattern.
 
 Encapsulates business rules as reusable, composable query specifications.
 
@@ -22,8 +21,7 @@ T = TypeVar("T")
 
 
 class ISpecification(ABC, Generic[T]):
-    """
-    Abstract Specification interface.
+    """Abstract Specification interface.
 
     Encapsulates a business rule that can be evaluated against an entity.
 
@@ -42,14 +40,14 @@ class ISpecification(ABC, Generic[T]):
 
     @abstractmethod
     def is_satisfied_by(self, entity: T) -> bool:
-        """
-        Check if entity satisfies this specification.
+        """Check if entity satisfies this specification.
 
         Args:
             entity: Entity to check.
 
         Returns:
             True if entity satisfies specification.
+
         """
         pass
 
@@ -70,21 +68,51 @@ class AndSpecification(ISpecification[T]):
     """Composite AND specification."""
 
     def __init__(self, left: ISpecification[T], right: ISpecification[T]):
+        """Execute __init__ operation.
+
+        Args:
+            left: The left parameter.
+            right: The right parameter.
+        """
         self._left = left
         self._right = right
 
     def is_satisfied_by(self, entity: T) -> bool:
-        return self._left.is_satisfied_by(entity) and self._right.is_satisfied_by(entity)
+        """Execute is_satisfied_by operation.
+
+        Args:
+            entity: The entity parameter.
+
+        Returns:
+            The result of the operation.
+        """
+        return self._left.is_satisfied_by(entity) and self._right.is_satisfied_by(
+            entity
+        )
 
 
 class OrSpecification(ISpecification[T]):
     """Composite OR specification."""
 
     def __init__(self, left: ISpecification[T], right: ISpecification[T]):
+        """Execute __init__ operation.
+
+        Args:
+            left: The left parameter.
+            right: The right parameter.
+        """
         self._left = left
         self._right = right
 
     def is_satisfied_by(self, entity: T) -> bool:
+        """Execute is_satisfied_by operation.
+
+        Args:
+            entity: The entity parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._left.is_satisfied_by(entity) or self._right.is_satisfied_by(entity)
 
 
@@ -92,31 +120,55 @@ class NotSpecification(ISpecification[T]):
     """Negated specification."""
 
     def __init__(self, spec: ISpecification[T]):
+        """Execute __init__ operation.
+
+        Args:
+            spec: The spec parameter.
+        """
         self._spec = spec
 
     def is_satisfied_by(self, entity: T) -> bool:
+        """Execute is_satisfied_by operation.
+
+        Args:
+            entity: The entity parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return not self._spec.is_satisfied_by(entity)
 
 
 class LambdaSpecification(ISpecification[T]):
-    """
-    Specification from a lambda function.
+    """Specification from a lambda function.
 
     Usage:
         is_adult = LambdaSpecification(lambda user: user.age >= 18)
     """
 
     def __init__(self, predicate: Callable[[T], bool]):
+        """Execute __init__ operation.
+
+        Args:
+            predicate: The predicate parameter.
+        """
         self._predicate = predicate
 
     def is_satisfied_by(self, entity: T) -> bool:
+        """Execute is_satisfied_by operation.
+
+        Args:
+            entity: The entity parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._predicate(entity)
 
 
 @dataclass
 class QuerySpecification(Generic[T]):
-    """
-    Query specification for database queries.
+    """Query specification for database queries.
 
     Translates business rules to database query conditions.
 
@@ -135,6 +187,11 @@ class QuerySpecification(Generic[T]):
     includes: List[str] = None
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         self.filters = self.filters or []
         self.ordering = self.ordering or []
         self.includes = self.includes or []
@@ -145,8 +202,7 @@ class QuerySpecification(Generic[T]):
         operator: str,
         value: Any,
     ) -> "QuerySpecification[T]":
-        """
-        Add a filter condition.
+        """Add a filter condition.
 
         Args:
             field: Field name to filter on.
@@ -155,6 +211,7 @@ class QuerySpecification(Generic[T]):
 
         Returns:
             Self for chaining.
+
         """
         self.filters.append((field, operator, value))
         return self
@@ -194,6 +251,12 @@ class FilterBuilder(Generic[T]):
     """Fluent filter builder."""
 
     def __init__(self, spec: QuerySpecification[T], field: str):
+        """Execute __init__ operation.
+
+        Args:
+            spec: The spec parameter.
+            field: The field parameter.
+        """
         self._spec = spec
         self._field = field
 

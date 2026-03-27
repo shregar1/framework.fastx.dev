@@ -1,5 +1,4 @@
-"""
-Enhanced Base Model Module.
+"""Enhanced Base Model Module.
 
 Provides :class:`EnhancedBaseModel` (Pydantic v2) plus :func:`enhanced_config` so
 subclasses can extend defaults with any :class:`~pydantic.ConfigDict` options
@@ -46,8 +45,7 @@ _ENHANCED_DEFAULTS: dict[str, Any] = {
 
 
 def enhanced_config(**overrides: Any) -> ConfigDict:
-    """
-    Build a :class:`~pydantic.ConfigDict` by merging *overrides* into the
+    """Build a :class:`~pydantic.ConfigDict` by merging *overrides* into the
     defaults used by :class:`EnhancedBaseModel`.
 
     Common overrides: ``title``, ``str_strip_whitespace``, ``populate_by_name``,
@@ -58,8 +56,7 @@ def enhanced_config(**overrides: Any) -> ConfigDict:
 
 
 class EnhancedBaseModel(BaseModel):
-    """
-    Pydantic v2 base for request DTOs: sanitization, security checks, strict extras.
+    """Pydantic v2 base for request DTOs: sanitization, security checks, strict extras.
 
     Subclasses may set ``model_config = enhanced_config(...)`` to add options
     without re-specifying defaults.
@@ -78,27 +75,31 @@ class EnhancedBaseModel(BaseModel):
         return v
 
     def validate_security(self) -> dict[str, Any]:
-        """
-        Scan string fields for SQL injection, XSS, and path traversal patterns.
+        """Scan string fields for SQL injection, XSS, and path traversal patterns.
 
         Returns:
             ``{"is_valid": bool, "issues": list[str]}``
+
         """
         if not SecurityValidators:
             return {"is_valid": True, "issues": []}
-            
+
         logger.debug("Performing security validation on EnhancedBaseModel")
         issues: list[str] = []
 
         for field_name, field_value in self.model_dump().items():
             if isinstance(field_value, str):
-                if not SecurityValidators.validate_sql_injection_prevention(field_value):
+                if not SecurityValidators.validate_sql_injection_prevention(
+                    field_value
+                ):
                     issues.append(f"Potential SQL injection in field '{field_name}'")
 
                 if not SecurityValidators.validate_xss_prevention(field_value):
                     issues.append(f"Potential XSS in field '{field_name}'")
 
-                if not SecurityValidators.validate_path_traversal_prevention(field_value):
+                if not SecurityValidators.validate_path_traversal_prevention(
+                    field_value
+                ):
                     issues.append(f"Potential path traversal in field '{field_name}'")
 
         return {"is_valid": len(issues) == 0, "issues": issues}

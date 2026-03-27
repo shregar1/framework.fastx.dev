@@ -1,23 +1,27 @@
-"""
-Example Repository.
-"""
+"""Example Repository."""
 
 from typing import Any, Dict, List, Optional
 from abstractions.repository import IRepository
 
+
 class ExampleRepository(IRepository):
-    """
-    Stub repository for demonstration.
+    """Stub repository for demonstration.
     Does not use an actual database.
     """
 
     def __init__(self, **kwargs: Any):
+        """Execute __init__ operation."""
         super().__init__(**kwargs)
         # In-memory storage for stubbing
         # Simulating storage as a class attribute to persist across requests in dev mode
-        if not hasattr(self.__class__, '_items'):
+        if not hasattr(self.__class__, "_items"):
             self.__class__._items = [
-                {"id": "ex-1", "name": "Initial Item", "description": "Stub data", "status": "active"},
+                {
+                    "id": "ex-1",
+                    "name": "Initial Item",
+                    "description": "Stub data",
+                    "status": "active",
+                },
             ]
 
     @property
@@ -27,10 +31,7 @@ class ExampleRepository(IRepository):
 
     def create_record(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Stub create operation."""
-        new_item = {
-            "id": f"ex-{len(self.items) + 1}",
-            **data
-        }
+        new_item = {"id": f"ex-{len(self.items) + 1}", **data}
         self.items.append(new_item)
         return new_item
 

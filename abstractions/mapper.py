@@ -1,5 +1,4 @@
-"""
-Mapper/Transformer Pattern.
+"""Mapper/Transformer Pattern.
 
 Handles conversion between different object representations
 (e.g., Entity to DTO, Domain to Persistence).
@@ -24,8 +23,7 @@ TDestination = TypeVar("TDestination")
 
 
 class IMapper(ABC, Generic[TSource, TDestination]):
-    """
-    Abstract mapper interface.
+    """Abstract mapper interface.
 
     Maps between source and destination types.
 
@@ -41,33 +39,32 @@ class IMapper(ABC, Generic[TSource, TDestination]):
 
     @abstractmethod
     def map(self, source: TSource) -> TDestination:
-        """
-        Map source to destination.
+        """Map source to destination.
 
         Args:
             source: Source object.
 
         Returns:
             Mapped destination object.
+
         """
         pass
 
     def map_many(self, sources: List[TSource]) -> List[TDestination]:
-        """
-        Map collection of sources.
+        """Map collection of sources.
 
         Args:
             sources: List of source objects.
 
         Returns:
             List of mapped destination objects.
+
         """
         return [self.map(source) for source in sources]
 
 
 class IBidirectionalMapper(IMapper[TSource, TDestination]):
-    """
-    Bidirectional mapper interface.
+    """Bidirectional mapper interface.
 
     Maps in both directions between types.
 
@@ -91,8 +88,7 @@ class IBidirectionalMapper(IMapper[TSource, TDestination]):
 
 
 class LambdaMapper(IMapper[TSource, TDestination]):
-    """
-    Mapper from a lambda function.
+    """Mapper from a lambda function.
 
     Usage:
         mapper = LambdaMapper(lambda user: UserDTO(
@@ -102,15 +98,27 @@ class LambdaMapper(IMapper[TSource, TDestination]):
     """
 
     def __init__(self, map_func: Callable[[TSource], TDestination]):
+        """Execute __init__ operation.
+
+        Args:
+            map_func: The map_func parameter.
+        """
         self._map_func = map_func
 
     def map(self, source: TSource) -> TDestination:
+        """Execute map operation.
+
+        Args:
+            source: The source parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._map_func(source)
 
 
 class CompositeMapper(IMapper[TSource, TDestination]):
-    """
-    Chains multiple mappers together.
+    """Chains multiple mappers together.
 
     Usage:
         # User -> UserDTO -> UserResponse
@@ -121,9 +129,22 @@ class CompositeMapper(IMapper[TSource, TDestination]):
     """
 
     def __init__(self, mappers: List[IMapper]):
+        """Execute __init__ operation.
+
+        Args:
+            mappers: The mappers parameter.
+        """
         self._mappers = mappers
 
     def map(self, source: TSource) -> TDestination:
+        """Execute map operation.
+
+        Args:
+            source: The source parameter.
+
+        Returns:
+            The result of the operation.
+        """
         result = source
         for mapper in self._mappers:
             result = mapper.map(result)
@@ -131,8 +152,7 @@ class CompositeMapper(IMapper[TSource, TDestination]):
 
 
 class MappingProfile:
-    """
-    Configuration for mapping between types.
+    """Configuration for mapping between types.
 
     Usage:
         profile = MappingProfile()
@@ -142,6 +162,7 @@ class MappingProfile:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._mappings: Dict[tuple, "TypeMapping"] = {}
 
     def create_map(
@@ -165,8 +186,7 @@ class MappingProfile:
 
 
 class TypeMapping(Generic[TSource, TDestination]):
-    """
-    Configuration for a single type mapping.
+    """Configuration for a single type mapping.
 
     Supports:
     - Custom member mappings
@@ -179,6 +199,12 @@ class TypeMapping(Generic[TSource, TDestination]):
         source_type: Type[TSource],
         dest_type: Type[TDestination],
     ):
+        """Execute __init__ operation.
+
+        Args:
+            source_type: The source_type parameter.
+            dest_type: The dest_type parameter.
+        """
         self._source_type = source_type
         self._dest_type = dest_type
         self._member_mappings: Dict[str, Callable] = {}
@@ -190,12 +216,12 @@ class TypeMapping(Generic[TSource, TDestination]):
         member: str,
         value_resolver: Callable[[TSource], Any],
     ) -> "TypeMapping[TSource, TDestination]":
-        """
-        Configure custom mapping for a member.
+        """Configure custom mapping for a member.
 
         Args:
             member: Destination member name.
             value_resolver: Function to get value from source.
+
         """
         self._member_mappings[member] = value_resolver
         return self
@@ -245,8 +271,7 @@ class TypeMapping(Generic[TSource, TDestination]):
 
 
 class AutoMapper:
-    """
-    Automatic mapper using registered profiles.
+    """Automatic mapper using registered profiles.
 
     Usage:
         mapper = AutoMapper()
@@ -256,6 +281,7 @@ class AutoMapper:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._profiles: List[MappingProfile] = []
         self._cache: Dict[tuple, TypeMapping] = {}
 
@@ -268,8 +294,7 @@ class AutoMapper:
         source: TSource,
         dest_type: Type[TDestination],
     ) -> TDestination:
-        """
-        Map source to destination type.
+        """Map source to destination type.
 
         Args:
             source: Source object.
@@ -277,6 +302,7 @@ class AutoMapper:
 
         Returns:
             Mapped object.
+
         """
         source_type = type(source)
         cache_key = (source_type, dest_type)
@@ -302,10 +328,7 @@ class AutoMapper:
     ) -> TDestination:
         """Attempt automatic mapping by matching attribute names."""
         if hasattr(source, "__dict__"):
-            attrs = {
-                k: v for k, v in source.__dict__.items()
-                if not k.startswith("_")
-            }
+            attrs = {k: v for k, v in source.__dict__.items() if not k.startswith("_")}
         elif hasattr(source, "_asdict"):
             attrs = source._asdict()
         else:

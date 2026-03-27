@@ -1,5 +1,4 @@
-"""
-Datastore Abstractions Module.
+"""Datastore Abstractions Module.
 
 Interfaces are defined in ``fast_datastores.interfaces`` and re-exported here so
 existing ``from abstractions.datastore import …`` imports keep working.

@@ -1,6 +1,4 @@
-"""
-Main API Router.
-"""
+"""Main API Router."""
 
 from fastapi import APIRouter
 from apis.v1 import router as v1_router

@@ -1,5 +1,4 @@
-"""
-Entity and Aggregate Root Patterns.
+"""Entity and Aggregate Root Patterns.
 
 Entities have identity that persists across time and states.
 Aggregate Roots are clusters of domain objects with a root entity.
@@ -26,8 +25,7 @@ TId = TypeVar("TId")
 
 
 class IEntity(ABC, Generic[TId]):
-    """
-    Abstract entity interface.
+    """Abstract entity interface.
 
     Entities are objects with a distinct identity that runs
     through time and different states.
@@ -62,8 +60,7 @@ class IEntity(ABC, Generic[TId]):
 
 @dataclass
 class Entity(IEntity[str]):
-    """
-    Base entity with string ID.
+    """Base entity with string ID.
 
     Usage:
         @dataclass
@@ -82,6 +79,11 @@ class Entity(IEntity[str]):
 
     @property
     def id(self) -> str:
+        """Execute id operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._id
 
     def touch(self) -> None:
@@ -90,8 +92,7 @@ class Entity(IEntity[str]):
 
 
 class IAggregateRoot(IEntity[TId]):
-    """
-    Aggregate Root interface.
+    """Aggregate Root interface.
 
     An aggregate is a cluster of domain objects that can be
     treated as a single unit. The root is the only member that
@@ -117,8 +118,7 @@ class IAggregateRoot(IEntity[TId]):
 
 @dataclass
 class AggregateRoot(Entity, IAggregateRoot[str]):
-    """
-    Base aggregate root implementation.
+    """Base aggregate root implementation.
 
     Usage:
         @dataclass
@@ -146,14 +146,23 @@ class AggregateRoot(Entity, IAggregateRoot[str]):
     _version: int = field(default=0, repr=False)
 
     def get_uncommitted_events(self) -> List[Any]:
+        """Execute get_uncommitted_events operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._events.copy()
 
     def clear_events(self) -> None:
+        """Execute clear_events operation.
+
+        Returns:
+            The result of the operation.
+        """
         self._events.clear()
 
     def _raise_event(self, event: Any) -> None:
-        """
-        Raise a domain event.
+        """Raise a domain event.
 
         Events are collected and dispatched after persistence.
         """
@@ -170,8 +179,7 @@ class AggregateRoot(Entity, IAggregateRoot[str]):
 
 
 class EntityFactory(Generic[TId]):
-    """
-    Factory for creating entities.
+    """Factory for creating entities.
 
     Usage:
         factory = EntityFactory(User)
@@ -179,6 +187,11 @@ class EntityFactory(Generic[TId]):
     """
 
     def __init__(self, entity_class: type):
+        """Execute __init__ operation.
+
+        Args:
+            entity_class: The entity_class parameter.
+        """
         self._entity_class = entity_class
 
     def create(self, **kwargs) -> Any:
@@ -192,8 +205,7 @@ class EntityFactory(Generic[TId]):
 
 @dataclass
 class DomainEvent:
-    """
-    Base class for domain events.
+    """Base class for domain events.
 
     Usage:
         @dataclass
@@ -220,8 +232,7 @@ class DomainEvent:
 
 
 class SoftDeletableEntity(Entity):
-    """
-    Entity that supports soft deletion.
+    """Entity that supports soft deletion.
 
     Usage:
         @dataclass
@@ -252,8 +263,7 @@ class SoftDeletableEntity(Entity):
 
 
 class AuditableEntity(Entity):
-    """
-    Entity with audit trail.
+    """Entity with audit trail.
 
     Usage:
         @dataclass
@@ -280,8 +290,7 @@ class AuditableEntity(Entity):
 
 
 class VersionedEntity(Entity):
-    """
-    Entity with version for optimistic locking.
+    """Entity with version for optimistic locking.
 
     Usage:
         @dataclass
@@ -299,6 +308,11 @@ class VersionedEntity(Entity):
 
     @property
     def version(self) -> int:
+        """Execute version operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._version
 
     def increment_version(self) -> None:

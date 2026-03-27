@@ -1,5 +1,4 @@
-"""
-Pytest Configuration and Shared Fixtures
+"""Pytest Configuration and Shared Fixtures.
 
 This file is automatically loaded by pytest and provides:
 - Path setup for imports
@@ -8,7 +7,7 @@ This file is automatically loaded by pytest and provides:
 
 Usage:
     Fixtures are automatically available in all test files.
-    
+
     def test_something(item_client, test_item):
         # item_client and test_item are automatically injected
         pass
@@ -35,20 +34,17 @@ from example.testing.fixtures import (
     # Database fixtures
     item_db,
     item_repository,
-    
     # Client fixtures
     app,
     item_client,
     async_item_client,
     authenticated_client,
-    
     # Auth fixtures
     mock_user,
     mock_admin_user,
     mock_auth,
     mock_invalid_auth,
     mock_expired_token,
-    
     # Test data fixtures
     test_item,
     test_items,
@@ -57,7 +53,6 @@ from example.testing.fixtures import (
     create_item_payload,
     update_item_payload,
     invalid_item_payloads,
-    
     # Utility fixtures
     freezer,
     event_loop,
@@ -93,14 +88,16 @@ __all__ = [
 # PYTEST CONFIGURATION
 # =============================================================================
 
+
 def pytest_configure(config):
-    """
-    Configure pytest with custom markers.
-    
+    """Configure pytest with custom markers.
+
     These markers can be used to categorize and filter tests.
     """
     config.addinivalue_line("markers", "unit: Unit tests (fast, isolated)")
-    config.addinivalue_line("markers", "integration: Integration tests (may use database)")
+    config.addinivalue_line(
+        "markers", "integration: Integration tests (may use database)"
+    )
     config.addinivalue_line("markers", "e2e: End-to-end tests (full flow)")
     config.addinivalue_line("markers", "slow: Slow tests (skip in fast mode)")
     config.addinivalue_line("markers", "auth: Authentication-related tests")
@@ -117,11 +114,11 @@ import pytest
 
 @pytest.fixture(scope="session")
 def test_settings():
-    """
-    Provide test-specific settings.
-    
+    """Provide test-specific settings.
+
     Returns:
         Dictionary with test configuration.
+
     """
     return {
         "database_url": "sqlite:///./test.db",
@@ -135,31 +132,31 @@ def test_settings():
 
 @pytest.fixture(autouse=True)
 def setup_test_env(test_settings, monkeypatch):
-    """
-    Set up environment for each test.
-    
+    """Set up environment for each test.
+
     Automatically configures environment variables for testing.
     """
     # Set test environment variables
     for key, value in test_settings.items():
         env_key = key.upper()
         monkeypatch.setenv(env_key, str(value))
-    
+
     yield
-    
+
     # Cleanup is handled by monkeypatch
 
 
 @pytest.fixture
 def captured_logs(caplog):
-    """
-    Provide captured log output for testing.
-    
+    """Provide captured log output for testing.
+
     Example:
         def test_logs(captured_logs):
             # Run code that logs
             assert "Expected message" in captured_logs.text
+
     """
     import logging
+
     caplog.set_level(logging.DEBUG)
     return caplog

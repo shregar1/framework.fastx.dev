@@ -1,5 +1,4 @@
-"""
-Service Abstraction Module.
+"""Service Abstraction Module.
 
 This module defines the base service interface that all business logic
 services must inherit from. Services encapsulate domain logic and
@@ -14,6 +13,7 @@ Example:
     ...     def run(self, request_dto: RegistrationDTO) -> dict:
     ...         # Business logic here
     ...         return {"status": "success"}
+
 """
 
 from abc import ABC, abstractmethod
@@ -25,8 +25,7 @@ from core.utils.context import ContextMixin
 
 
 class IService(ABC, ContextMixin):
-    """
-    Abstract base class for business logic services.
+    """Abstract base class for business logic services.
 
     The IService class provides a standardized interface for implementing
     business logic in the FastMVC framework. Services are the core of the
@@ -60,6 +59,7 @@ class IService(ABC, ContextMixin):
         ...         # Process payment
         ...         # Create order record
         ...         return {"order_id": "...", "status": "confirmed"}
+
     """
 
     def __init__(
@@ -70,8 +70,7 @@ class IService(ABC, ContextMixin):
         user_id: int = None,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize the service with request context.
+        """Initialize the service with request context.
 
         Args:
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
@@ -79,6 +78,7 @@ class IService(ABC, ContextMixin):
             api_name (str, optional): Name of the API endpoint. Defaults to None.
             user_id (int, optional): Database ID of the user. Defaults to None.
             **kwargs: Additional arguments for parent classes.
+
         """
         super().__init__(
             urn=urn,
@@ -90,8 +90,7 @@ class IService(ABC, ContextMixin):
 
     @abstractmethod
     def run(self, request_dto: BaseModel) -> dict:
-        """
-        Execute the service's main business logic.
+        """Execute the service's main business logic.
 
         This is the primary entry point for the service. Subclasses must
         implement this method to define their specific business operations.
@@ -114,5 +113,6 @@ class IService(ABC, ContextMixin):
             ...         raise BadInputError("Email already exists")
             ...     new_user = self.user_repo.create(request_dto)
             ...     return {"user_id": new_user.id, "status": "created"}
+
         """
         pass

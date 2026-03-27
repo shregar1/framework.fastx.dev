@@ -1,5 +1,4 @@
-"""
-Pipeline/Chain of Responsibility Pattern.
+"""Pipeline/Chain of Responsibility Pattern.
 
 Enables sequential processing through a chain of handlers,
 where each handler can process, modify, or short-circuit.
@@ -25,8 +24,7 @@ TContext = TypeVar("TContext")
 
 
 class IPipelineHandler(ABC, Generic[TRequest, TResponse]):
-    """
-    Pipeline handler interface.
+    """Pipeline handler interface.
 
     Each handler processes the request and optionally passes
     to the next handler in the chain.
@@ -50,8 +48,7 @@ class IPipelineHandler(ABC, Generic[TRequest, TResponse]):
         request: TRequest,
         next: Callable[[TRequest], TResponse],
     ) -> TResponse:
-        """
-        Handle the request.
+        """Handle the request.
 
         Args:
             request: Incoming request.
@@ -59,13 +56,13 @@ class IPipelineHandler(ABC, Generic[TRequest, TResponse]):
 
         Returns:
             Response from processing.
+
         """
         pass
 
 
 class Pipeline(Generic[TRequest, TResponse]):
-    """
-    Request processing pipeline.
+    """Request processing pipeline.
 
     Chains handlers together for sequential processing.
 
@@ -80,6 +77,7 @@ class Pipeline(Generic[TRequest, TResponse]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._handlers: List[IPipelineHandler[TRequest, TResponse]] = []
         self._final_handler: Optional[Callable[[TRequest], TResponse]] = None
 
@@ -100,20 +98,28 @@ class Pipeline(Generic[TRequest, TResponse]):
         return self
 
     async def execute(self, request: TRequest) -> TResponse:
-        """
-        Execute the pipeline with the given request.
+        """Execute the pipeline with the given request.
 
         Args:
             request: Request to process.
 
         Returns:
             Final response.
+
         """
         if not self._final_handler:
             raise ValueError("Pipeline requires a final handler")
 
         # Build chain from end to start
         async def final(req: TRequest) -> TResponse:
+            """Execute final operation.
+
+            Args:
+                req: The req parameter.
+
+            Returns:
+                The result of the operation.
+            """
             result = self._final_handler(req)
             if hasattr(result, "__await__"):
                 return await result
@@ -125,8 +131,27 @@ class Pipeline(Generic[TRequest, TResponse]):
             prev = current
 
             async def make_next(h, p):
+                """Execute make_next operation.
+
+                Args:
+                    h: The h parameter.
+                    p: The p parameter.
+
+                Returns:
+                    The result of the operation.
+                """
+
                 async def next_handler(req: TRequest) -> TResponse:
+                    """Execute next_handler operation.
+
+                    Args:
+                        req: The req parameter.
+
+                    Returns:
+                        The result of the operation.
+                    """
                     return await h.handle(req, p)
+
                 return next_handler
 
             current = await make_next(handler, prev)
@@ -138,6 +163,7 @@ class SyncPipeline(Generic[TRequest, TResponse]):
     """Synchronous pipeline."""
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._handlers: List[Callable] = []
         self._final_handler: Optional[Callable[[TRequest], TResponse]] = None
 
@@ -163,6 +189,15 @@ class SyncPipeline(Generic[TRequest, TResponse]):
             raise ValueError("Pipeline requires a final handler")
 
         def build_chain(handlers: List[Callable], final: Callable) -> Callable:
+            """Execute build_chain operation.
+
+            Args:
+                handlers: The handlers parameter.
+                final: The final parameter.
+
+            Returns:
+                The result of the operation.
+            """
             if not handlers:
                 return final
 
@@ -176,8 +211,7 @@ class SyncPipeline(Generic[TRequest, TResponse]):
 
 @dataclass
 class PipelineContext(Generic[TRequest]):
-    """
-    Context passed through pipeline.
+    """Context passed through pipeline.
 
     Allows handlers to share data and state.
 
@@ -194,6 +228,11 @@ class PipelineContext(Generic[TRequest]):
     _data: dict = None
 
     def __post_init__(self):
+        """Execute __post_init__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         if self._data is None:
             self._data = {}
 
@@ -211,8 +250,7 @@ class PipelineContext(Generic[TRequest]):
 
 
 class TransformPipeline(Generic[TRequest]):
-    """
-    Transform pipeline that modifies data through stages.
+    """Transform pipeline that modifies data through stages.
 
     Usage:
         pipeline = TransformPipeline()
@@ -224,6 +262,7 @@ class TransformPipeline(Generic[TRequest]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._transforms: List[Callable[[TRequest], TRequest]] = []
 
     def add(
@@ -243,8 +282,7 @@ class TransformPipeline(Generic[TRequest]):
 
 
 class FilterPipeline(Generic[TRequest]):
-    """
-    Filter pipeline that removes items not matching criteria.
+    """Filter pipeline that removes items not matching criteria.
 
     Usage:
         pipeline = FilterPipeline()
@@ -255,6 +293,7 @@ class FilterPipeline(Generic[TRequest]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._filters: List[Callable[[Any], bool]] = []
 
     def add(
@@ -274,8 +313,7 @@ class FilterPipeline(Generic[TRequest]):
 
 
 def pipe(*functions: Callable) -> Callable:
-    """
-    Create a pipeline from functions.
+    """Create a pipeline from functions.
 
     Usage:
         process = pipe(
@@ -286,17 +324,36 @@ def pipe(*functions: Callable) -> Callable:
 
         result = process("  Hello World  ")  # ["hello", "world"]
     """
+
     def pipeline(data: Any) -> Any:
+        """Execute pipeline operation.
+
+        Args:
+            data: The data parameter.
+
+        Returns:
+            The result of the operation.
+        """
         result = data
         for func in functions:
             result = func(result)
         return result
+
     return pipeline
 
 
 async def async_pipe(*functions: Callable) -> Callable:
     """Async version of pipe."""
+
     async def pipeline(data: Any) -> Any:
+        """Execute pipeline operation.
+
+        Args:
+            data: The data parameter.
+
+        Returns:
+            The result of the operation.
+        """
         result = data
         for func in functions:
             if hasattr(func, "__call__"):
@@ -304,4 +361,5 @@ async def async_pipe(*functions: Callable) -> Callable:
                 if hasattr(result, "__await__"):
                     result = await result
         return result
+
     return pipeline

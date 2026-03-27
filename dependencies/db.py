@@ -1,5 +1,4 @@
-"""
-Database Dependency Module.
+"""Database Dependency Module.
 
 Re-exports DBDependency from fast_db for backward compatibility.
 
@@ -20,7 +19,7 @@ except ImportError:
     # Fallback when fast_db is not installed
     class _DBDependencyFallback:
         """Fallback DBDependency when fast_db is not installed."""
-        
+
         @staticmethod
         def derive() -> Any:
             """Raise informative error about missing dependency."""
@@ -28,7 +27,7 @@ except ImportError:
                 "fast_db is required for database dependencies. "
                 "Install with: pip install pyfastmvc[platform]"
             )
-    
+
     DBDependency = _DBDependencyFallback  # type: ignore
 
 __all__ = ["DBDependency"]

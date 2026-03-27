@@ -1,5 +1,4 @@
-"""
-Startup Utilities Module.
+"""Startup Utilities Module.
 
 This module initializes core application services and loads configuration
 on application startup. It provides shared instances of database sessions,
@@ -113,6 +112,7 @@ if DBConfiguration:
 
 try:
     from fast_channels import ChannelsConfiguration, ChannelsConfigurationDTO
+
     channels_configuration = ChannelsConfiguration().get_config()
 except ImportError:
     pass
@@ -190,6 +190,7 @@ logger.info("Loaded environment variables")
 
 try:
     from fast_db import create_and_set_session
+
     db_session = create_and_set_session(db_configuration)
 except ImportError:
     create_and_set_session = None  # type: ignore
@@ -268,9 +269,7 @@ if CHANNEL_BACKEND == "redis" and redis_session:
 
         from fast_channels import RedisChannelBackend
 
-        redis_url = (
-            f"redis://:{cache_configuration.password or ''}@{cache_configuration.host or 'localhost'}:{cache_configuration.port or 6379}/0"
-        )
+        redis_url = f"redis://:{cache_configuration.password or ''}@{cache_configuration.host or 'localhost'}:{cache_configuration.port or 6379}/0"
         redis_async = aioredis.from_url(redis_url)
         channel_backend = RedisChannelBackend(redis_async)
         logger.info("Initialized Redis channels backend")

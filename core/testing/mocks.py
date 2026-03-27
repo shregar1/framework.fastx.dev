@@ -1,5 +1,4 @@
-"""
-Mock Utilities for Testing.
+"""Mock Utilities for Testing.
 
 Provides helpers for mocking external services and dependencies.
 """
@@ -10,8 +9,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 
 class MockExternalService:
-    """
-    Context manager for mocking external service calls.
+    """Context manager for mocking external service calls.
 
     Usage:
         with MockExternalService("httpx.AsyncClient.get") as mock:
@@ -26,14 +24,14 @@ class MockExternalService:
         side_effect: Optional[Union[Exception, Callable]] = None,
         async_mock: bool = True,
     ):
-        """
-        Initialize mock.
+        """Initialize mock.
 
         Args:
             target: Target to mock (e.g., "module.Class.method").
             return_value: Value to return from mock.
             side_effect: Side effect (exception or function).
             async_mock: Use AsyncMock for async functions.
+
         """
         self._target = target
         self._return_value = return_value
@@ -43,6 +41,11 @@ class MockExternalService:
         self._mock = None
 
     def __enter__(self) -> Union[MagicMock, AsyncMock]:
+        """Execute __enter__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         mock_class = AsyncMock if self._async_mock else MagicMock
         self._mock = mock_class(return_value=self._return_value)
 
@@ -53,6 +56,11 @@ class MockExternalService:
         return self._patcher.__enter__()
 
     def __exit__(self, *args: Any) -> None:
+        """Execute __exit__ operation.
+
+        Returns:
+            The result of the operation.
+        """
         if self._patcher:
             self._patcher.__exit__(*args)
 
@@ -63,8 +71,7 @@ def mock_external(
     side_effect: Optional[Union[Exception, Callable]] = None,
     async_mock: bool = True,
 ) -> Callable:
-    """
-    Decorator to mock external service calls.
+    """Decorator to mock external service calls.
 
     Usage:
         @mock_external("stripe.Charge.create", return_value={"id": "ch_123"})
@@ -79,17 +86,37 @@ def mock_external(
     """
 
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
+
         @functools.wraps(func)
         async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            """Execute async_wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             with MockExternalService(target, return_value, side_effect, async_mock):
                 return await func(*args, **kwargs)
 
         @functools.wraps(func)
         def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
+            """Execute sync_wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             with MockExternalService(target, return_value, side_effect, async_mock):
                 return func(*args, **kwargs)
 
         import asyncio
+
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         return sync_wrapper
@@ -107,35 +134,66 @@ class MockResponse:
         text: str = "",
         headers: Optional[Dict[str, str]] = None,
     ):
+        """Execute __init__ operation.
+
+        Args:
+            status_code: The status_code parameter.
+            json_data: The json_data parameter.
+            text: The text parameter.
+            headers: The headers parameter.
+        """
         self.status_code = status_code
         self._json_data = json_data
         self._text = text
         self.headers = headers or {}
 
     def json(self) -> Dict[str, Any]:
+        """Execute json operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._json_data or {}
 
     @property
     def text(self) -> str:
+        """Execute text operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._text
 
     def raise_for_status(self) -> None:
+        """Execute raise_for_status operation.
+
+        Returns:
+            The result of the operation.
+        """
         if self.status_code >= 400:
             raise Exception(f"HTTP Error: {self.status_code}")
 
 
 class MockRedis:
-    """
-    Mock Redis client for testing.
+    """Mock Redis client for testing.
 
     Provides in-memory implementation of common Redis commands.
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._data: Dict[str, Any] = {}
         self._expiry: Dict[str, float] = {}
 
     def get(self, key: str) -> Optional[str]:
+        """Execute get operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._data.get(key)
 
     def set(
@@ -145,10 +203,26 @@ class MockRedis:
         ex: Optional[int] = None,
         px: Optional[int] = None,
     ) -> bool:
+        """Execute set operation.
+
+        Args:
+            key: The key parameter.
+            value: The value parameter.
+            ex: The ex parameter.
+            px: The px parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._data[key] = value
         return True
 
     def delete(self, *keys: str) -> int:
+        """Execute delete operation.
+
+        Returns:
+            The result of the operation.
+        """
         count = 0
         for key in keys:
             if key in self._data:
@@ -157,30 +231,88 @@ class MockRedis:
         return count
 
     def exists(self, *keys: str) -> int:
+        """Execute exists operation.
+
+        Returns:
+            The result of the operation.
+        """
         return sum(1 for key in keys if key in self._data)
 
     def incr(self, key: str, amount: int = 1) -> int:
+        """Execute incr operation.
+
+        Args:
+            key: The key parameter.
+            amount: The amount parameter.
+
+        Returns:
+            The result of the operation.
+        """
         value = int(self._data.get(key, 0)) + amount
         self._data[key] = value
         return value
 
     def decr(self, key: str, amount: int = 1) -> int:
+        """Execute decr operation.
+
+        Args:
+            key: The key parameter.
+            amount: The amount parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self.incr(key, -amount)
 
     def hset(self, name: str, key: str, value: Any) -> int:
+        """Execute hset operation.
+
+        Args:
+            name: The name parameter.
+            key: The key parameter.
+            value: The value parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if name not in self._data:
             self._data[name] = {}
         self._data[name][key] = value
         return 1
 
     def hget(self, name: str, key: str) -> Optional[Any]:
+        """Execute hget operation.
+
+        Args:
+            name: The name parameter.
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         hash_data = self._data.get(name, {})
         return hash_data.get(key)
 
     def hgetall(self, name: str) -> Dict[str, Any]:
+        """Execute hgetall operation.
+
+        Args:
+            name: The name parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._data.get(name, {})
 
     def lpush(self, key: str, *values: Any) -> int:
+        """Execute lpush operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if key not in self._data:
             self._data[key] = []
         for value in values:
@@ -188,30 +320,72 @@ class MockRedis:
         return len(self._data[key])
 
     def rpush(self, key: str, *values: Any) -> int:
+        """Execute rpush operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if key not in self._data:
             self._data[key] = []
         self._data[key].extend(values)
         return len(self._data[key])
 
     def lpop(self, key: str) -> Optional[Any]:
+        """Execute lpop operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         lst = self._data.get(key, [])
         if lst:
             return lst.pop(0)
         return None
 
     def rpop(self, key: str) -> Optional[Any]:
+        """Execute rpop operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         lst = self._data.get(key, [])
         if lst:
             return lst.pop()
         return None
 
     def lrange(self, key: str, start: int, end: int) -> list:
+        """Execute lrange operation.
+
+        Args:
+            key: The key parameter.
+            start: The start parameter.
+            end: The end parameter.
+
+        Returns:
+            The result of the operation.
+        """
         lst = self._data.get(key, [])
         if end == -1:
             return lst[start:]
-        return lst[start:end + 1]
+        return lst[start : end + 1]
 
     def sadd(self, key: str, *values: Any) -> int:
+        """Execute sadd operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if key not in self._data:
             self._data[key] = set()
         before = len(self._data[key])
@@ -219,35 +393,79 @@ class MockRedis:
         return len(self._data[key]) - before
 
     def smembers(self, key: str) -> set:
+        """Execute smembers operation.
+
+        Args:
+            key: The key parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._data.get(key, set())
 
     def sismember(self, key: str, value: Any) -> bool:
+        """Execute sismember operation.
+
+        Args:
+            key: The key parameter.
+            value: The value parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return value in self._data.get(key, set())
 
     def ping(self) -> bool:
+        """Execute ping operation.
+
+        Returns:
+            The result of the operation.
+        """
         return True
 
     def flushall(self) -> None:
+        """Execute flushall operation.
+
+        Returns:
+            The result of the operation.
+        """
         self._data.clear()
 
 
 class MockDatabase:
-    """
-    Mock database session for testing.
+    """Mock database session for testing.
 
     Provides basic CRUD operations in memory.
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._tables: Dict[str, Dict[str, Any]] = {}
         self._id_counter = 0
 
     def _get_table(self, table_name: str) -> Dict[str, Any]:
+        """Execute _get_table operation.
+
+        Args:
+            table_name: The table_name parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if table_name not in self._tables:
             self._tables[table_name] = {}
         return self._tables[table_name]
 
     def insert(self, table: str, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute insert operation.
+
+        Args:
+            table: The table parameter.
+            record: The record parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._id_counter += 1
         record["id"] = record.get("id", self._id_counter)
         table_data = self._get_table(table)
@@ -255,9 +473,30 @@ class MockDatabase:
         return record
 
     def get(self, table: str, record_id: Any) -> Optional[Dict[str, Any]]:
+        """Execute get operation.
+
+        Args:
+            table: The table parameter.
+            record_id: The record_id parameter.
+
+        Returns:
+            The result of the operation.
+        """
         return self._get_table(table).get(record_id)
 
-    def update(self, table: str, record_id: Any, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def update(
+        self, table: str, record_id: Any, updates: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        """Execute update operation.
+
+        Args:
+            table: The table parameter.
+            record_id: The record_id parameter.
+            updates: The updates parameter.
+
+        Returns:
+            The result of the operation.
+        """
         record = self.get(table, record_id)
         if record:
             record.update(updates)
@@ -265,6 +504,15 @@ class MockDatabase:
         return None
 
     def delete(self, table: str, record_id: Any) -> bool:
+        """Execute delete operation.
+
+        Args:
+            table: The table parameter.
+            record_id: The record_id parameter.
+
+        Returns:
+            The result of the operation.
+        """
         table_data = self._get_table(table)
         if record_id in table_data:
             del table_data[record_id]
@@ -276,6 +524,15 @@ class MockDatabase:
         table: str,
         filters: Optional[Dict[str, Any]] = None,
     ) -> list[Dict[str, Any]]:
+        """Execute query operation.
+
+        Args:
+            table: The table parameter.
+            filters: The filters parameter.
+
+        Returns:
+            The result of the operation.
+        """
         table_data = self._get_table(table)
         results = list(table_data.values())
 
@@ -286,5 +543,10 @@ class MockDatabase:
         return results
 
     def clear(self) -> None:
+        """Execute clear operation.
+
+        Returns:
+            The result of the operation.
+        """
         self._tables.clear()
         self._id_counter = 0

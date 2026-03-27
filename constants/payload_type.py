@@ -1,5 +1,4 @@
-"""
-Payload Type Constants Module.
+"""Payload Type Constants Module.
 
 This module defines constants for request and response payload types.
 These are used throughout the application to specify content types
@@ -15,8 +14,7 @@ from typing import Final
 
 
 class RequestPayloadType:
-    """
-    Constants for supported request payload types.
+    """Constants for supported request payload types.
 
     These constants identify how incoming request data should be parsed
     and processed by the application.
@@ -37,6 +35,7 @@ class RequestPayloadType:
         ...         return request.form()
         ...     elif payload_type == RequestPayloadType.QUERY:
         ...         return dict(request.query_params)
+
     """
 
     JSON: Final[str] = "json"
@@ -53,8 +52,7 @@ class RequestPayloadType:
 
 
 class ResponsePayloadType:
-    """
-    Constants for supported response payload types.
+    """Constants for supported response payload types.
 
     These constants identify how outgoing response data should be
     formatted and serialized.
@@ -76,6 +74,7 @@ class ResponsePayloadType:
     Note:
         The class name has a typo (ResponsePlayloadType -> ResponsePayloadType)
         that is preserved for backward compatibility.
+
     """
 
     JSON: Final[str] = "json"

@@ -1,5 +1,4 @@
-"""
-Decorator Pattern.
+"""Decorator Pattern.
 
 Dynamically adds behavior to objects without modifying their
 structure, using composition instead of inheritance.
@@ -27,8 +26,7 @@ TResult = TypeVar("TResult")
 
 
 class IComponent(ABC, Generic[T]):
-    """
-    Base component interface for decorator pattern.
+    """Base component interface for decorator pattern.
 
     Usage:
         class DataSource(IComponent[str]):
@@ -50,13 +48,16 @@ class IComponent(ABC, Generic[T]):
 
     @abstractmethod
     def execute(self) -> T:
-        """Execute the component operation."""
+        """Execute execute operation.
+
+        Returns:
+            The result of the operation.
+        """
         pass
 
 
 class BaseDecorator(IComponent[T]):
-    """
-    Base decorator class.
+    """Base decorator class.
 
     Usage:
         class LoggingDecorator(BaseDecorator):
@@ -68,9 +69,19 @@ class BaseDecorator(IComponent[T]):
     """
 
     def __init__(self, wrapped: IComponent[T]):
+        """Execute __init__ operation.
+
+        Args:
+            wrapped: The wrapped parameter.
+        """
         self._wrapped = wrapped
 
     def execute(self) -> T:
+        """Execute execute operation.
+
+        Returns:
+            The result of the operation.
+        """
         return self._wrapped.execute()
 
 
@@ -78,8 +89,7 @@ class BaseDecorator(IComponent[T]):
 
 
 def timing(func: Callable) -> Callable:
-    """
-    Decorator to measure execution time.
+    """Decorator to measure execution time.
 
     Usage:
         @timing
@@ -91,24 +101,38 @@ def timing(func: Callable) -> Callable:
             await asyncio.sleep(1)
     """
     if asyncio.iscoroutinefunction(func):
+
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
+            """Execute async_wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             start = time.perf_counter()
             try:
                 return await func(*args, **kwargs)
             finally:
                 elapsed = time.perf_counter() - start
                 logging.info(f"{func.__name__} took {elapsed:.4f}s")
+
         return async_wrapper
     else:
+
         @wraps(func)
         def sync_wrapper(*args, **kwargs):
+            """Execute sync_wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             start = time.perf_counter()
             try:
                 return func(*args, **kwargs)
             finally:
                 elapsed = time.perf_counter() - start
                 logging.info(f"{func.__name__} took {elapsed:.4f}s")
+
         return sync_wrapper
 
 
@@ -118,8 +142,7 @@ def retry(
     backoff: float = 2.0,
     exceptions: tuple = (Exception,),
 ) -> Callable:
-    """
-    Decorator to retry failed operations.
+    """Decorator to retry failed operations.
 
     Usage:
         @retry(max_attempts=3, delay=1.0)
@@ -130,10 +153,25 @@ def retry(
         async def fetch_data():
             return await http_client.get(url)
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if asyncio.iscoroutinefunction(func):
+
             @wraps(func)
             async def async_wrapper(*args, **kwargs):
+                """Execute async_wrapper operation.
+
+                Returns:
+                    The result of the operation.
+                """
                 last_exception = None
                 current_delay = delay
 
@@ -147,10 +185,17 @@ def retry(
                             current_delay *= backoff
 
                 raise last_exception
+
             return async_wrapper
         else:
+
             @wraps(func)
             def sync_wrapper(*args, **kwargs):
+                """Execute sync_wrapper operation.
+
+                Returns:
+                    The result of the operation.
+                """
                 last_exception = None
                 current_delay = delay
 
@@ -164,25 +209,40 @@ def retry(
                             current_delay *= backoff
 
                 raise last_exception
+
             return sync_wrapper
+
     return decorator
 
 
 def cache(ttl_seconds: Optional[int] = None) -> Callable:
-    """
-    Simple in-memory caching decorator.
+    """Simple in-memory caching decorator.
 
     Usage:
         @cache(ttl_seconds=60)
         def get_user(user_id: str) -> User:
             return database.get_user(user_id)
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         _cache: dict = {}
         _timestamps: dict = {}
 
         @wraps(func)
         def wrapper(*args, **kwargs):
+            """Execute wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             key = (args, tuple(sorted(kwargs.items())))
 
             if key in _cache:
@@ -199,6 +259,7 @@ def cache(ttl_seconds: Optional[int] = None) -> Callable:
 
         wrapper.clear_cache = lambda: (_cache.clear(), _timestamps.clear())
         return wrapper
+
     return decorator
 
 
@@ -206,8 +267,7 @@ def log_calls(
     logger: Optional[logging.Logger] = None,
     level: int = logging.DEBUG,
 ) -> Callable:
-    """
-    Log function calls with arguments and results.
+    """Log function calls with arguments and results.
 
     Usage:
         @log_calls()
@@ -217,9 +277,23 @@ def log_calls(
     log = logger or logging.getLogger(__name__)
 
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if asyncio.iscoroutinefunction(func):
+
             @wraps(func)
             async def async_wrapper(*args, **kwargs):
+                """Execute async_wrapper operation.
+
+                Returns:
+                    The result of the operation.
+                """
                 log.log(level, f"Calling {func.__name__}({args}, {kwargs})")
                 try:
                     result = await func(*args, **kwargs)
@@ -228,10 +302,17 @@ def log_calls(
                 except Exception as e:
                     log.exception(f"{func.__name__} raised {e}")
                     raise
+
             return async_wrapper
         else:
+
             @wraps(func)
             def sync_wrapper(*args, **kwargs):
+                """Execute sync_wrapper operation.
+
+                Returns:
+                    The result of the operation.
+                """
                 log.log(level, f"Calling {func.__name__}({args}, {kwargs})")
                 try:
                     result = func(*args, **kwargs)
@@ -240,13 +321,14 @@ def log_calls(
                 except Exception as e:
                     log.exception(f"{func.__name__} raised {e}")
                     raise
+
             return sync_wrapper
+
     return decorator
 
 
 def validate_args(**validators: Callable[[Any], bool]) -> Callable:
-    """
-    Validate function arguments.
+    """Validate function arguments.
 
     Usage:
         @validate_args(
@@ -256,10 +338,26 @@ def validate_args(**validators: Callable[[Any], bool]) -> Callable:
         def transfer(user_id: str, amount: float):
             return process_transfer(user_id, amount)
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
+
         @wraps(func)
         def wrapper(*args, **kwargs):
+            """Execute wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             import inspect
+
             sig = inspect.signature(func)
             bound = sig.bind(*args, **kwargs)
             bound.apply_defaults()
@@ -268,41 +366,57 @@ def validate_args(**validators: Callable[[Any], bool]) -> Callable:
                 if param_name in bound.arguments:
                     value = bound.arguments[param_name]
                     if not validator(value):
-                        raise ValueError(
-                            f"Validation failed for {param_name}: {value}"
-                        )
+                        raise ValueError(f"Validation failed for {param_name}: {value}")
 
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def deprecated(message: str = "") -> Callable:
-    """
-    Mark function as deprecated.
+    """Mark function as deprecated.
 
     Usage:
         @deprecated("Use new_function() instead")
         def old_function():
             pass
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
+
         @wraps(func)
         def wrapper(*args, **kwargs):
+            """Execute wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             import warnings
+
             warnings.warn(
                 f"{func.__name__} is deprecated. {message}",
                 DeprecationWarning,
                 stacklevel=2,
             )
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def singleton(cls: type) -> type:
-    """
-    Make a class a singleton.
+    """Make a class a singleton.
 
     Usage:
         @singleton
@@ -314,6 +428,11 @@ def singleton(cls: type) -> type:
 
     @wraps(cls)
     def get_instance(*args, **kwargs):
+        """Execute get_instance operation.
+
+        Returns:
+            The result of the operation.
+        """
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
@@ -322,8 +441,7 @@ def singleton(cls: type) -> type:
 
 
 def run_in_thread(func: Callable) -> Callable:
-    """
-    Run synchronous function in a thread pool.
+    """Run synchronous function in a thread pool.
 
     Usage:
         @run_in_thread
@@ -333,26 +451,46 @@ def run_in_thread(func: Callable) -> Callable:
         # Can now be awaited
         result = await blocking_io()
     """
+
     @wraps(func)
     async def wrapper(*args, **kwargs):
+        """Execute wrapper operation.
+
+        Returns:
+            The result of the operation.
+        """
         return await asyncio.to_thread(func, *args, **kwargs)
+
     return wrapper
 
 
 def rate_limit(calls: int, period: float) -> Callable:
-    """
-    Rate limit function calls.
+    """Rate limit function calls.
 
     Usage:
         @rate_limit(calls=10, period=60)  # 10 calls per minute
         def api_call():
             return make_request()
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         call_times: list = []
 
         @wraps(func)
         def wrapper(*args, **kwargs):
+            """Execute wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             now = time.time()
             # Remove old calls outside the period
             while call_times and call_times[0] < now - period:
@@ -364,22 +502,38 @@ def rate_limit(calls: int, period: float) -> Callable:
 
             call_times.append(now)
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def timeout(seconds: float) -> Callable:
-    """
-    Add timeout to async functions.
+    """Add timeout to async functions.
 
     Usage:
         @timeout(30)
         async def long_running_task():
             await process_data()
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
+
         @wraps(func)
         async def wrapper(*args, **kwargs):
+            """Execute wrapper operation.
+
+            Returns:
+                The result of the operation.
+            """
             try:
                 return await asyncio.wait_for(
                     func(*args, **kwargs),
@@ -387,5 +541,7 @@ def timeout(seconds: float) -> Callable:
                 )
             except asyncio.TimeoutError:
                 raise TimeoutError(f"{func.__name__} timed out after {seconds}s")
+
         return wrapper
+
     return decorator

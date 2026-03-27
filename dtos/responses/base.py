@@ -1,5 +1,4 @@
-"""
-Base Response DTO Module.
+"""Base Response DTO Module.
 
 This module defines the standard response structure for all API endpoints.
 Every API response should use BaseResponseDTO to ensure consistent
@@ -18,13 +17,11 @@ Usage:
     ... )
 """
 
-
 from pydantic import BaseModel
 
 
 class BaseResponseDTO(BaseModel):
-    """
-    Standard response DTO for all API endpoints.
+    """Standard response DTO for all API endpoints.
 
     This DTO defines the consistent response structure used across
     all API endpoints in the FastMVC application. It includes
@@ -81,6 +78,7 @@ class BaseResponseDTO(BaseModel):
     Note:
         Controllers use DictionaryUtility.convert_dict_keys_to_camel_case()
         to convert snake_case field names to camelCase in the final response.
+
     """
 
     transactionUrn: str

@@ -1,5 +1,4 @@
-"""
-Dictionary Utility Dependency Module.
+"""Dictionary Utility Dependency Module.
 
 This module provides FastAPI dependency injection for DictionaryUtility.
 It returns a factory function that creates utility instances with
@@ -23,8 +22,7 @@ from fast_utilities.dictionary import DictionaryUtility
 
 
 class DictionaryUtilityDependency:
-    """
-    FastAPI dependency provider for DictionaryUtility.
+    """FastAPI dependency provider for DictionaryUtility.
 
     This class provides a factory pattern for creating DictionaryUtility
     instances with request-specific context for logging and tracing.
@@ -45,12 +43,12 @@ class DictionaryUtilityDependency:
         ...     user_id=user_id
         ... )
         >>> camel_data = util.convert_dict_keys_to_camel_case(snake_data)
+
     """
 
     @staticmethod
     def derive() -> Callable:
-        """
-        Provide a factory function for creating DictionaryUtility instances.
+        """Provide a factory function for creating DictionaryUtility instances.
 
         Returns a factory that accepts request context and returns a
         configured DictionaryUtility instance.
@@ -73,6 +71,7 @@ class DictionaryUtilityDependency:
             ...     api_name="LOGIN",
             ...     user_id="user-789"
             ... )
+
         """
         logger.debug("DictionaryUtilityDependency factory created")
 
@@ -82,8 +81,7 @@ class DictionaryUtilityDependency:
             api_name: str,
             user_id: str,
         ) -> DictionaryUtility:
-            """
-            Create a DictionaryUtility instance with request context.
+            """Create a DictionaryUtility instance with request context.
 
             Args:
                 urn (str): Unique Request Number for tracing.
@@ -93,6 +91,7 @@ class DictionaryUtilityDependency:
 
             Returns:
                 DictionaryUtility: Configured utility instance.
+
             """
             logger.info("Instantiating DictionaryUtility")
             return DictionaryUtility(

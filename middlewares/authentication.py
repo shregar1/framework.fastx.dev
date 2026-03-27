@@ -1,5 +1,4 @@
-"""
-App-specific wiring for :class:`JWTBearerAuthMiddleware` from ``fastmiddleware``.
+"""App-specific wiring for :class:`JWTBearerAuthMiddleware` from ``fastmiddleware``.
 
 JWT decode and user session lookup use this application's repositories and DTOs.
 
@@ -46,7 +45,9 @@ def _decode_bearer(token: str, urn: str) -> dict:
 def _load_user(user_data: dict, urn: str):
     """Load user from database."""
     if UserRepository and db_session:
-        return UserRepository(urn=urn, session=db_session).retrieve_record_by_id_and_is_logged_in(
+        return UserRepository(
+            urn=urn, session=db_session
+        ).retrieve_record_by_id_and_is_logged_in(
             id=user_data.get("user_id"),
             is_logged_in=True,
             is_deleted=False,
@@ -69,7 +70,9 @@ if JWTBearerAuthMiddleware:
                 transactionUrn=getattr(request.state, "urn", None),
                 status=APIStatus.FAILED,
                 responseMessage=error.message,
-                responseKey=f"error_{error.kind.name.lower()}" if hasattr(error.kind, 'name') else "error_authentication",
+                responseKey=f"error_{error.kind.name.lower()}"
+                if hasattr(error.kind, "name")
+                else "error_authentication",
                 data={},
                 errors=None,
             ).model_dump(),
@@ -79,11 +82,26 @@ else:
     # Fallback middleware that allows all requests
     class _NoOpAuthMiddleware:
         """No-op authentication middleware for development without fastmiddleware."""
-        
+
         def __init__(self, app):
+            """Execute __init__ operation.
+
+            Args:
+                app: The app parameter.
+            """
             self.app = app
-        
+
         async def __call__(self, scope, receive, send):
+            """Execute __call__ operation.
+
+            Args:
+                scope: The scope parameter.
+                receive: The receive parameter.
+                send: The send parameter.
+
+            Returns:
+                The result of the operation.
+            """
             await self.app(scope, receive, send)
-    
+
     AuthenticationMiddleware = _NoOpAuthMiddleware

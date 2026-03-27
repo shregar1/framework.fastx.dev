@@ -1,5 +1,4 @@
-"""
-Regular Expression Patterns Module.
+"""Regular Expression Patterns Module.
 
 This module defines compiled regular expressions and pattern strings
 for input validation, security checks, and data parsing. These patterns
@@ -16,8 +15,7 @@ from typing import Final
 
 
 class RegularExpression:
-    """
-    Collection of regular expressions for validation and security.
+    """Collection of regular expressions for validation and security.
 
     This class provides pre-compiled regex patterns and pattern strings
     for common validation tasks including email, password, phone number
@@ -52,6 +50,7 @@ class RegularExpression:
         and logging, but should not be the only line of defense against
         injection attacks. Always use parameterized queries and proper
         encoding.
+
     """
 
     DD_MM_YYYY: Final[str] = r"\b\d{2}/\d{2}/\d{4}\b"
@@ -63,7 +62,7 @@ class RegularExpression:
     """
 
     PASSWORD_PATTERN: Final[re.Pattern] = re.compile(
-        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+        r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
     )
     """
     Strong password validation pattern.
@@ -81,7 +80,7 @@ class RegularExpression:
     """
 
     EMAIL_PATTERN: Final[re.Pattern] = re.compile(
-        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     )
     """
     Email address validation pattern.
@@ -94,9 +93,7 @@ class RegularExpression:
         >>> RegularExpression.EMAIL_PATTERN.match("invalid-email")  # None
     """
 
-    PHONE_PATTERN: Final[re.Pattern] = re.compile(
-        r'^\+?1?\d{9,15}$'
-    )
+    PHONE_PATTERN: Final[re.Pattern] = re.compile(r"^\+?1?\d{9,15}$")
     """
     International phone number pattern.
 
@@ -108,9 +105,7 @@ class RegularExpression:
         >>> RegularExpression.PHONE_PATTERN.match("4155552671")  # Match
     """
 
-    ALPHANUMERIC_PATTERN: Final[re.Pattern] = re.compile(
-        r'^[a-zA-Z0-9\s\-_]+$'
-    )
+    ALPHANUMERIC_PATTERN: Final[re.Pattern] = re.compile(r"^[a-zA-Z0-9\s\-_]+$")
     """
     Alphanumeric pattern with spaces, hyphens, and underscores.
 
@@ -124,16 +119,16 @@ class RegularExpression:
     """
 
     DANGEROUS_SQL_INJECTION_PATTERNS: Final[list[str]] = [
-        r'(\b(union|select|insert|update|delete|drop|create|alter|exec|\
-            execute)\b)',
-        r'(\b(or|and)\b\s+\d+\s*=\s*\d+)',
-        r'(\b(union|select|insert|update|delete|drop|create|alter|exec|\
+        r"(\b(union|select|insert|update|delete|drop|create|alter|exec|\
+            execute)\b)",
+        r"(\b(or|and)\b\s+\d+\s*=\s*\d+)",
+        r"(\b(union|select|insert|update|delete|drop|create|alter|exec|\
             execute)\b.*\b(union|select|insert|update|delete|drop|create|\
-            alter|exec|execute)\b)',
-        r'(\b(union|select|insert|update|delete|drop|create|alter|exec|\
+            alter|exec|execute)\b)",
+        r"(\b(union|select|insert|update|delete|drop|create|alter|exec|\
             execute)\b.*\b(union|select|insert|update|delete|drop|create|\
             alter|exec|execute)\b.*\b(union|select|insert|update|delete|\
-            drop|create|alter|exec|execute)\b)',
+            drop|create|alter|exec|execute)\b)",
     ]
     """
     SQL injection detection patterns.
@@ -149,12 +144,12 @@ class RegularExpression:
     """
 
     DANGEROUS_XSS_PATTERNS: Final[list[str]] = [
-        r'<script[^>]*>.*?</script>',
-        r'javascript:',
-        r'on\w+\s*=',
-        r'<iframe[^>]*>',
-        r'<object[^>]*>',
-        r'<embed[^>]*>',
+        r"<script[^>]*>.*?</script>",
+        r"javascript:",
+        r"on\w+\s*=",
+        r"<iframe[^>]*>",
+        r"<object[^>]*>",
+        r"<embed[^>]*>",
     ]
     """
     Cross-Site Scripting (XSS) detection patterns.
@@ -171,10 +166,10 @@ class RegularExpression:
     """
 
     DANGEROUS_PATH_TRAVERSAL_PATTERNS: Final[list[str]] = [
-        r'\.\./',
-        r'\.\.\\',
-        r'%2e%2e%2f',
-        r'%2e%2e%5c',
+        r"\.\./",
+        r"\.\.\\",
+        r"%2e%2e%2f",
+        r"%2e%2e%5c",
     ]
     """
     Path traversal attack detection patterns.

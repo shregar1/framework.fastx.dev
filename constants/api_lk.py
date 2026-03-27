@@ -1,5 +1,4 @@
-"""
-API Logical Keys (APILK) Module.
+"""API Logical Keys (APILK) Module.
 
 This module defines logical key constants for identifying API operations
 throughout the application. These keys are used for routing, logging,
@@ -16,8 +15,7 @@ from typing import Final
 
 
 class APILK:
-    """
-    API Logical Keys for operation identification.
+    """API Logical Keys for operation identification.
 
     These constants provide a centralized, type-safe way to identify
     different API operations. Using these keys instead of string literals
@@ -40,6 +38,7 @@ class APILK:
     Note:
         All keys are defined as Final[str] to prevent accidental modification
         and enable static type checking.
+
     """
 
     LOGIN: Final[str] = "LOGIN"

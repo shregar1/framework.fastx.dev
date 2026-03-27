@@ -1,6 +1,4 @@
-"""
-Example Controller.
-"""
+"""Example Controller."""
 
 from typing import Any
 from abstractions.controller import IController
@@ -11,9 +9,9 @@ from constants.api_status import APIStatus
 from services.example_service import ExampleService
 from repositories.example_repository import ExampleRepository
 
+
 class ExampleController(IController):
-    """
-    Example class-based controller.
+    """Example class-based controller.
     Demonstrates the full FastMVC flow from DTO to Service to Repository.
     """
 
@@ -24,11 +22,9 @@ class ExampleController(IController):
         payload: dict,
         headers: dict,
         api_name: str,
-        user_id: str
+        user_id: str,
     ) -> BaseResponseDTO:
-        """
-        Handle a POST request to create an example item.
-        """
+        """Handle a POST request to create an example item."""
         # 1. Initialize Context & Validate Request Structure
         await self.validate_request(
             urn=urn,
@@ -36,7 +32,7 @@ class ExampleController(IController):
             request_payload=payload,
             request_headers=headers,
             api_name=api_name,
-            user_id=user_id
+            user_id=user_id,
         )
 
         self.logger.info("Handling create example request")
@@ -54,7 +50,7 @@ class ExampleController(IController):
             user_urn=user_urn,
             api_name=api_name,
             user_id=user_id,
-            logger=self.logger
+            logger=self.logger,
         )
 
         # 4. Execute Service Logic
@@ -69,5 +65,5 @@ class ExampleController(IController):
             status=APIStatus.SUCCESS,
             responseMessage=result["message"],
             responseKey="success_example_created",
-            data=response_data.model_dump()
+            data=response_data.model_dump(),
         )

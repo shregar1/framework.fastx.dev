@@ -1,5 +1,4 @@
-"""
-Testing Utilities Module.
+"""Testing Utilities Module.
 
 Provides testing helpers for FastMVC applications:
 - Factory pattern for creating test data

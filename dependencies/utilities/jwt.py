@@ -1,5 +1,4 @@
-"""
-JWT Utility Dependency Module.
+"""JWT Utility Dependency Module.
 
 This module provides FastAPI dependency injection for JWTUtility.
 It returns a factory function that creates utility instances with
@@ -23,8 +22,7 @@ from fast_utilities.jwt import JWTUtility
 
 
 class JWTUtilityDependency:
-    """
-    FastAPI dependency provider for JWTUtility.
+    """FastAPI dependency provider for JWTUtility.
 
     This class provides a factory pattern for creating JWTUtility
     instances with request-specific context for logging and tracing.
@@ -45,12 +43,12 @@ class JWTUtilityDependency:
         ...     user_id=user_id
         ... )
         >>> token = jwt_util.generate_token({"user_id": user_id})
+
     """
 
     @staticmethod
     def derive() -> Callable:
-        """
-        Provide a factory function for creating JWTUtility instances.
+        """Provide a factory function for creating JWTUtility instances.
 
         Returns a factory that accepts request context and returns a
         configured JWTUtility instance.
@@ -73,6 +71,7 @@ class JWTUtilityDependency:
             ...     api_name="LOGIN",
             ...     user_id="user-789"
             ... )
+
         """
         logger.debug("JWTUtilityDependency factory created")
 
@@ -82,8 +81,7 @@ class JWTUtilityDependency:
             api_name: str,
             user_id: str,
         ) -> JWTUtility:
-            """
-            Create a JWTUtility instance with request context.
+            """Create a JWTUtility instance with request context.
 
             Args:
                 urn (str): Unique Request Number for tracing.
@@ -93,6 +91,7 @@ class JWTUtilityDependency:
 
             Returns:
                 JWTUtility: Configured utility instance.
+
             """
             logger.info("Instantiating JWTUtility")
             return JWTUtility(

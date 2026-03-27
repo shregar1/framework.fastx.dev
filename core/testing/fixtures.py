@@ -1,5 +1,4 @@
-"""
-Test Fixtures and Utilities.
+"""Test Fixtures and Utilities.
 
 Provides common fixtures and test utilities for FastMVC applications.
 """
@@ -13,8 +12,7 @@ from fastapi.testclient import TestClient as FastAPITestClient
 
 
 class TestClient(FastAPITestClient):
-    """
-    Extended test client with additional utilities.
+    """Extended test client with additional utilities.
 
     Usage:
         client = TestClient(app)
@@ -32,6 +30,11 @@ class TestClient(FastAPITestClient):
     """
 
     def __init__(self, app: FastAPI, **kwargs: Any):
+        """Execute __init__ operation.
+
+        Args:
+            app: The app parameter.
+        """
         super().__init__(app, **kwargs)
         self._default_headers: Dict[str, str] = {}
 
@@ -60,8 +63,7 @@ class TestClient(FastAPITestClient):
 
 
 class DatabaseTestCase:
-    """
-    Base class for database tests.
+    """Base class for database tests.
 
     Provides transaction rollback for test isolation.
 
@@ -96,8 +98,7 @@ class DatabaseTestCase:
 
 
 class AsyncDatabaseTestCase:
-    """
-    Async version of DatabaseTestCase.
+    """Async version of DatabaseTestCase.
 
     Usage:
         class TestUserRepository(AsyncDatabaseTestCase):
@@ -133,8 +134,7 @@ class AsyncDatabaseTestCase:
 
 
 def create_test_app(**kwargs: Any) -> FastAPI:
-    """
-    Create a FastAPI app configured for testing.
+    """Create a FastAPI app configured for testing.
 
     Usage:
         app = create_test_app()
@@ -153,8 +153,7 @@ def create_test_app(**kwargs: Any) -> FastAPI:
 
 
 async def run_async(coro: Any) -> Any:
-    """
-    Run async function in sync context.
+    """Run async function in sync context.
 
     Useful for running async tests in synchronous test runners.
     """
@@ -163,8 +162,7 @@ async def run_async(coro: Any) -> Any:
 
 
 class FixtureRegistry:
-    """
-    Registry for test fixtures.
+    """Registry for test fixtures.
 
     Usage:
         fixtures = FixtureRegistry()
@@ -178,6 +176,7 @@ class FixtureRegistry:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._fixtures: Dict[str, Any] = {}
         self._cache: Dict[str, Any] = {}
 
@@ -185,6 +184,14 @@ class FixtureRegistry:
         """Decorator to register a fixture."""
 
         def decorator(func: Any) -> Any:
+            """Execute decorator operation.
+
+            Args:
+                func: The func parameter.
+
+            Returns:
+                The result of the operation.
+            """
             self._fixtures[name] = func
             return func
 

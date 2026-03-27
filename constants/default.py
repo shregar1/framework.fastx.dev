@@ -1,5 +1,4 @@
-"""
-Default Configuration Constants Module.
+"""Default Configuration Constants Module.
 
 This module defines default values for application configuration settings.
 These defaults are used as fallbacks when configuration files are missing
@@ -14,8 +13,7 @@ from typing import Any, Final
 
 
 class Default:
-    """
-    Default configuration values for the FastMVC application.
+    """Default configuration values for the FastMVC application.
 
     This class contains all default values for application settings including
     authentication, rate limiting, security headers, input validation, and CORS.
@@ -49,6 +47,7 @@ class Default:
     Note:
         These defaults are designed for development. Production deployments
         should use explicit configuration files with stricter values.
+
     """
 
     ACCESS_TOKEN_EXPIRE_MINUTES: Final[int] = 1440
@@ -82,7 +81,7 @@ class Default:
             "enable_token_bucket": False,
             "enable_fixed_window": False,
             "excluded_paths": ["/health", "/docs", "/openapi.json"],
-            "excluded_methods": ["OPTIONS"]
+            "excluded_methods": ["OPTIONS"],
         },
         "security_headers": {
             "enable_hsts": True,
@@ -96,7 +95,7 @@ class Default:
             "xss_protection": "1; mode=block",
             "referrer_policy": "strict-origin-when-cross-origin",
             "custom_csp": None,
-            "custom_permissions_policy": None
+            "custom_permissions_policy": None,
         },
         "input_validation": {
             "max_string_length": 1000,
@@ -106,9 +105,7 @@ class Default:
             "enable_sql_injection_check": True,
             "enable_xss_check": True,
             "enable_path_traversal_check": True,
-            "weak_passwords": [
-                "password", "123456", "qwerty", "admin", "letmein"
-            ]
+            "weak_passwords": ["password", "123456", "qwerty", "admin", "letmein"],
         },
         "authentication": {
             "jwt_expiry_minutes": 30,
@@ -117,15 +114,15 @@ class Default:
             "lockout_duration_minutes": 15,
             "password_history_count": 5,
             "require_strong_password": True,
-            "session_timeout_minutes": 60
+            "session_timeout_minutes": 60,
         },
         "cors": {
             "allowed_origins": ["*"],
             "allowed_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allowed_headers": ["*"],
             "allow_credentials": True,
-            "max_age": 3600
-        }
+            "max_age": 3600,
+        },
     }
     """
     Complete security configuration with sensible defaults.

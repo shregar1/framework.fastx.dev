@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Database Seed Script
+"""Database Seed Script.
 
 Populate the database with initial data after migrations.
 Run automatically with: fastmvc db reset --seed
@@ -30,27 +29,27 @@ DATABASE_URL = "sqlite:///./app.db"
 def seed_data():
     """Seed the database with initial data."""
     print("🌱 Seeding database...")
-    
+
     # Create engine and session
     engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     db = SessionLocal()
-    
+
     try:
         # Example: Add initial items
         # initial_items = [
         #     {"name": "Welcome Item", "description": "Your first item", "completed": False},
         #     {"name": "Learn FastMVC", "description": "Explore the framework", "completed": False},
         # ]
-        # 
+        #
         # for item_data in initial_items:
         #     item = Item(**item_data)
         #     db.add(item)
         #
         # db.commit()
-        
+
         print("✅ Seed data applied successfully!")
-        
+
     except Exception as e:
         print(f"❌ Error seeding database: {e}")
         db.rollback()

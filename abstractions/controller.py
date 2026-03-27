@@ -1,5 +1,4 @@
-"""
-Controller Abstraction Module.
+"""Controller Abstraction Module.
 
 This module defines the base controller interface that all API controllers
 must inherit from. Controllers handle HTTP request validation, orchestrate
@@ -10,6 +9,7 @@ Example:
     ...     async def validate_request(self, urn, user_urn, request_payload, ...):
     ...         await super().validate_request(...)
     ...         # Custom validation logic
+
 """
 
 from abc import ABC
@@ -19,8 +19,7 @@ from core.utils.context import ContextMixin
 
 
 class IController(ABC, ContextMixin):
-    """
-    Abstract base class for all API controllers.
+    """Abstract base class for all API controllers.
 
     The IController provides a standardized interface for handling HTTP requests
     in the FastMVC framework. It includes request context tracking (URN, user info),
@@ -42,6 +41,7 @@ class IController(ABC, ContextMixin):
         ...     async def validate_request(self, ...):
         ...         await super().validate_request(...)
         ...         # Add custom validation
+
     """
 
     def __init__(
@@ -52,8 +52,7 @@ class IController(ABC, ContextMixin):
         user_id: str = None,
         **kwargs: Any,
     ) -> None:
-        """
-        Initialize the controller with request context.
+        """Initialize the controller with request context.
 
         Args:
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
@@ -61,6 +60,7 @@ class IController(ABC, ContextMixin):
             api_name (str, optional): Name of the API endpoint. Defaults to None.
             user_id (str, optional): Database ID of the user. Defaults to None.
             **kwargs: Additional arguments for parent classes.
+
         """
         super().__init__(
             urn=urn,
@@ -79,8 +79,7 @@ class IController(ABC, ContextMixin):
         api_name: str,
         user_id: str,
     ) -> None:
-        """
-        Validate and process incoming HTTP request.
+        """Validate and process incoming HTTP request.
 
         This method should be called at the start of each controller action
         to set up the request context and perform validation. Subclasses
@@ -105,6 +104,7 @@ class IController(ABC, ContextMixin):
             ...     await super().validate_request(...)
             ...     if not request_payload.get('email'):
             ...         raise BadInputError("Email is required")
+
         """
         self.urn = urn
         self.user_urn = user_urn

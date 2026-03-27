@@ -1,5 +1,4 @@
-"""
-Domain Events Pattern.
+"""Domain Events Pattern.
 
 Enables loose coupling through event-driven communication
 between different parts of the application.
@@ -28,8 +27,7 @@ TEvent = TypeVar("TEvent", bound="IDomainEvent")
 
 @dataclass
 class IDomainEvent:
-    """
-    Base domain event interface.
+    """Base domain event interface.
 
     Domain events represent something that happened in the domain.
     They are named in past tense (UserCreated, OrderPlaced).
@@ -59,8 +57,7 @@ class IDomainEvent:
 
 
 class IEventHandler(ABC, Generic[TEvent]):
-    """
-    Event handler interface.
+    """Event handler interface.
 
     Handles a specific type of domain event.
 
@@ -72,18 +69,17 @@ class IEventHandler(ABC, Generic[TEvent]):
 
     @abstractmethod
     async def handle(self, event: TEvent) -> None:
-        """
-        Handle the event.
+        """Handle the event.
 
         Args:
             event: Event to handle.
+
         """
         pass
 
 
 class EventDispatcher:
-    """
-    Domain event dispatcher.
+    """Domain event dispatcher.
 
     Routes events to registered handlers.
 
@@ -96,6 +92,7 @@ class EventDispatcher:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._handlers: Dict[Type[IDomainEvent], List[IEventHandler]] = {}
         self._global_handlers: List[IEventHandler] = []
 
@@ -104,12 +101,12 @@ class EventDispatcher:
         event_type: Type[TEvent],
         handler: IEventHandler[TEvent],
     ) -> None:
-        """
-        Subscribe a handler to an event type.
+        """Subscribe a handler to an event type.
 
         Args:
             event_type: Type of event to handle.
             handler: Handler to invoke.
+
         """
         if event_type not in self._handlers:
             self._handlers[event_type] = []
@@ -129,11 +126,11 @@ class EventDispatcher:
             self._handlers[event_type].remove(handler)
 
     async def dispatch(self, event: IDomainEvent) -> None:
-        """
-        Dispatch an event to all registered handlers.
+        """Dispatch an event to all registered handlers.
 
         Args:
             event: Event to dispatch.
+
         """
         handlers = self._handlers.get(type(event), [])
         all_handlers = handlers + self._global_handlers
@@ -151,8 +148,7 @@ class EventDispatcher:
 
 
 class EventStore:
-    """
-    Event store for event sourcing.
+    """Event store for event sourcing.
 
     Persists all domain events for replay and audit.
 
@@ -165,6 +161,7 @@ class EventStore:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._events: Dict[str, List[IDomainEvent]] = {}
         self._all_events: List[IDomainEvent] = []
 
@@ -173,12 +170,12 @@ class EventStore:
         aggregate_id: str,
         event: IDomainEvent,
     ) -> None:
-        """
-        Append an event to the store.
+        """Append an event to the store.
 
         Args:
             aggregate_id: ID of the aggregate.
             event: Event to store.
+
         """
         if aggregate_id not in self._events:
             self._events[aggregate_id] = []
@@ -190,8 +187,7 @@ class EventStore:
         aggregate_id: str,
         since: Optional[datetime] = None,
     ) -> List[IDomainEvent]:
-        """
-        Get events for an aggregate.
+        """Get events for an aggregate.
 
         Args:
             aggregate_id: ID of the aggregate.
@@ -199,6 +195,7 @@ class EventStore:
 
         Returns:
             List of events.
+
         """
         events = self._events.get(aggregate_id, [])
         if since:
@@ -220,8 +217,7 @@ class EventStore:
 
 
 class AggregateRoot:
-    """
-    Base class for aggregate roots with event sourcing.
+    """Base class for aggregate roots with event sourcing.
 
     Aggregates collect domain events and can be replayed.
 
@@ -244,6 +240,7 @@ class AggregateRoot:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._uncommitted_events: List[IDomainEvent] = []
         self._version = 0
 
@@ -257,8 +254,7 @@ class AggregateRoot:
         self._uncommitted_events.clear()
 
     def _raise_event(self, event: IDomainEvent) -> None:
-        """
-        Raise a domain event.
+        """Raise a domain event.
 
         Applies the event and adds to uncommitted list.
         """
@@ -267,19 +263,18 @@ class AggregateRoot:
         self._version += 1
 
     def _apply(self, event: IDomainEvent) -> None:
-        """
-        Apply an event to update aggregate state.
+        """Apply an event to update aggregate state.
 
         Override this to handle specific events.
         """
         pass
 
     def load_from_history(self, events: List[IDomainEvent]) -> None:
-        """
-        Replay events to rebuild aggregate state.
+        """Replay events to rebuild aggregate state.
 
         Args:
             events: Historical events to replay.
+
         """
         for event in events:
             self._apply(event)
@@ -287,15 +282,24 @@ class AggregateRoot:
 
 
 def event_handler(event_type: Type[TEvent]) -> Callable:
-    """
-    Decorator to register a function as an event handler.
+    """Decorator to register a function as an event handler.
 
     Usage:
         @event_handler(UserCreatedEvent)
         async def send_welcome_email(event: UserCreatedEvent):
             await email_service.send_welcome(event.email)
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         func._event_type = event_type
         return func
+
     return decorator

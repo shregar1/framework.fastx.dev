@@ -1,5 +1,4 @@
-"""
-FastMVC Custom API Documentation
+"""FastMVC Custom API Documentation.
 
 Provides branded Swagger UI and ReDoc with dark mode and custom styling.
 
@@ -16,16 +15,16 @@ from fastapi.openapi.utils import get_openapi
 
 # FastMVC Brand Colors
 FASTMVC_THEME = {
-    "primary": "#0ea5e9",      # Cyan 500
-    "secondary": "#d946ef",    # Fuchsia 500
-    "accent": "#8b5cf6",       # Violet 500
+    "primary": "#0ea5e9",  # Cyan 500
+    "secondary": "#d946ef",  # Fuchsia 500
+    "accent": "#8b5cf6",  # Violet 500
     "dark": {
-        "bg": "#0f0f1a",       # Dark background
+        "bg": "#0f0f1a",  # Dark background
         "surface": "#1a1a2e",  # Card/surface
-        "text": "#e2e8f0",     # Primary text
-        "muted": "#94a3b8",    # Secondary text
-        "border": "#2d3748",   # Borders
-    }
+        "text": "#e2e8f0",  # Primary text
+        "muted": "#94a3b8",  # Secondary text
+        "border": "#2d3748",  # Borders
+    },
 }
 
 # Custom CSS for Swagger UI dark mode
@@ -468,35 +467,34 @@ SWAGGER_UI_JS = """
 
 
 def setup_custom_docs(app: FastAPI) -> None:
-    """
-    Set up custom FastMVC branded documentation for FastAPI.
-    
+    """Set up custom FastMVC branded documentation for FastAPI.
+
     Args:
         app: FastAPI application instance
+
     """
-    
     # Store original openapi schema
     original_openapi = app.openapi
-    
+
     def custom_openapi():
         """Generate custom OpenAPI schema with FastMVC branding."""
         if app.openapi_schema:
             return app.openapi_schema
-        
+
         openapi_schema = original_openapi()
-        
+
         # Add FastMVC branding
         openapi_schema["info"]["x-logo"] = {
             "url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E",
-            "altText": "FastMVC Logo"
+            "altText": "FastMVC Logo",
         }
-        
+
         # Add example servers
         openapi_schema["servers"] = [
             {"url": "http://localhost:8000", "description": "Local Development"},
             {"url": "https://api.example.com", "description": "Production"},
         ]
-        
+
         # Add example requests/responses to paths
         for path_data in openapi_schema.get("paths", {}).values():
             for method_data in path_data.values():
@@ -506,65 +504,73 @@ def setup_custom_docs(app: FastAPI) -> None:
                         {
                             "lang": "curl",
                             "label": "cURL",
-                            "source": f"curl -X {{method}} {{url}}"
+                            "source": f"curl -X {{method}} {{url}}",
                         },
                         {
                             "lang": "Python",
                             "label": "Python (httpx)",
-                            "source": "import httpx\n\nasync with httpx.AsyncClient() as client:\n    response = await client.{method}(url)\n    print(response.json())"
-                        }
+                            "source": "import httpx\n\nasync with httpx.AsyncClient() as client:\n    response = await client.{method}(url)\n    print(response.json())",
+                        },
                     ]
-        
+
         app.openapi_schema = openapi_schema
         return app.openapi_schema
-    
+
     app.openapi = custom_openapi
-    
+
     # Try to serve standalone swagger.html if it exists
     swagger_html_path = Path("static/swagger.html")
-    
+
     @app.get("/docs", include_in_schema=False)
     async def custom_swagger_ui_html():
         """Custom Swagger UI with FastMVC branding."""
         # Use standalone HTML file if available
         if swagger_html_path.exists():
             from fastapi.responses import HTMLResponse
+
             return HTMLResponse(content=swagger_html_path.read_text())
-        
+
         # Fallback to embedded Swagger UI
-        return get_swagger_ui_html(
-            openapi_url=app.openapi_url,
-            title=f"{app.title} - API Documentation",
-            swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
-            swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
-            swagger_favicon_url="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E",
-            init_oauth={
-                "clientId": "your-client-id",
-                "clientSecret": "your-client-secret-if-required",
-                "realm": "your-realms",
-                "appName": app.title,
-                "scopeSeparator": " ",
-                "additionalQueryStringParams": {}
-            },
-        ) + SWAGGER_UI_CSS + SWAGGER_UI_JS
-    
+        return (
+            get_swagger_ui_html(
+                openapi_url=app.openapi_url,
+                title=f"{app.title} - API Documentation",
+                swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
+                swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
+                swagger_favicon_url="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E",
+                init_oauth={
+                    "clientId": "your-client-id",
+                    "clientSecret": "your-client-secret-if-required",
+                    "realm": "your-realms",
+                    "appName": app.title,
+                    "scopeSeparator": " ",
+                    "additionalQueryStringParams": {},
+                },
+            )
+            + SWAGGER_UI_CSS
+            + SWAGGER_UI_JS
+        )
+
     # Override ReDoc endpoint
     @app.get("/redoc", include_in_schema=False)
     async def custom_redoc_html():
         """Custom ReDoc with FastMVC branding."""
-        return get_redoc_html(
-            openapi_url=app.openapi_url,
-            title=f"{app.title} - ReDoc",
-            redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@2.1.3/bundles/redoc.standalone.js",
-            redoc_favicon_url="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E",
-        ) + """
+        return (
+            get_redoc_html(
+                openapi_url=app.openapi_url,
+                title=f"{app.title} - ReDoc",
+                redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@2.1.3/bundles/redoc.standalone.js",
+                redoc_favicon_url="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E",
+            )
+            + """
         <style>
             body { background: #0f0f1a !important; }
             .menu-content { background: #1a1a2e !important; }
             .api-content { background: #0f0f1a !important; }
         </style>
         """
-    
+        )
+
     print("✅ Custom FastMVC API documentation configured")
     print("   - Swagger UI: http://localhost:8000/docs")
     print("   - ReDoc:      http://localhost:8000/redoc")
@@ -575,35 +581,39 @@ def add_examples_to_schema(
     path: str,
     method: str,
     request_example: dict = None,
-    response_examples: dict = None
+    response_examples: dict = None,
 ):
-    """
-    Add example requests/responses to OpenAPI schema.
-    
+    """Add example requests/responses to OpenAPI schema.
+
     Args:
         app: FastAPI application
         path: API path (e.g., "/items")
         method: HTTP method (e.g., "post")
         request_example: Example request body
         response_examples: Dict of status code -> example
+
     """
-    if not hasattr(app, 'openapi_schema') or app.openapi_schema is None:
+    if not hasattr(app, "openapi_schema") or app.openapi_schema is None:
         app.openapi()
-    
+
     schema = app.openapi_schema
     path_data = schema.get("paths", {}).get(path, {})
     method_data = path_data.get(method.lower(), {})
-    
+
     # Add request example
     if request_example and "requestBody" in method_data:
-        method_data["requestBody"]["content"]["application/json"]["example"] = request_example
-    
+        method_data["requestBody"]["content"]["application/json"]["example"] = (
+            request_example
+        )
+
     # Add response examples
     if response_examples and "responses" in method_data:
         for status_code, example in response_examples.items():
             if status_code in method_data["responses"]:
-                method_data["responses"][status_code]["content"]["application/json"]["example"] = example
-    
+                method_data["responses"][status_code]["content"]["application/json"][
+                    "example"
+                ] = example
+
     app.openapi_schema = schema
 
 
@@ -646,7 +656,7 @@ async with httpx.AsyncClient() as client:
 })
 .then(response => response.json())
 .then(data => console.log(data));
-"""
+""",
     },
     "get_items": {
         "curl": "curl http://localhost:8000/items",
@@ -659,6 +669,6 @@ async with httpx.AsyncClient() as client:
         "javascript": """fetch('http://localhost:8000/items')
   .then(response => response.json())
   .then(data => console.log(data));
-"""
-    }
+""",
+    },
 }

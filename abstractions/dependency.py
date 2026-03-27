@@ -1,5 +1,4 @@
-"""
-Dependency Abstraction Module.
+"""Dependency Abstraction Module.
 
 This module defines the base interface for FastAPI dependency injection.
 Dependencies are reusable components that can be injected into route handlers,
@@ -10,6 +9,7 @@ Example:
     ...     def __init__(self, urn: str):
     ...         super().__init__(urn=urn)
     ...         self.session = create_session()
+
 """
 
 from abc import ABC
@@ -18,8 +18,7 @@ from loguru import logger
 
 
 class IDependency(ABC):
-    """
-    Abstract base class for FastAPI dependencies.
+    """Abstract base class for FastAPI dependencies.
 
     The IDependency class provides a standardized interface for creating
     injectable dependencies in the FastMVC framework. Dependencies encapsulate
@@ -47,6 +46,7 @@ class IDependency(ABC):
         ...     async def validate_token(self, token: str) -> bool:
         ...         # Token validation logic
         ...         return True
+
     """
 
     def __init__(
@@ -56,14 +56,14 @@ class IDependency(ABC):
         api_name: str = None,
         user_id: str = None,
     ) -> None:
-        """
-        Initialize the dependency with request context.
+        """Initialize the dependency with request context.
 
         Args:
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
             user_id (str, optional): Database ID of the user. Defaults to None.
+
         """
         self._urn = urn
         self._user_urn = user_urn

@@ -1,5 +1,4 @@
-"""
-Observer/Publisher-Subscriber Pattern.
+"""Observer/Publisher-Subscriber Pattern.
 
 Defines a one-to-many dependency between objects so that
 when one object changes state, all dependents are notified.
@@ -26,8 +25,7 @@ T = TypeVar("T")
 
 
 class IObserver(ABC, Generic[T]):
-    """
-    Observer interface.
+    """Observer interface.
 
     Usage:
         class EmailNotifier(IObserver[OrderEvent]):
@@ -41,11 +39,11 @@ class IObserver(ABC, Generic[T]):
 
     @abstractmethod
     def update(self, event: T) -> None:
-        """
-        Handle notification from subject.
+        """Handle notification from subject.
 
         Args:
             event: Event data from subject.
+
         """
         pass
 
@@ -60,8 +58,7 @@ class IAsyncObserver(ABC, Generic[T]):
 
 
 class ISubject(ABC, Generic[T]):
-    """
-    Subject/Observable interface.
+    """Subject/Observable interface.
 
     Usage:
         class OrderService(ISubject[OrderEvent]):
@@ -87,8 +84,7 @@ class ISubject(ABC, Generic[T]):
 
 
 class Subject(ISubject[T]):
-    """
-    Base subject implementation.
+    """Base subject implementation.
 
     Usage:
         subject = Subject()
@@ -99,6 +95,7 @@ class Subject(ISubject[T]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._observers: Set[IObserver[T]] = set()
 
     def attach(self, observer: IObserver[T]) -> None:
@@ -116,8 +113,7 @@ class Subject(ISubject[T]):
 
 
 class AsyncSubject(Generic[T]):
-    """
-    Async subject for async observers.
+    """Async subject for async observers.
 
     Usage:
         subject = AsyncSubject()
@@ -127,12 +123,29 @@ class AsyncSubject(Generic[T]):
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._observers: Set[IAsyncObserver[T]] = set()
 
     def attach(self, observer: IAsyncObserver[T]) -> None:
+        """Execute attach operation.
+
+        Args:
+            observer: The observer parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._observers.add(observer)
 
     def detach(self, observer: IAsyncObserver[T]) -> None:
+        """Execute detach operation.
+
+        Args:
+            observer: The observer parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._observers.discard(observer)
 
     async def notify(self, event: T) -> None:
@@ -144,30 +157,53 @@ class AsyncSubject(Generic[T]):
 
 
 class WeakSubject(ISubject[T]):
-    """
-    Subject using weak references.
+    """Subject using weak references.
 
     Observers are automatically removed when garbage collected.
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._observers: WeakSet = WeakSet()
 
     def attach(self, observer: IObserver[T]) -> None:
+        """Execute attach operation.
+
+        Args:
+            observer: The observer parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._observers.add(observer)
 
     def detach(self, observer: IObserver[T]) -> None:
+        """Execute detach operation.
+
+        Args:
+            observer: The observer parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._observers.discard(observer)
 
     def notify(self, event: T) -> None:
+        """Execute notify operation.
+
+        Args:
+            event: The event parameter.
+
+        Returns:
+            The result of the operation.
+        """
         for observer in self._observers:
             observer.update(event)
 
 
 @dataclass
 class EventChannel(Generic[T]):
-    """
-    Named event channel for pub/sub.
+    """Named event channel for pub/sub.
 
     Usage:
         channel = EventChannel("orders")
@@ -195,8 +231,7 @@ class EventChannel(Generic[T]):
 
 
 class EventBus:
-    """
-    Central event bus for application-wide pub/sub.
+    """Central event bus for application-wide pub/sub.
 
     Usage:
         bus = EventBus()
@@ -211,6 +246,7 @@ class EventBus:
     """
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._channels: Dict[str, EventChannel] = {}
         self._global_observers: List[IObserver] = []
 
@@ -252,6 +288,7 @@ class AsyncEventBus:
     """Async version of EventBus."""
 
     def __init__(self):
+        """Execute __init__ operation."""
         self._handlers: Dict[str, List[Callable]] = {}
 
     def subscribe(
@@ -269,7 +306,8 @@ class AsyncEventBus:
         handlers = self._handlers.get(event_type, [])
         await asyncio.gather(
             *[
-                handler(event) if asyncio.iscoroutinefunction(handler)
+                handler(event)
+                if asyncio.iscoroutinefunction(handler)
                 else asyncio.to_thread(handler, event)
                 for handler in handlers
             ],
@@ -278,8 +316,7 @@ class AsyncEventBus:
 
 
 class LambdaObserver(IObserver[T]):
-    """
-    Observer from a lambda function.
+    """Observer from a lambda function.
 
     Usage:
         observer = LambdaObserver(lambda e: print(f"Event: {e}"))
@@ -287,15 +324,27 @@ class LambdaObserver(IObserver[T]):
     """
 
     def __init__(self, callback: Callable[[T], None]):
+        """Execute __init__ operation.
+
+        Args:
+            callback: The callback parameter.
+        """
         self._callback = callback
 
     def update(self, event: T) -> None:
+        """Execute update operation.
+
+        Args:
+            event: The event parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._callback(event)
 
 
 class FilteredObserver(IObserver[T]):
-    """
-    Observer that filters events before processing.
+    """Observer that filters events before processing.
 
     Usage:
         observer = FilteredObserver(
@@ -309,17 +358,30 @@ class FilteredObserver(IObserver[T]):
         predicate: Callable[[T], bool],
         handler: Callable[[T], None],
     ):
+        """Execute __init__ operation.
+
+        Args:
+            predicate: The predicate parameter.
+            handler: The handler parameter.
+        """
         self._predicate = predicate
         self._handler = handler
 
     def update(self, event: T) -> None:
+        """Execute update operation.
+
+        Args:
+            event: The event parameter.
+
+        Returns:
+            The result of the operation.
+        """
         if self._predicate(event):
             self._handler(event)
 
 
 class BufferedObserver(IObserver[T]):
-    """
-    Observer that buffers events and processes in batches.
+    """Observer that buffers events and processes in batches.
 
     Usage:
         observer = BufferedObserver(
@@ -333,11 +395,25 @@ class BufferedObserver(IObserver[T]):
         batch_size: int,
         handler: Callable[[List[T]], None],
     ):
+        """Execute __init__ operation.
+
+        Args:
+            batch_size: The batch_size parameter.
+            handler: The handler parameter.
+        """
         self._batch_size = batch_size
         self._handler = handler
         self._buffer: List[T] = []
 
     def update(self, event: T) -> None:
+        """Execute update operation.
+
+        Args:
+            event: The event parameter.
+
+        Returns:
+            The result of the operation.
+        """
         self._buffer.append(event)
         if len(self._buffer) >= self._batch_size:
             self.flush()
@@ -350,15 +426,24 @@ class BufferedObserver(IObserver[T]):
 
 
 def on_event(event_type: str):
-    """
-    Decorator to register an event handler.
+    """Decorator to register an event handler.
 
     Usage:
         @on_event("user.created")
         def handle_user_created(event: UserCreatedEvent):
             send_welcome_email(event.email)
     """
+
     def decorator(func: Callable) -> Callable:
+        """Execute decorator operation.
+
+        Args:
+            func: The func parameter.
+
+        Returns:
+            The result of the operation.
+        """
         func._event_type = event_type
         return func
+
     return decorator

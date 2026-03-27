@@ -1,11 +1,10 @@
-"""
-FastMVC Example Testing Utilities
+"""FastMVC Example Testing Utilities.
 
 Provides factories and fixtures for testing the example Item API.
 
 Usage:
     from example.testing import ItemFactory, item_client
-    
+
     def test_create_item(item_client):
         # Use factory to create test data
         data = ItemFactory.create_dict()

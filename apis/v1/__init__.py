@@ -1,6 +1,4 @@
-"""
-V1 API Router.
-"""
+"""V1 API Router."""
 
 from fastapi import APIRouter
 from apis.v1.example import router as example_router
