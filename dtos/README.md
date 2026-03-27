@@ -6,6 +6,20 @@ The **`dtos`** package defines **Pydantic models** for **HTTP request bodies**, 
 
 Request DTOs often inherit from **`IRequestDTO`** (reference numbers, shared validators); responses use **`BaseResponseDTO`** / **`IResponseDTO`** for a consistent **`transactionUrn`**, **`status`**, **`data`**, and **`errors`** shape.
 
+## Nested folders and leaf filenames
+
+When DTOs are grouped by **segment** (e.g. `dtos/requests/item/`), **leaf module names stay short**; the path already encodes the resource. Use **verb or role** filenames such as **`create.py`**, **`update.py`**, **`fetch.py`** — not `create_item_request_dto.py` under `item/`.
+
+**Class names** remain fully explicit (`CreateItemRequestDTO`, `UpdateItemRequestDTO`). See [**New API scaffolding**](../docs/guide/new-api-scaffolding.md#leaf-file-naming-nested-folders) for the generator/CLI convention.
+
+## One concrete class per file
+
+- **Default**: **one** concrete Pydantic **model class** per **module** (one **purpose** per file: create, update, delete, etc.).
+- **Nested models**: Small helper models that exist **only** to compose a parent DTO (e.g. nested `Address` fields) **may** live in the **same file** as that parent. If a type is **reused** across requests, give it its own module.
+- **Abstractions**: Segment-level bases (`abstraction.py`, `IRequestExampleDTO`) are separate from concrete bodies.
+
+See [**New API scaffolding — One concrete class per file**](../docs/guide/new-api-scaffolding.md#one-concrete-class-per-file-dtos).
+
 ## Overview
 
 The `dtos` module contains Pydantic models for data validation, serialization, and documentation. DTOs ensure type-safe data transfer between layers of the application.

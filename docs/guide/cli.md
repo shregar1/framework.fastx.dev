@@ -41,6 +41,10 @@ fastmvc add resource -f <folder> -r <operation> -v <version>
 - `dtos/requests/apis/v1/user/create.py` (Request Schema)
 - `dtos/responses/apis/v1/user/create.py` (Response Schema)
 
+**Leaf filenames under a segment folder** should stay **short** (`create.py`, `update.py`): the folder path already names the resource (`user`, `item`, …). Do **not** emit redundant names like `create_user_request_dto.py` inside `dtos/requests/.../user/`. **Class** names stay explicit (`CreateUserRequestDTO`). See [New API scaffolding — Leaf file naming](new-api-scaffolding.md#leaf-file-naming-nested-folders).
+
+**One concrete DTO class per generated file**: each `create.py` / `update.py` module exports a **single** primary request model. **Nested** Pydantic models that only support that body may live in the **same** file; shared sub-models get their own file. See [One concrete class per file](new-api-scaffolding.md#one-concrete-class-per-file-dtos).
+
 ### `fastmvc add auth`
 Scaffolds a complete **Zero-to-Hero** authentication stack in one command.
 

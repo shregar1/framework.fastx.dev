@@ -18,31 +18,32 @@ pip install -r requirements-dev.txt
 
 ## Test Structure
 
-The **`tests/`** tree **mirrors** the application layout (controllers, services, dtos, factories, middlewares, repositories, etc.). Put each test module next to the same path as the code under test (for example, `tests/example/` for the sample app, `tests/factories/apis/v1/example/` for factory tests).
+The **`tests/`** tree **mirrors** the application layout (controllers, services, dtos, factories, middlewares, repositories, etc.). Put each test module next to the same path as the code under test (for example, `tests/example/test_example_item.py` for Item API tests, `tests/factories/apis/v1/example/` for DTO factory tests).
 
 ```
 my-project/
 ├── tests/
 │   ├── conftest.py                    # Shared fixtures
 │   ├── example/
-│   │   └── test_example_item.py       # Example API tests
+│   │   └── test_example_item.py       # Item API tests (legacy path)
 │   ├── factories/apis/v1/example/
 │   │   └── test_factories_example.py
 │   └── …                              # abstractions, controllers, services, …
-└── example/testing/                   # Testing utilities
-    ├── __init__.py
-    ├── factories.py                   # Data factories
-    └── fixtures.py                    # Pytest fixtures
+└── testing/item/                      # ItemFactory + pytest fixtures (imported by conftest)
+    ├── factories.py
+    └── fixtures.py
 ```
 
 ## Factories
 
 Factories generate fake test data using `faker`.
 
+DTOs in `dtos/requests/<segment>/` follow **one concrete Pydantic class per module** (nested helpers may share a file with their parent). Factory modules should import the matching DTO from the same paths (e.g. `dtos.requests.example.create`). See [New API scaffolding — One concrete class per file](new-api-scaffolding.md#one-concrete-class-per-file-dtos).
+
 ### ItemFactory
 
 ```python
-from example.testing import ItemFactory
+from testing.item import ItemFactory
 
 # Create single entity
 item = ItemFactory.create(name="Custom Name")
@@ -247,7 +248,7 @@ Test individual components in isolation:
 @pytest.mark.unit
 def test_entity_validation():
     """Test entity validation logic."""
-    from example.entities.item import ItemEntity
+    from entities.item import ItemEntity
     
     with pytest.raises(ValueError):
         ItemEntity(name="")  # Empty name should fail

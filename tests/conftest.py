@@ -30,11 +30,11 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 # =============================================================================
-# IMPORT FIXTURES FROM EXAMPLE TESTING MODULE
+# IMPORT FIXTURES FROM ITEM TESTING MODULE
 # =============================================================================
 
-# Import all fixtures from example testing module
-from example.testing.fixtures import (
+# Import all fixtures from testing.item.fixtures
+from testing.item.fixtures import (
     # DataI fixtures
     item_db,
     item_repository,

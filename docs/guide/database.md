@@ -157,7 +157,7 @@ fastmvc db history --verbose
 
 ### Development Workflow
 
-1. **Modify models** in `example/entity.py` or your entity files
+1. **Modify models** in `entities/<your_domain>/` or your entity files
 2. **Generate migration:**
    ```bash
    fastmvc db migrate -m "Add email field to users"

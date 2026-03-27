@@ -8,7 +8,7 @@ CI (e.g. GitHub Actions) typically runs **`pytest`** with options from **`pytest
 
 ## Layout (mirrors the app)
 
-Place test modules under the same relative path as the code they exercise (e.g. factory tests under `tests/factories/apis/v1/example/`, sample app tests under `tests/example/`). Empty packages use `__init__.py` as placeholders until tests are added.
+Place test modules under the same relative path as the code they exercise (e.g. factory tests under `tests/factories/apis/v1/example/`, Item API tests under `tests/example/` or `tests/controllers/apis/v1/item/`). Empty packages use `__init__.py` as placeholders until tests are added.
 
 ```
 tests/
@@ -23,7 +23,7 @@ tests/
 ├── dependencies/                  # → dependencies/
 ├── dtos/                          # → dtos/
 ├── example/                       # → example/
-│   └── test_example_item.py
+│   └── test_example_item.py   # Item API (see testing/item/ for fixtures)
 ├── factories/                     # → factories/
 │   └── apis/
 │       └── v1/
@@ -46,13 +46,13 @@ Top-level **`factories/`** (not under `tests/`) provides **DTO-aligned builders*
 
 ## How it fits in the stack
 
-Tests mirror the **production** structure: they import from `services`, `repositories`, `example`, etc., and may use **`example/testing`** or **`core/testing`** factories and mocks.
+Tests mirror the **production** structure: they import from `services`, `repositories`, `entities`, etc., and may use **`testing/item`** or **`core/testing`** factories and mocks.
 
 ## Related files
 
 - **`pytest.ini`** — markers, defaults  
 - **`pytest.ini` / `pyproject.toml`** — coverage and plugins  
-- **`example/testing/`** — Factories used by example tests  
+- **`testing/item/`** — Factories and fixtures for Item API tests  
 
 ## Practices
 

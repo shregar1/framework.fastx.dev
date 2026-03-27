@@ -9,7 +9,7 @@ from dependencies.repositories.example.example_repository_dependency import (
 from dependencies.services.v1.example.example_service_dependency import (
     ExampleServiceDependency,
 )
-from dtos.requests.example.example_request import ExampleCreateRequestDTO
+from dtos.requests.example.create import ExampleCreateRequestDTO
 from dtos.responses.example.example_response import ExampleResponseDataDTO
 from dtos.responses.I import IResponseDTO
 from constants.api_status import APIStatus

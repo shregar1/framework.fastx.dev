@@ -2,10 +2,7 @@
 
 from typing import Any, Dict, List, Optional
 
-from dtos.requests.example.example_request import (
-    ExampleCreateRequestDTO,
-    ExampleUpdateRequestDTO,
-)
+from dtos.requests.example import ExampleCreateRequestDTO, ExampleUpdateRequestDTO
 from repositories.example.example_repository import ExampleRepository
 from services.example.abstraction import IExampleService
 

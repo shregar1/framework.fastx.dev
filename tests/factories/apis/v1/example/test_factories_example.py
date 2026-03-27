@@ -5,7 +5,7 @@ import uuid
 import pytest
 
 from dtos.requests.apis.v1.user.fetch import FetchUserRequestDTO
-from dtos.requests.example.example_request import (
+from dtos.requests.example import (
     ExampleCreateRequestDTO,
     ExampleDeleteRequestDTO,
     ExampleUpdateRequestDTO,

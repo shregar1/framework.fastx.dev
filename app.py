@@ -72,9 +72,9 @@ try:
 except ImportError:
     UserRouter = None  # type: ignore
 
-# Optional example API (Item CRUD demonstration)
+# Optional sample Item API (CRUD demonstration)
 try:
-    from example.controllers.item_controller import router as ExampleItemRouter
+    from controllers.apis.v1.item.item_controller import router as ExampleItemRouter
 except ImportError:
     ExampleItemRouter = None  # type: ignore
 

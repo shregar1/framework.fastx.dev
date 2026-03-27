@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from dtos.requests.example.example_request import ExampleDeleteRequestDTO
+from dtos.requests.example.delete import ExampleDeleteRequestDTO
 
 from factories.apis.v1.example.common import new_reference_number
 

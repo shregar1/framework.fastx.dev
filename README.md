@@ -131,7 +131,8 @@ make docker-up-dev
 Generated projects include comprehensive testing utilities:
 
 ```python
-from example.testing import ItemFactory, item_client
+from testing.item import ItemFactory
+from testing.item.fixtures import item_client  # or rely on tests/conftest.py
 
 # Generate fake test data
 item = ItemFactory.create(name="Test Item")

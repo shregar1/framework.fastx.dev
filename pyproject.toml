@@ -161,7 +161,7 @@ py-modules = ["app", "start_utils"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["fast_mvc*", "abstractions*", "controllers*", "core*", "dependencies*", "dtos*", "fast_cli*", "middlewares*", "migrations*", "models*", "repositories*", "services*", "utilities*", "constants*", "config*"]
+include = ["fast_mvc*", "abstractions*", "controllers*", "core*", "dependencies*", "dtos*", "entities*", "fast_cli*", "middlewares*", "migrations*", "models*", "repositories*", "services*", "testing*", "utilities*", "constants*", "config*"]
 exclude = ["tests*", "docs*", "scripts*", "dist*", "htmlcov*"]
 
 [tool.setuptools.package-data]

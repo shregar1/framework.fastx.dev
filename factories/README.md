@@ -4,7 +4,7 @@
 
 The **`factories`** package holds **reusable builders** for test data and local tooling: dictionaries and Pydantic DTOs that match production request/response shapes. The **folder layout mirrors** the API and DTO trees so you can find the factory for an endpoint next to the same path under **`dtos/requests/apis/...`** and conceptually next to **`controllers/apis/...`**.
 
-It complements **`example/testing/`** (example `ItemFactory`) and **`core/testing/factories.py`** (generic helpers).
+It complements **`testing/item/`** (`ItemFactory`, pytest fixtures) and **`core/testing/factories.py`** (generic helpers).
 
 ## Layout (`factories/apis/v1/example`)
 
@@ -63,7 +63,7 @@ get_body = ExampleFetchRequestFactory.build()
 
 ## Related
 
-- `dtos/requests/example/` — `ExampleCreateRequestDTO`, `ExampleUpdateRequestDTO`, `ExampleDeleteRequestDTO`, …  
-- `example/testing/factories.py` — Item-focused factories for the sample CRUD API  
+- `dtos/requests/example/` — `create.py`, `update.py`, `delete.py` (one **concrete** DTO class per module; see `dtos/README.md`)  
+- `testing/item/factories.py` — Item-focused factories for the sample CRUD API  
 - `core/testing/factories.py` — Generic `Factory` / `FactoryField` helpers  
 - `tests/README.md` — fixtures and discovery  

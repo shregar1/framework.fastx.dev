@@ -9,7 +9,7 @@ Run tests:
 
 import pytest
 from datetime import datetime
-from example.testing.factories import ItemFactory
+from testing.item.factories import ItemFactory
 
 # Mark all tests in this file
 pytestmark = [pytest.mark.api, pytest.mark.integration]
@@ -273,7 +273,7 @@ class TestItemService:
 
     def test_service_create_item(self, item_repository):
         """Test creating item through service."""
-        from example.services.item_service import ItemService
+        from services.item.item_service import ItemService
 
         service = ItemService(item_repository)
 
@@ -288,7 +288,7 @@ class TestItemService:
 
     def test_service_get_item(self, item_repository, test_item):
         """Test getting item through service."""
-        from example.services.item_service import ItemService
+        from services.item.item_service import ItemService
 
         service = ItemService(item_repository)
 

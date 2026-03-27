@@ -37,11 +37,11 @@ my-project/
 ├── config/                # Configuration
 │   ├── settings.py        # Settings management
 │   └── validator.py       # Environment validation
-├── example/               # Example API (Item CRUD)
-│   ├── entity.py          # Domain entities
-│   ├── repository.py      # Data access layer
-│   ├── service.py         # Business logic
-│   └── controller.py      # HTTP handlers
+├── entities/item/         # Sample Item domain entity
+├── repositories/item/     # Item data access
+├── services/item/         # Item business logic
+├── controllers/apis/v1/item/  # Item HTTP routes
+├── testing/item/          # Item test factories & fixtures
 ├── abstractions/          # I classes and interfaces
 ├── core/                  # Core utilities
 ├── middlewares/           # Custom middleware

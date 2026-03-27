@@ -22,7 +22,8 @@ controllers/
 ├── abstraction.py          # App-level controller base (extends framework IController)
 ├── apis/                   # REST-style API controllers (nested by version / area)
 │   └── v1/
-│       └── example/        # Sample example API (abstraction.py, create.py, …)
+│       ├── item/           # Sample Item CRUD (item_controller.py)
+│       └── example/        # Thin DTO demo (abstraction.py, create.py, …)
 ├── auth/                   # Authentication-related controllers
 └── router.py               # Example router wiring (if present)
 ```

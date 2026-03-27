@@ -59,12 +59,9 @@ my-project/
 │   ├── request.py            # Request DTOs
 │   └── response.py           # Response DTOs
 │
-├── example/                   # Example API implementation
-│   ├── entity.py             # Item entity
-│   ├── repository.py         # Item repository
-│   ├── service.py            # Item service
-│   ├── controller.py         # Item controller
-│   └── __init__.py
+├── entities/                  # Domain entities (e.g. entities/item/)
+├── controllers/apis/v1/       # Versioned HTTP controllers (e.g. item/, example/)
+├── testing/                   # Pytest factories/fixtures per domain (e.g. testing/item/)
 │
 ├── factories/                 # Test/tooling factories (mirror apis/… and dtos/requests/apis/…)
 │   └── apis/v1/example/     # fetch, create, patch, put, update, delete, common
@@ -86,7 +83,7 @@ my-project/
 │
 ├── tests/                     # Test suite (mirrors app: controllers, services, dtos, …)
 │   ├── conftest.py           # Pytest configuration
-│   ├── example/              # Tests for example/ sample app
+│   ├── controllers/apis/v1/item/  # HTTP tests for sample Item API (see guide/new-api-scaffolding.md)
 │   ├── factories/            # Tests for factories/ (same subpaths as prod)
 │   └── …                     # abstractions, apis, config, middlewares, repositories, …
 │
@@ -121,17 +118,21 @@ Shared utilities and infrastructure:
 - **Exceptions**: Custom exception classes
 - **Responses**: Standard response formats
 
-### 3. Feature Layer (Example)
+### 3. Feature layer (per resource)
 
-Each feature follows the MVC pattern:
+Each feature follows the MVC pattern across packages, for example the **Item** sample:
 
 ```
-example/
-├── entity.py      # Data model
-├── repository.py  # Data access
-├── service.py     # Business logic
-└── controller.py  # HTTP endpoints
+entities/item/              # ItemEntity
+repositories/item/          # ItemRepository
+services/item/              # ItemService
+controllers/apis/v1/item/   # Router + ItemController
+dtos/requests/item/         # create.py, update.py — one concrete class per file (nested helpers optional)
+dtos/responses/item/        # Response DTOs
+testing/item/               # ItemFactory, pytest fixtures
 ```
+
+See [**New API scaffolding**](new-api-scaffolding.md) for a generator-oriented checklist.
 
 ## Design Principles
 

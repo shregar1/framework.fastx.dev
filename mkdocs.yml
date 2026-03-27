@@ -86,6 +86,7 @@ nav:
     - Installation: guide/installation.md
     - Quick Start: guide/quickstart.md
     - Project Structure: guide/project-structure.md
+    - New API scaffolding: guide/new-api-scaffolding.md
     - "The `_maint` folder (critical)": guide/maint-folder.md
     - Core Features: guide/features.md
   - User Guide:

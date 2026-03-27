@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from dtos.requests.example.example_request import ExampleCreateRequestDTO
+from dtos.requests.example.create import ExampleCreateRequestDTO
 
 from factories.apis.v1.example.common import new_reference_number
 

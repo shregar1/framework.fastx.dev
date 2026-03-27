@@ -52,6 +52,10 @@ python3 -m pytest tests/ -q --cov=src --cov-fail-under=95
 
 Overview: [../docs/COVERAGE.md](../docs/COVERAGE.md).
 
+## DTOs (one class per file)
+
+Under `dtos/requests/<segment>/`, keep **one concrete Pydantic model per module** (e.g. `create.py` → `ExampleCreateRequestDTO`). **Nested** models that only support a single parent may live in the **same** file. Shared bases live in `abstraction.py`. Details: [docs/guide/new-api-scaffolding.md](docs/guide/new-api-scaffolding.md#one-concrete-class-per-file-dtos), [dtos/README.md](dtos/README.md#one-concrete-class-per-file).
+
 ## Quality checks
 
 ```bash

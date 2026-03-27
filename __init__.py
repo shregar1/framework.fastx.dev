@@ -9,8 +9,8 @@ Basic Usage:
     app = FastMVCApp()
     app.run()
 
-Example API (Included):
-    # The example module demonstrates FastMVC patterns with a complete Item API:
+Sample Item API (included):
+    # Item CRUD lives under the normal package layout (entities, services, …).
 
     from fast_mvc import item_router  # FastAPI router
 
@@ -46,7 +46,7 @@ Modules:
     - abstractions: I interfaces (Controller, Service, Repository, etc.)
     - dtos: Data Transfer Objects and validation
     - dependencies: DI container and utilities
-    - example: Complete working example (Item API)
+    - entities, services, repositories: sample Item API (see docs/guide/new-api-scaffolding.md)
 
 Optional Integrations (via fast-platform):
     - notifications: Email, SMS, Chat, Push notifications
@@ -74,20 +74,21 @@ from dtos.requests.abstraction import IRequestDTO
 # Application factory
 from app import app as FastMVCApp
 
-# Example API (optional - demonstrates framework usage)
+# Sample Item API (optional — demonstrates full stack wiring)
 try:
-    from example import (
-        ItemEntity,
-        ItemRepository,
-        ItemService,
+    from controllers.apis.v1.item.item_controller import (
         ItemController,
-        item_router,
-        CreateItemRequestDTO,
-        UpdateItemRequestDTO,
-        ItemResponseDTO,
+        router as item_router,
+    )
+    from dtos.requests.item import CreateItemRequestDTO, UpdateItemRequestDTO
+    from dtos.responses.item import (
         ItemListResponseDTO,
+        ItemResponseDTO,
         ItemStatsResponseDTO,
     )
+    from entities.item import ItemEntity
+    from repositories.item import ItemRepository
+    from services.item import ItemService
 
     _EXAMPLE_AVAILABLE = True
 except ImportError:

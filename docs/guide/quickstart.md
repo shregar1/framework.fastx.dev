@@ -78,11 +78,11 @@ my-project/
 ├── config/                # Configuration
 │   ├── settings.py
 │   └── validator.py
-├── example/               # Example API
-│   ├── entity.py
-│   ├── repository.py
-│   ├── service.py
-│   └── controller.py
+├── entities/item/         # Sample Item entity
+├── repositories/item/
+├── services/item/
+├── controllers/apis/v1/item/
+├── testing/item/
 ├── abstractions/          # I classes
 ├── core/                  # Core utilities
 ├── middlewares/           # Middleware
