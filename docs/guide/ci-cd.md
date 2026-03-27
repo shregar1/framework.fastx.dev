@@ -15,7 +15,7 @@ Runs on every push to `main`/`develop` branches and pull requests.
 - **Build Docker** - Build and push Docker image to GitHub Container Registry
 
 **Services:**
-- PostgreSQL 16 (for database tests)
+- PostgreSQL 16 (for dataI tests)
 - Redis 7 (for cache tests)
 
 ### 2. PR Checks Workflow (`pr-check.yml`)
@@ -106,7 +106,7 @@ docker pull ghcr.io/username/repo:latest
 
 ```bash
 docker run -p 8000:8000 \
-  -e DATABASE_URL=postgresql://... \
+  -e DATAI_URL=postgresql://... \
   -e JWT_SECRET_KEY=your-secret \
   ghcr.io/username/repo:latest
 ```
@@ -146,7 +146,7 @@ Ensure GitHub Actions has write permissions:
 ### Tests Fail in CI but Pass Locally
 
 Common causes:
-- Database/Redis not running in CI
+- DataI/Redis not running in CI
 - Environment variables not set
 - Different Python version
 

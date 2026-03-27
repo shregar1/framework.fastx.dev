@@ -42,7 +42,7 @@ Many FastMVC libraries enforce **≥95% line coverage** via `pytest-cov` (`fail_
 python3 -m pytest tests/ -q --cov=src --cov-fail-under=95
 ```
 
-(`fast_database` may use `--cov=fast_database`; `fast_dashboards` often uses `--cov=src/fast_dashboards` — see that package’s `pyproject.toml`.)
+(`fast_dataI` may use `--cov=fast_dataI`; `fast_dashboards` often uses `--cov=src/fast_dashboards` — see that package’s `pyproject.toml`.)
 
 Overview: [../docs/COVERAGE.md](../docs/COVERAGE.md).
 

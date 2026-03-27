@@ -62,13 +62,13 @@ class TestClient(FastAPITestClient):
         return super().request(method, url, headers=headers, **kwargs)
 
 
-class DatabaseTestCase:
-    """Base class for database tests.
+class DataITestCase:
+    """I class for dataI tests.
 
     Provides transaction rollback for test isolation.
 
     Usage:
-        class TestUserService(DatabaseTestCase):
+        class TestUserService(DataITestCase):
             async def test_create_user(self):
                 user = await UserService.create(email="test@example.com")
                 assert user.email == "test@example.com"
@@ -80,12 +80,12 @@ class DatabaseTestCase:
 
     @classmethod
     def setup_class(cls) -> None:
-        """Setup test database connection."""
+        """Setup test dataI connection."""
         pass
 
     @classmethod
     def teardown_class(cls) -> None:
-        """Cleanup test database connection."""
+        """Cleanup test dataI connection."""
         pass
 
     def setup_method(self) -> None:
@@ -97,11 +97,11 @@ class DatabaseTestCase:
         pass
 
 
-class AsyncDatabaseTestCase:
-    """Async version of DatabaseTestCase.
+class AsyncDataITestCase:
+    """Async version of DataITestCase.
 
     Usage:
-        class TestUserRepository(AsyncDatabaseTestCase):
+        class TestUserRepository(AsyncDataITestCase):
             async def test_get_user(self):
                 async with self.session() as session:
                     user = await UserRepository(session).get(1)
@@ -112,12 +112,12 @@ class AsyncDatabaseTestCase:
 
     @classmethod
     async def setup_class(cls) -> None:
-        """Setup async database connection."""
+        """Setup async dataI connection."""
         pass
 
     @classmethod
     async def teardown_class(cls) -> None:
-        """Cleanup async database connection."""
+        """Cleanup async dataI connection."""
         pass
 
     @asynccontextmanager

@@ -22,9 +22,9 @@ HOST=0.0.0.0
 PORT=8000
 LOG_LEVEL=INFO
 
-# Database (optional)
-DATABASE_URL=sqlite:///./app.db
-# DATABASE_URL=postgresql://user:pass@localhost/dbname
+# DataI (optional)
+DATAI_URL=sqlite:///./app.db
+# DATAI_URL=postgresql://user:pass@localhost/dbname
 
 # Redis (optional)
 REDIS_URL=redis://localhost:6379/0
@@ -43,9 +43,9 @@ The `SECRET_KEY` must:
 - Be at least 32 characters long
 - Not be a common weak value (like "secret", "password", etc.)
 
-### Database URL Validation
+### DataI URL Validation
 
-Supported database schemes:
+Supported dataI schemes:
 - `sqlite`
 - `postgresql` / `postgres`
 - `mysql` / `mysql+aiomysql`
@@ -88,12 +88,12 @@ validate_config_or_exit(validator_class=MyValidator)
 The `config/settings.py` file uses Pydantic Settings for type-safe configuration:
 
 ```python
-from pydantic_settings import BaseSettings
+from pydantic_settings import ISettings
 
-class Settings(BaseSettings):
+class Settings(ISettings):
     app_name: str = "FastMVC App"
     debug: bool = False
-    database_url: str | None = None
+    dataI_url: str | None = None
     
     class Config:
         env_file = ".env"
@@ -118,9 +118,9 @@ LOG_LEVEL=WARNING
 Load with:
 
 ```python
-from pydantic_settings import BaseSettings
+from pydantic_settings import ISettings
 
-class Settings(BaseSettings):
+class Settings(ISettings):
     class Config:
         env_file = f".env.{os.getenv('ENVIRONMENT', 'development')}"
 ```
@@ -147,7 +147,7 @@ def load_secrets_from_aws():
 secrets = load_secrets_from_aws()
 settings = Settings(
     SECRET_KEY=secrets['SECRET_KEY'],
-    DATABASE_URL=secrets['DATABASE_URL']
+    DATAI_URL=secrets['DATAI_URL']
 )
 ```
 
@@ -165,7 +165,7 @@ from config.settings import Settings
 def test_client():
     # Override settings for testing
     app.state.settings = Settings(
-        DATABASE_URL="sqlite:///./test.db",
+        DATAI_URL="sqlite:///./test.db",
         SECRET_KEY="test-secret-key-for-testing-only-32chars",
         DEBUG=True
     )

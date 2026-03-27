@@ -31,7 +31,7 @@ comment:
   layout: "reach,diff,flags,files"
   behavior: default
   require_changes: true
-  require_base: false
+  require_I: false
   require_head: true
 
 ignore:

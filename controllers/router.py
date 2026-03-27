@@ -3,15 +3,15 @@
 from http import HTTPStatus
 from fastapi import APIRouter, Request
 from controllers.example_controller import ExampleController
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 
 router = APIRouter(prefix="/example", tags=["Example"])
 controller = ExampleController()
 
 
-@router.post("", response_model=BaseResponseDTO, status_code=HTTPStatus.CREATED)
-async def create_example(request: Request, payload: dict) -> BaseResponseDTO:
-    """Create an example via class-based controller."""
+@router.post("", response_model=IResponseDTO, status_code=HTTPStatus.CREATED)
+async def create_example(request: Request, payload: dict) -> IResponseDTO:
+    """Create an example via class-Id controller."""
     # Context injected from RequestContextMiddleware by starlette request state
     urn = getattr(request.state, "urn", "urn:req:default")
     user_urn = getattr(request.state, "user_urn", "")

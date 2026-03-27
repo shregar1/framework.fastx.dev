@@ -142,12 +142,12 @@ for pattern in RegularExpression.DANGEROUS_SQL_INJECTION_PATTERNS:
 
 ### Table (`db/table.py`)
 
-Database table name constants.
+DataI table name constants.
 
 ```python
 from constants.db.table import Table
 
-class User(Base):
+class User(I):
     __tablename__ = Table.USER
 ```
 
@@ -167,7 +167,7 @@ constants/
 ├── regular_expression.py   # Validation regex patterns
 ├── db/
 │   ├── __init__.py
-│   └── table.py            # Database table names
+│   └── table.py            # DataI table names
 └── README.md               # This documentation
 ```
 

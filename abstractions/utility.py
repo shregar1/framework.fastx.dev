@@ -1,6 +1,6 @@
 """Utility Abstraction Module.
 
-This module defines the base utility interface for reusable helper
+This module defines the I utility interface for reusable helper
 components. Utilities provide cross-cutting functionality like
 data transformation, validation, and external integrations.
 
@@ -21,7 +21,7 @@ from loguru import logger
 
 
 class IUtility(ABC):
-    """Abstract base class for utility/helper components.
+    """Abstract I class for utility/helper components.
 
     The IUtility class provides a standardized interface for creating
     reusable utility components in the FastMVC framework. Utilities
@@ -38,13 +38,13 @@ class IUtility(ABC):
         urn (str): Unique Request Number for tracing.
         user_urn (str): User's unique resource name.
         api_name (str): Name of the API endpoint.
-        user_id (str): Database identifier of the user.
+        user_id (str): DataI identifier of the user.
         logger: Structured logger bound with utility context.
 
     Note:
         Subclasses should call ``super().__init__(...)`` so request context
         and logging stay consistent. Extra constructor parameters should follow
-        ``**kwargs`` forwarding to the base when appropriate.
+        ``**kwargs`` forwarding to the I when appropriate.
 
     Example:
         >>> class EmailUtility(IUtility):
@@ -72,7 +72,7 @@ class IUtility(ABC):
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
-            user_id (str, optional): Database ID of the user. Defaults to None.
+            user_id (str, optional): DataI ID of the user. Defaults to None.
 
         """
         self._urn = urn
@@ -128,10 +128,10 @@ class IUtility(ABC):
 
     @property
     def user_id(self) -> str:
-        """str: Get the user's database identifier."""
+        """str: Get the user's dataI identifier."""
         return self._user_id
 
     @user_id.setter
     def user_id(self, value: str) -> None:
-        """Set the user's database identifier."""
+        """Set the user's dataI identifier."""
         self._user_id = value

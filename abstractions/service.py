@@ -1,6 +1,6 @@
 """Service Abstraction Module.
 
-This module defines the base service interface that all business logic
+This module defines the I service interface that all business logic
 services must inherit from. Services encapsulate domain logic and
 orchestrate operations between repositories and external systems.
 
@@ -18,14 +18,14 @@ Example:
 
 from abc import ABC, abstractmethod
 
-from pydantic import BaseModel
+from pydantic import IModel
 
 from typing import Any
 from core.utils.context import ContextMixin
 
 
 class IService(ABC, ContextMixin):
-    """Abstract base class for business logic services.
+    """Abstract I class for business logic services.
 
     The IService class provides a standardized interface for implementing
     business logic in the FastMVC framework. Services are the core of the
@@ -41,7 +41,7 @@ class IService(ABC, ContextMixin):
         urn (str): Unique Request Number for tracing.
         user_urn (str): User's unique resource name.
         api_name (str): Name of the API endpoint.
-        user_id (int): Database identifier of the user.
+        user_id (int): DataI identifier of the user.
         logger: Structured logger bound with service context.
 
     Abstract Methods:
@@ -76,7 +76,7 @@ class IService(ABC, ContextMixin):
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
-            user_id (int, optional): Database ID of the user. Defaults to None.
+            user_id (int, optional): DataI ID of the user. Defaults to None.
             **kwargs: Additional arguments for parent classes.
 
         """
@@ -89,14 +89,14 @@ class IService(ABC, ContextMixin):
         )
 
     @abstractmethod
-    def run(self, request_dto: BaseModel) -> dict:
+    def run(self, request_dto: IModel) -> dict:
         """Execute the service's main business logic.
 
         This is the primary entry point for the service. Subclasses must
         implement this method to define their specific business operations.
 
         Args:
-            request_dto (BaseModel): Pydantic model containing request data.
+            request_dto (IModel): Pydantic model containing request data.
 
         Returns:
             dict: Result of the business operation, typically containing

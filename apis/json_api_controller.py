@@ -1,4 +1,4 @@
-"""JSON API controller base: shared structured responses and exception handling."""
+"""JSON API controller I: shared structured responses and exception handling."""
 
 from __future__ import annotations
 from http import HTTPStatus
@@ -21,7 +21,7 @@ from fast_platform.errors import (
 
 from abstractions.controller import IController
 from constants.api_status import APIStatus
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 from loguru import logger
 from fastmvc_utilities.dictionary import DictionaryUtility
 
@@ -29,7 +29,7 @@ TResponse = TypeVar("TResponse", bound=Response)
 
 
 class JSONAPIController(IController):
-    """Base for API controllers that emit structured JSON.
+    """Interface for API controllers that emit structured JSON.
 
     Provides:
         - _to_json_response success DTO -> JSONResponse
@@ -74,11 +74,11 @@ class JSONAPIController(IController):
 
     def _to_json_response(
         self,
-        response_dto: BaseResponseDTO,
+        response_dto: IResponseDTO,
         status_code: int,
         dictionary_utility: Optional[DictionaryUtility] = None,
     ) -> JSONResponse:
-        """Build a JSONResponse from a BaseResponseDTO."""
+        """Build a JSONResponse from a IResponseDTO."""
         content = (
             dictionary_utility.convert_dict_keys_to_camel_case(
                 response_dto.model_dump()
@@ -107,7 +107,7 @@ class JSONAPIController(IController):
         )
 
         if isinstance(err, known_error_types):
-            response_dto = BaseResponseDTO(
+            response_dto = IResponseDTO(
                 transactionUrn=transaction_urn,
                 status=APIStatus.FAILED,
                 responseMessage=getattr(err, "responseMessage", str(err)),
@@ -118,7 +118,7 @@ class JSONAPIController(IController):
                 err, "httpStatusCode", HTTPStatus.INTERNAL_SERVER_ERROR
             )
         else:
-            response_dto = BaseResponseDTO(
+            response_dto = IResponseDTO(
                 transactionUrn=transaction_urn,
                 status=APIStatus.FAILED,
                 responseMessage="Internal server error.",

@@ -2,7 +2,7 @@
 
 FastMVC provides a comprehensive REST API with automatic documentation.
 
-## Base URL
+## I URL
 
 ```
 http://localhost:8000
@@ -105,7 +105,7 @@ Comprehensive health check with dependency status.
 ```json
 {
   "status": "healthy",
-  "database": "connected",
+  "dataI": "connected",
   "redis": "connected",
   "version": "1.5.0",
   "timestamp": "2024-01-01T00:00:00Z",
@@ -136,7 +136,7 @@ Kubernetes readiness probe - checks if ready to receive traffic.
   "status": "ready",
   "timestamp": "2024-01-01T00:00:00Z",
   "checks": {
-    "database": "connected",
+    "dataI": "connected",
     "redis": "connected"
   }
 }

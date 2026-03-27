@@ -84,6 +84,6 @@ See `.github/workflows/ci.yml` for details.
 
 ## CODEOWNERS
 
-The `.github/CODEOWNERS` file defines who must review changes to specific parts of the codebase.
+The `.github/CODEOWNERS` file defines who must review changes to specific parts of the codeI.
 
 All PRs modifying protected paths require approval from the designated code owners.

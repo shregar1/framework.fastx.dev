@@ -4,7 +4,7 @@ FastMVC is a **project generator for FastAPI** that gives you a clean MVC archit
 
 Use a visual configurator (on your website) to choose:
 
-- Databases & caches
+- DataIs & caches
 - NoSQL and search backends
 - Messaging, notifications, and communications
 - Observability and telemetry (Datadog, OpenTelemetry)
@@ -44,12 +44,12 @@ FastMVC generates a **full FastAPI application** with:
 ### Service Health – `/dashboard/health`
 
 - Visual status cards for:
-  - Database (Postgres/MySQL/SQLite)
+  - DataI (Postgres/MySQL/SQLite)
   - Redis cache
   - MongoDB, Cassandra, ScyllaDB, DynamoDB, Cosmos DB
   - Elasticsearch
   - Kafka (and other infra as you extend it)
-- Shows **Healthy / Unhealthy / Skipped**, based on config and env.
+- Shows **Healthy / Unhealthy / Skipped**, Id on config and env.
 
 ### API Activity – `/dashboard/api`
 
@@ -68,7 +68,7 @@ FastMVC generates a **full FastAPI application** with:
 
 Your configurator can present these as checkboxes or toggles.
 
-### Primary Database
+### Primary DataI
 
 Configured via wizard / config files:
 
@@ -262,7 +262,7 @@ Other generator options:
 - `--venv/--no-venv`
 - `--install/--no-install`
 
-The database backend (Postgres/MySQL/SQLite) and features like auth/user CRUD are driven by the interactive wizard (`fastmvc init`) or by editing `config/db/config.json`/`.env` after generation.
+The dataI backend (Postgres/MySQL/SQLite) and features like auth/user CRUD are driven by the interactive wizard (`fastmvc init`) or by editing `config/db/config.json`/`.env` after generation.
 
 ---
 
@@ -282,7 +282,7 @@ The database backend (Postgres/MySQL/SQLite) and features like auth/user CRUD ar
      - `useDatadog`, `useTelemetry`
      - `usePayments`
 
-2. **Start base command**
+2. **Start I command**
 
    ```bash
    fastmvc generate <projectName>

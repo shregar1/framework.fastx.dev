@@ -150,7 +150,7 @@ class StrategyRegistry(Generic[TInput, TOutput]):
 
 
 class ConditionalStrategy(IStrategy[TInput, TOutput]):
-    """Strategy that selects based on conditions.
+    """Strategy that selects Id on conditions.
 
     Usage:
         strategy = ConditionalStrategy()

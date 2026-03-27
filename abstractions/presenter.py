@@ -59,7 +59,7 @@ class IPresenter(ABC, Generic[TData, TViewModel]):
 
 @dataclass
 class ViewModel:
-    """Base view model class.
+    """I view model class.
 
     View models contain display-ready data.
 

@@ -17,10 +17,10 @@ except ImportError:
     fake = None
 
 from example.entities.item import ItemEntity
-from example.dtos.item_dtos import (
-    CreateItemRequest,
-    UpdateItemRequest,
-    ItemResponse,
+from example.dtos.item import (
+    CreateItemRequestDTO,
+    UpdateItemRequestDTO,
+    ItemResponseDTO,
 )
 
 
@@ -158,52 +158,52 @@ class ItemFactory:
         return [cls.create_dict(**overrides) for _ in range(count)]
 
     @classmethod
-    def create_create_request(cls, **overrides) -> CreateItemRequest:
+    def create_create_request(cls, **overrides) -> CreateItemRequestDTO:
         """Create a CreateItemRequest DTO.
 
         Args:
             **overrides: Field values to override defaults
 
         Returns:
-            CreateItemRequest instance
+            CreateItemRequestDTO instance
 
         """
         data = cls._generate_fake_data(**overrides)
-        return CreateItemRequest(
+        return CreateItemRequestDTO(
             name=data["name"],
             description=data["description"],
         )
 
     @classmethod
-    def create_update_request(cls, **overrides) -> UpdateItemRequest:
+    def create_update_request(cls, **overrides) -> UpdateItemRequestDTO:
         """Create an UpdateItemRequest DTO.
 
         Args:
             **overrides: Field values to override defaults
 
         Returns:
-            UpdateItemRequest instance
+            UpdateItemRequestDTO instance
 
         """
         data = cls._generate_fake_data(**overrides)
-        return UpdateItemRequest(
+        return UpdateItemRequestDTO(
             name=overrides.get("name", data["name"]),
             description=overrides.get("description", data["description"]),
         )
 
     @classmethod
-    def create_response(cls, **overrides) -> ItemResponse:
+    def create_response(cls, **overrides) -> ItemResponseDTO:
         """Create an ItemResponse DTO.
 
         Args:
             **overrides: Field values to override defaults
 
         Returns:
-            ItemResponse instance
+            ItemResponseDTO instance
 
         """
         data = cls._generate_fake_data(**overrides)
-        return ItemResponse(
+        return ItemResponseDTO(
             id=data["id"],
             name=data["name"],
             description=data["description"],

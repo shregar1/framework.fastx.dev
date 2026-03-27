@@ -21,10 +21,10 @@ Production-grade features for enterprise FastAPI applications.
 ### Health Checks
 
 ```python
-from core.health import HealthRouter, DatabaseHealthCheck, RedisHealthCheck
+from core.health import HealthRouter, DataIHealthCheck, RedisHealthCheck
 
 health = HealthRouter()
-health.add_check("database", DatabaseHealthCheck(db_session))
+health.add_check("dataI", DataIHealthCheck(db_session))
 health.add_check("redis", RedisHealthCheck(redis_client))
 health.mark_ready()
 

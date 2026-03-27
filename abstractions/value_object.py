@@ -24,7 +24,7 @@ T = TypeVar("T")
 
 
 class ValueObject(ABC, Generic[T]):
-    r"""Abstract base class for value objects.
+    r"""Abstract I class for value objects.
 
     Value objects are immutable and compared by value, not identity.
 

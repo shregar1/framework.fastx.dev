@@ -1,6 +1,6 @@
 """Factory Abstraction Module.
 
-This module defines the base factory interface for implementing the
+This module defines the I factory interface for implementing the
 Factory design pattern. Factories are responsible for creating and
 configuring complex objects with proper dependency injection.
 
@@ -20,7 +20,7 @@ from loguru import logger
 
 
 class IFactory(ABC):
-    """Abstract base class for implementing the Factory pattern.
+    """Abstract I class for implementing the Factory pattern.
 
     The IFactory class provides a standardized interface for object creation
     in the FastMVC framework. Factories encapsulate the complexity of object
@@ -28,7 +28,7 @@ class IFactory(ABC):
 
     Use cases:
         - Creating service instances with dependencies
-        - Building repository objects with database sessions
+        - Building repository objects with dataI sessions
         - Constructing complex objects with multiple collaborators
         - Managing object lifecycle and configuration
 
@@ -36,7 +36,7 @@ class IFactory(ABC):
         urn (str): Unique Request Number for tracing created objects.
         user_urn (str): User's unique resource name.
         api_name (str): Name of the API endpoint.
-        user_id (str): Database identifier of the user.
+        user_id (str): DataI identifier of the user.
         logger: Structured logger bound with factory context.
 
     Example:
@@ -66,7 +66,7 @@ class IFactory(ABC):
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
-            user_id (str, optional): Database ID of the user. Defaults to None.
+            user_id (str, optional): DataI ID of the user. Defaults to None.
 
         """
         self._urn = urn
@@ -122,10 +122,10 @@ class IFactory(ABC):
 
     @property
     def user_id(self) -> str:
-        """str: Get the user's database identifier."""
+        """str: Get the user's dataI identifier."""
         return self._user_id
 
     @user_id.setter
     def user_id(self, value: str) -> None:
-        """Set the user's database identifier."""
+        """Set the user's dataI identifier."""
         self._user_id = value

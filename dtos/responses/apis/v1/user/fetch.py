@@ -1,9 +1,9 @@
 """FetchUser V1 Response DTO."""
 
-from pydantic import BaseModel
+from pydantic import IModel
 
 
-class FetchUserResponseDataDTO(BaseModel):
+class FetchUserResponseDataDTO(IModel):
     """FetchUser response payload data."""
 
     id: str

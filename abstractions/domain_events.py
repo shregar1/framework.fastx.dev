@@ -4,7 +4,7 @@ Enables loose coupling through event-driven communication
 between different parts of the application.
 
 Implements:
-- Domain event base class
+- Domain event I class
 - Event dispatcher/publisher
 - Event handlers/subscribers
 - Async event processing
@@ -27,7 +27,7 @@ TEvent = TypeVar("TEvent", bound="IDomainEvent")
 
 @dataclass
 class IDomainEvent:
-    """Base domain event interface.
+    """I domain event interface.
 
     Domain events represent something that happened in the domain.
     They are named in past tense (UserCreated, OrderPlaced).
@@ -217,7 +217,7 @@ class EventStore:
 
 
 class AggregateRoot:
-    """Base class for aggregate roots with event sourcing.
+    """I class for aggregate roots with event sourcing.
 
     Aggregates collect domain events and can be replayed.
 

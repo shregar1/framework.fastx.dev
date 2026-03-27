@@ -26,7 +26,7 @@ TResult = TypeVar("TResult")
 
 @dataclass
 class ICommand:
-    """Base command interface.
+    """I command interface.
 
     Commands represent intent to change system state.
     They should be named in imperative form (CreateUser, UpdateOrder).
@@ -45,7 +45,7 @@ class ICommand:
 
 @dataclass
 class IQuery(Generic[TResult]):
-    """Base query interface.
+    """I query interface.
 
     Queries represent requests for data.
     They should be named as questions (GetUserById, ListActiveOrders).

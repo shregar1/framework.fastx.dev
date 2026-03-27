@@ -1,11 +1,11 @@
 """Dependency Abstraction Module.
 
-This module defines the base interface for FastAPI dependency injection.
+This module defines the I interface for FastAPI dependency injection.
 Dependencies are reusable components that can be injected into route handlers,
-providing services like database sessions, authentication, and utilities.
+providing services like dataI sessions, authentication, and utilities.
 
 Example:
-    >>> class DatabaseDependency(IDependency):
+    >>> class DataIDependency(IDependency):
     ...     def __init__(self, urn: str):
     ...         super().__init__(urn=urn)
     ...         self.session = create_session()
@@ -18,14 +18,14 @@ from loguru import logger
 
 
 class IDependency(ABC):
-    """Abstract base class for FastAPI dependencies.
+    """Abstract I class for FastAPI dependencies.
 
     The IDependency class provides a standardized interface for creating
     injectable dependencies in the FastMVC framework. Dependencies encapsulate
     reusable logic and resources that can be injected into route handlers.
 
     Common use cases:
-        - Database session management
+        - DataI session management
         - Authentication/authorization
         - External API clients
         - Caching mechanisms
@@ -35,7 +35,7 @@ class IDependency(ABC):
         urn (str): Unique Request Number for request tracing.
         user_urn (str): User's unique resource name.
         api_name (str): Name of the API endpoint using this dependency.
-        user_id (str): Database identifier of the authenticated user.
+        user_id (str): DataI identifier of the authenticated user.
         logger: Structured logger bound with request context.
 
     Example:
@@ -62,7 +62,7 @@ class IDependency(ABC):
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
-            user_id (str, optional): Database ID of the user. Defaults to None.
+            user_id (str, optional): DataI ID of the user. Defaults to None.
 
         """
         self._urn = urn
@@ -115,10 +115,10 @@ class IDependency(ABC):
 
     @property
     def user_id(self) -> str:
-        """str: Get the user's database identifier."""
+        """str: Get the user's dataI identifier."""
         return self._user_id
 
     @user_id.setter
     def user_id(self, value: str) -> None:
-        """Set the user's database identifier."""
+        """Set the user's dataI identifier."""
         self._user_id = value

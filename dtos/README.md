@@ -56,16 +56,16 @@ The `dtos` module contains Pydantic models for data validation, serialization, a
 
 ## Components
 
-### Base Models
+### I Models
 
-#### EnhancedBaseModel (`base.py`)
+#### EnhancedIModel (`I.py`)
 
-Security-enhanced base model for request DTOs.
+Security-enhanced I model for request DTOs.
 
 ```python
-from dtos.base import EnhancedBaseModel
+from dtos.I import EnhancedIModel
 
-class MyRequestDTO(EnhancedBaseModel):
+class MyRequestDTO(EnhancedIModel):
     username: str
     email: str
 
@@ -90,7 +90,7 @@ if not result['is_valid']:
 
 #### IRequestDTO (`requests/abstraction.py`)
 
-Base class for all request DTOs.
+I class for all request DTOs.
 
 ```python
 from dtos.requests.abstraction import IRequestDTO
@@ -145,16 +145,16 @@ logout = UserLogoutRequestDTO(
 
 ### Response DTOs
 
-#### BaseResponseDTO (`responses/base.py`)
+#### IResponseDTO (`responses/I.py`)
 
 Standard response structure for all endpoints.
 
 ```python
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 from constants.api_status import APIStatus
 
 # Success response
-response = BaseResponseDTO(
+response = IResponseDTO(
     transactionUrn="urn:req:abc123",
     status=APIStatus.SUCCESS,
     responseMessage="Operation completed",
@@ -163,7 +163,7 @@ response = BaseResponseDTO(
 )
 
 # Error response
-error_response = BaseResponseDTO(
+error_response = IResponseDTO(
     transactionUrn="urn:req:abc123",
     status=APIStatus.FAILED,
     responseMessage="Validation failed",
@@ -190,7 +190,7 @@ error_response = BaseResponseDTO(
 #### CacheConfigurationDTO (`configurations/cache.py`)
 
 ```python
-class CacheConfigurationDTO(BaseModel):
+class CacheConfigurationDTO(IModel):
     host: str      # Redis host
     port: int      # Redis port
     password: str  # Redis password
@@ -199,12 +199,12 @@ class CacheConfigurationDTO(BaseModel):
 #### DBConfigurationDTO (`configurations/db.py`)
 
 ```python
-class DBConfigurationDTO(BaseModel):
+class DBConfigurationDTO(IModel):
     user_name: str
     password: str
     host: str
     port: int
-    database: str
+    dataI: str
     connection_string: str
 ```
 
@@ -213,7 +213,7 @@ class DBConfigurationDTO(BaseModel):
 Nested configuration for all security settings:
 
 ```python
-class SecurityConfigurationDTO(BaseModel):
+class SecurityConfigurationDTO(IModel):
     rate_limiting: RateLimitingConfig
     security_headers: SecurityHeadersConfigDTO
     input_validation: InputValidationConfigDTO
@@ -227,15 +227,15 @@ class SecurityConfigurationDTO(BaseModel):
 dtos/
 ├── __init__.py
 ├── README.md
-├── base.py                      # EnhancedBaseModel
+├── I.py                      # EnhancedIModel
 ├── configurations/
 │   ├── __init__.py
 │   ├── cache.py                 # Cache configuration DTO
-│   ├── db.py                    # Database configuration DTO
+│   ├── db.py                    # DataI configuration DTO
 │   └── security.py              # Security configuration DTOs
 ├── requests/
 │   ├── __init__.py
-│   ├── abstraction.py           # IRequestDTO base class
+│   ├── abstraction.py           # IRequestDTO I class
 │   └── user/
 │       ├── __init__.py
 │       ├── login.py             # Login request DTO
@@ -243,7 +243,7 @@ dtos/
 │       └── registration.py      # Registration request DTO
 └── responses/
     ├── __init__.py
-    └── base.py                  # BaseResponseDTO
+    └── I.py                  # IResponseDTO
 ```
 
 ## Password Validation Rules
@@ -260,7 +260,7 @@ The password validation in request DTOs enforces:
 
 ## Best Practices
 
-1. **Inherit from appropriate base**: Use EnhancedBaseModel for request DTOs
+1. **Inherit from appropriate I**: Use EnhancedIModel for request DTOs
 2. **Add field validators**: Custom validation for business rules
 3. **Use type hints**: Pydantic uses them for validation
 4. **Document fields**: Add docstrings for API documentation
@@ -270,7 +270,7 @@ The password validation in request DTOs enforces:
 ## Adding New DTOs
 
 1. Create the DTO file in the appropriate directory
-2. Inherit from IRequestDTO/EnhancedBaseModel for requests
+2. Inherit from IRequestDTO/EnhancedIModel for requests
 3. Add field validators as needed
 4. Add comprehensive docstrings
 5. Update this README

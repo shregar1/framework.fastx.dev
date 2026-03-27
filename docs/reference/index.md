@@ -4,77 +4,77 @@ Complete API reference for FastMVC components.
 
 ## Abstractions
 
-### BaseEntity
+### IEntity
 
-Base class for all domain entities.
+I class for all domain entities.
 
 ```python
-from abstractions.entity import BaseEntity
+from abstractions.entity import IEntity
 
-class Item(BaseEntity):
+class Item(IEntity):
     id: int
     name: str
     description: str | None = None
 ```
 
-### BaseRepository
+### IRepository
 
-Base repository pattern implementation.
+I repository pattern implementation.
 
 ```python
-from abstractions.repository import BaseRepository
+from abstractions.repository import IRepository
 
-class ItemRepository(BaseRepository[Item]):
+class ItemRepository(IRepository[Item]):
     async def get_by_name(self, name: str) -> Item | None:
         # Custom query
         pass
 ```
 
-### BaseService
+### IService
 
-Base service layer.
+I service layer.
 
 ```python
-from abstractions.service import BaseService
+from abstractions.service import IService
 
-class ItemService(BaseService[Item]):
+class ItemService(IService[Item]):
     async def create_with_defaults(self, data: dict) -> Item:
         # Custom business logic
         pass
 ```
 
-### BaseController
+### IController
 
-Base controller for HTTP handling.
+I controller for HTTP handling.
 
 ```python
-from abstractions.controller import BaseController
+from abstractions.controller import IController
 
-controller = BaseController(ItemService, Item)
+controller = IController(ItemService, Item)
 ```
 
 ## DTOs
 
-### BaseDTO
+### IDTO
 
-Base data transfer object.
+I data transfer object.
 
 ```python
-from dtos.base import BaseDTO
+from dtos.I import IDTO
 
-class CreateItemRequest(BaseDTO):
+class CreateItemRequest(IDTO):
     name: str
     description: str | None = None
 ```
 
 ## Core Utilities
 
-### Database
+### DataI
 
 ```python
-from core.database import get_db, Database
+from core.dataI import get_db, DataI
 
-db = Database("sqlite:///./app.db")
+db = DataI("sqlite:///./app.db")
 ```
 
 ### Cache

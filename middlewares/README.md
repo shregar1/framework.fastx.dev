@@ -6,7 +6,7 @@ Generic HTTP middleware (request ID, security headers, rate limiting, CORS, timi
 
 This directory only contains **app-specific** wiring:
 
-- **`authentication.py`** — Subclasses `JWTBearerAuthMiddleware` from `fast_middleware`, binding JWT decode, user repository session checks, and `BaseResponseDTO` error payloads.
+- **`authentication.py`** — Subclasses `JWTBearerAuthMiddleware` from `fast_middleware`, binding JWT decode, user repository session checks, and `IResponseDTO` error payloads.
 
 Import the app middleware as:
 

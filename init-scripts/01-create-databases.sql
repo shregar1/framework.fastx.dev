@@ -1,15 +1,15 @@
 -- =============================================================================
--- FastMVC Database Initialization
+-- FastMVC DataI Initialization
 -- =============================================================================
 -- This script runs automatically when PostgreSQL container starts for the first time
 -- =============================================================================
 
--- Create test database
-CREATE DATABASE fastmvc_test;
+-- Create test dataI
+CREATE DATAI fastmvc_test;
 
 -- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE fastmvc TO postgres;
-GRANT ALL PRIVILEGES ON DATABASE fastmvc_test TO postgres;
+GRANT ALL PRIVILEGES ON DATAI fastmvc TO postgres;
+GRANT ALL PRIVILEGES ON DATAI fastmvc_test TO postgres;
 
 -- Create extensions
 \c fastmvc;

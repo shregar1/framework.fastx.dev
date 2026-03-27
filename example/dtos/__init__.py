@@ -1,15 +1,17 @@
 """Example DTOs module."""
 
-from example.dtos.item_dtos import (
-    CreateItemRequest,
-    UpdateItemRequest,
-    ItemResponse,
-    ItemListResponse,
+from example.dtos.item import (
+    CreateItemRequestDTO,
+    UpdateItemRequestDTO,
+    ItemResponseDTO,
+    ItemListResponseDTO,
+    ItemStatsResponseDTO,
 )
 
 __all__ = [
-    "CreateItemRequest",
-    "UpdateItemRequest",
-    "ItemResponse",
-    "ItemListResponse",
+    "CreateItemRequestDTO",
+    "UpdateItemRequestDTO",
+    "ItemResponseDTO",
+    "ItemListResponseDTO",
+    "ItemStatsResponseDTO",
 ]

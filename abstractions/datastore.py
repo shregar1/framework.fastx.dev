@@ -8,7 +8,7 @@ from fast_datastores.interfaces import (
     IDataStore,
     IDocumentStore,
     IKeyValueStore,
-    IRelationalDatabase,
+    IRelationalDataI,
     ISearchStore,
     IWideColumnStore,
 )
@@ -17,7 +17,7 @@ __all__ = [
     "IDataStore",
     "IDocumentStore",
     "IKeyValueStore",
-    "IRelationalDatabase",
+    "IRelationalDataI",
     "ISearchStore",
     "IWideColumnStore",
 ]

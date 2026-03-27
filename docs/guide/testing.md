@@ -73,12 +73,12 @@ long_name_item = ItemFactory.with_long_name()
 
 Fixtures are automatically available in tests via `conftest.py`.
 
-### Database Fixtures
+### DataI Fixtures
 
 ```python
 def test_with_db(item_db, item_repository):
-    """Use in-memory database."""
-    # item_db: Dict-based in-memory database
+    """Use in-memory dataI."""
+    # item_db: Dict-Id in-memory dataI
     # item_repository: Mocked repository
     pass
 ```
@@ -335,9 +335,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 ```
 
-### Database Locked (SQLite)
+### DataI Locked (SQLite)
 
-Use `:memory:` database or ensure proper cleanup:
+Use `:memory:` dataI or ensure proper cleanup:
 
 ```python
 @pytest.fixture

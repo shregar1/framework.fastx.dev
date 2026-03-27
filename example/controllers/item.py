@@ -11,12 +11,12 @@ from fastapi.responses import JSONResponse
 from abstractions.controller import IController
 from abstractions.result import Result
 from example.services.item_service import ItemService
-from example.dtos.item_dtos import (
-    CreateItemRequest,
-    UpdateItemRequest,
-    ItemResponse,
-    ItemListResponse,
-    ItemStatsResponse,
+from example.dtos.item import (
+    CreateItemRequestDTO,
+    UpdateItemRequestDTO,
+    ItemResponseDTO,
+    ItemListResponseDTO,
+    ItemStatsResponseDTO,
 )
 from example.dependencies.service_deps import get_item_service
 
@@ -87,7 +87,7 @@ class ItemController(IController):
 
     # CRUD Endpoints
 
-    async def create(self, request: CreateItemRequest) -> JSONResponse:
+    async def create(self, request: CreateItemRequestDTO) -> JSONResponse:
         """Create a new item.
 
         Args:
@@ -118,7 +118,7 @@ class ItemController(IController):
             )
 
         # Convert to response DTO
-        response = ItemResponse.from_entity(result.value)
+        response = ItemResponseDTO.from_entity(result.value)
 
         return JSONResponse(
             status_code=HTTPStatus.CREATED,
@@ -149,7 +149,7 @@ class ItemController(IController):
                 detail=f"Item with ID '{item_id}' not found",
             )
 
-        response = ItemResponse.from_entity(result.value)
+        response = ItemResponseDTO.from_entity(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def get_all(self) -> JSONResponse:
@@ -167,10 +167,10 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemListResponse.from_entities(result.value)
+        response = ItemListResponseDTO.from_entities(result.value)
         return JSONResponse(content=response.to_dict())
 
-    async def update(self, item_id: str, request: UpdateItemRequest) -> JSONResponse:
+    async def update(self, item_id: str, request: UpdateItemRequestDTO) -> JSONResponse:
         """Update an item.
 
         Args:
@@ -202,7 +202,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemResponse.from_entity(result.value)
+        response = ItemResponseDTO.from_entity(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def delete(self, item_id: str) -> JSONResponse:
@@ -253,7 +253,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemResponse.from_entity(result.value)
+        response = ItemResponseDTO.from_entity(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def uncomplete(self, item_id: str) -> JSONResponse:
@@ -274,7 +274,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemResponse.from_entity(result.value)
+        response = ItemResponseDTO.from_entity(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def toggle(self, item_id: str) -> JSONResponse:
@@ -295,7 +295,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemResponse.from_entity(result.value)
+        response = ItemResponseDTO.from_entity(result.value)
         return JSONResponse(content=response.to_dict())
 
     # Query Endpoints
@@ -318,7 +318,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemListResponse.from_entities(result.value)
+        response = ItemListResponseDTO.from_entities(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def get_completed(self) -> JSONResponse:
@@ -336,7 +336,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemListResponse.from_entities(result.value)
+        response = ItemListResponseDTO.from_entities(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def get_pending(self) -> JSONResponse:
@@ -354,7 +354,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemListResponse.from_entities(result.value)
+        response = ItemListResponseDTO.from_entities(result.value)
         return JSONResponse(content=response.to_dict())
 
     async def get_statistics(self) -> JSONResponse:
@@ -372,7 +372,7 @@ class ItemController(IController):
                 detail=result.error,
             )
 
-        response = ItemStatsResponse.from_stats(result.value)
+        response = ItemStatsResponseDTO.from_stats(result.value)
         return JSONResponse(content=response.to_dict())
 
 
@@ -382,7 +382,7 @@ _controller = ItemController()
 
 
 @router.post("", response_model=dict, status_code=HTTPStatus.CREATED)
-async def create_item(request: CreateItemRequest) -> JSONResponse:
+async def create_item(request: CreateItemRequestDTO) -> JSONResponse:
     """Create a new item."""
     return await _controller.create(request)
 
@@ -424,7 +424,7 @@ async def get_item(item_id: str) -> JSONResponse:
 
 
 @router.patch("/{item_id}", response_model=dict)
-async def update_item(item_id: str, request: UpdateItemRequest) -> JSONResponse:
+async def update_item(item_id: str, request: UpdateItemRequestDTO) -> JSONResponse:
     """Update an item."""
     return await _controller.update(item_id, request)
 

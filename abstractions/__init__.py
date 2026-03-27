@@ -24,9 +24,10 @@ Patterns Included:
 - Presenter: View formatting
 """
 
-# Base MVC abstractions
+# I MVC abstractions
 from .controller import IController
 from .dependency import IDependency
+from .dto import AbstractRequestDTO, AbstractResponseDTO
 from .error import IError
 from .repository import IRepository
 from .service import IService
@@ -36,7 +37,7 @@ from .utility import IUtility
 from .unit_of_work import (
     IUnitOfWork,
     ISyncUnitOfWork,
-    BaseUnitOfWork,
+    IUnitOfWork,
     UnitOfWorkManager,
 )
 
@@ -165,7 +166,7 @@ from .observer import (
 # Decorator Pattern
 from .decorator import (
     IComponent,
-    BaseDecorator,
+    IDecorator,
     timing,
     retry,
     cache,
@@ -204,9 +205,11 @@ from .presenter import (
 )
 
 __all__ = [
-    # Base MVC
+    # I MVC
     "IController",
     "IDependency",
+    "AbstractRequestDTO",
+    "AbstractResponseDTO",
     "IError",
     "IRepository",
     "IService",
@@ -214,7 +217,7 @@ __all__ = [
     # Unit of Work
     "IUnitOfWork",
     "ISyncUnitOfWork",
-    "BaseUnitOfWork",
+    "IUnitOfWork",
     "UnitOfWorkManager",
     # Specification
     "ISpecification",
@@ -310,7 +313,7 @@ __all__ = [
     "on_event",
     # Decorator
     "IComponent",
-    "BaseDecorator",
+    "IDecorator",
     "timing",
     "retry",
     "cache",

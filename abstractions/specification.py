@@ -168,9 +168,9 @@ class LambdaSpecification(ISpecification[T]):
 
 @dataclass
 class QuerySpecification(Generic[T]):
-    """Query specification for database queries.
+    """Query specification for dataI queries.
 
-    Translates business rules to database query conditions.
+    Translates business rules to dataI query conditions.
 
     Usage:
         spec = QuerySpecification[User]()

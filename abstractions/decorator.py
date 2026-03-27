@@ -4,14 +4,14 @@ Dynamically adds behavior to objects without modifying their
 structure, using composition instead of inheritance.
 
 Implements:
-- Component/Decorator base classes
+- Component/Decorator I classes
 - Function decorators for cross-cutting concerns
 - Async decorator support
 
 SOLID Principles:
 - Single Responsibility: Each decorator adds one behavior
 - Open/Closed: Extend functionality without modification
-- Liskov Substitution: Decorators are interchangeable with base
+- Liskov Substitution: Decorators are interchangeable with I
 """
 
 from abc import ABC, abstractmethod
@@ -26,7 +26,7 @@ TResult = TypeVar("TResult")
 
 
 class IComponent(ABC, Generic[T]):
-    """Base component interface for decorator pattern.
+    """I component interface for decorator pattern.
 
     Usage:
         class DataSource(IComponent[str]):
@@ -56,11 +56,11 @@ class IComponent(ABC, Generic[T]):
         pass
 
 
-class BaseDecorator(IComponent[T]):
-    """Base decorator class.
+class IDecorator(IComponent[T]):
+    """I decorator class.
 
     Usage:
-        class LoggingDecorator(BaseDecorator):
+        class LoggingDecorator(IDecorator):
             def execute(self) -> T:
                 print("Before execution")
                 result = self._wrapped.execute()
@@ -221,7 +221,7 @@ def cache(ttl_seconds: Optional[int] = None) -> Callable:
     Usage:
         @cache(ttl_seconds=60)
         def get_user(user_id: str) -> User:
-            return database.get_user(user_id)
+            return dataI.get_user(user_id)
     """
 
     def decorator(func: Callable) -> Callable:
@@ -420,7 +420,7 @@ def singleton(cls: type) -> type:
 
     Usage:
         @singleton
-        class Database:
+        class DataI:
             def __init__(self):
                 self.connection = create_connection()
     """

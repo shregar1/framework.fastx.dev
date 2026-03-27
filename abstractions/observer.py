@@ -6,7 +6,7 @@ when one object changes state, all dependents are notified.
 Implements:
 - Subject/Observable interface
 - Observer interface
-- Event-based notifications
+- Event-Id notifications
 - Async observer support
 
 SOLID Principles:
@@ -84,7 +84,7 @@ class ISubject(ABC, Generic[T]):
 
 
 class Subject(ISubject[T]):
-    """Base subject implementation.
+    """I subject implementation.
 
     Usage:
         subject = Subject()

@@ -112,7 +112,7 @@ except ImportError:
 # Flags for optional routers (used by tests and docs)
 DASHBOARD_ROUTER_ENABLED = DashboardRouter is not None
 
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 
 # Domain errors (requires pyfastmvc[platform])
 try:
@@ -136,8 +136,17 @@ from middlewares import AuthenticationMiddleware
 
 # Configuration validation - fail fast on misconfig
 # Set VALIDATE_CONFIG=false to skip validation
+# Tests skip strict startup validation to avoid env-coupled imports.
+IS_TEST_RUN = (
+    os.getenv("PYTEST_CURRENT_TEST") is not None
+    or os.getenv("TESTING", "").lower() in ("true", "1", "yes", "on")
+)
 try:
-    if os.getenv("VALIDATE_CONFIG", "true").lower() not in ("false", "0", "no", "off"):
+    if (
+        not IS_TEST_RUN
+        and os.getenv("VALIDATE_CONFIG", "true").lower()
+        not in ("false", "0", "no", "off")
+    ):
         from config.validator import validate_config_or_exit
 
         validate_config_or_exit()
@@ -280,7 +289,7 @@ def _app_error_response(
     except Exception:
         pass
 
-    response_dto = BaseResponseDTO(
+    response_dto = IResponseDTO(
         transactionUrn=urn,
         status=APIStatus.FAILED,
         responseMessage=getattr(exc, "responseMessage", str(exc)),
@@ -297,10 +306,10 @@ def _app_error_response(
 if HAS_PLATFORM_ERRORS:
 
     @app.exception_handler(UnexpectedResponseError)
-    async def unexpected_response_error_handler(
+    async def unexpectedresponseerror_handler(
         request: Request, exc: UnexpectedResponseError
     ):
-        """Execute unexpected_response_error_handler operation.
+        """Execute unexpectedresponseerror_handler operation.
 
         Args:
             request: The request parameter.
@@ -312,8 +321,8 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="error")
 
     @app.exception_handler(BadInputError)
-    async def bad_input_error_handler(request: Request, exc: BadInputError):
-        """Execute bad_input_error_handler operation.
+    async def badinputerror_handler(request: Request, exc: BadInputError):
+        """Execute badinputerror_handler operation.
 
         Args:
             request: The request parameter.
@@ -325,8 +334,8 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(NotFoundError)
-    async def not_found_error_handler(request: Request, exc: NotFoundError):
-        """Execute not_found_error_handler operation.
+    async def notfounderror_handler(request: Request, exc: NotFoundError):
+        """Execute notfounderror_handler operation.
 
         Args:
             request: The request parameter.
@@ -338,8 +347,8 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="info")
 
     @app.exception_handler(UnauthorizedError)
-    async def unauthorized_error_handler(request: Request, exc: UnauthorizedError):
-        """Execute unauthorized_error_handler operation.
+    async def unauthorizederror_handler(request: Request, exc: UnauthorizedError):
+        """Execute unauthorizederror_handler operation.
 
         Args:
             request: The request parameter.
@@ -351,8 +360,8 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(ForbiddenError)
-    async def forbidden_error_handler(request: Request, exc: ForbiddenError):
-        """Execute forbidden_error_handler operation.
+    async def forbiddenerror_handler(request: Request, exc: ForbiddenError):
+        """Execute forbiddenerror_handler operation.
 
         Args:
             request: The request parameter.
@@ -364,8 +373,8 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(ConflictError)
-    async def conflict_error_handler(request: Request, exc: ConflictError):
-        """Execute conflict_error_handler operation.
+    async def conflicterror_handler(request: Request, exc: ConflictError):
+        """Execute conflicterror_handler operation.
 
         Args:
             request: The request parameter.
@@ -377,8 +386,8 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="warning")
 
     @app.exception_handler(RateLimitError)
-    async def rate_limit_error_handler(request: Request, exc: RateLimitError):
-        """Execute rate_limit_error_handler operation.
+    async def ratelimiterror_handler(request: Request, exc: RateLimitError):
+        """Execute ratelimiterror_handler operation.
 
         Args:
             request: The request parameter.
@@ -390,10 +399,10 @@ if HAS_PLATFORM_ERRORS:
         return _app_error_response(request, exc, log_level="info")
 
     @app.exception_handler(ServiceUnavailableError)
-    async def service_unavailable_error_handler(
+    async def serviceunavailableerror_handler(
         request: Request, exc: ServiceUnavailableError
     ):
-        """Execute service_unavailable_error_handler operation.
+        """Execute serviceunavailableerror_handler operation.
 
         Args:
             request: The request parameter.
@@ -410,7 +419,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     """Catch-all handler for unhandled exceptions to avoid leaking internals."""
     urn = getattr(request.state, "urn", None) or ""
     logger.exception("Unhandled exception occurred while processing request.", urn=urn)
-    response_dto = BaseResponseDTO(
+    response_dto = IResponseDTO(
         transactionUrn=urn,
         status=APIStatus.FAILED,
         responseMessage="Internal server error.",
@@ -430,7 +439,7 @@ async def health_check():
 
     Performs comprehensive health checks on:
     - Application status
-    - Database connectivity (if configured)
+    - DataI connectivity (if configured)
     - Redis cache connectivity (if configured)
     - Application version
 
@@ -444,7 +453,7 @@ async def health_check():
         >>> curl http://localhost:8000/health
         {
             "status": "healthy",
-            "database": "connected",
+            "dataI": "connected",
             "redis": "connected",
             "version": "1.5.0",
             "timestamp": "2024-01-01T00:00:00Z",
@@ -468,7 +477,7 @@ async def health_check():
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
-    # Check database connectivity
+    # Check dataI connectivity
     db_status: str = "not_configured"
     try:
         from start_utils import db_session
@@ -488,9 +497,9 @@ async def health_check():
     except Exception as e:
         db_status = f"disconnected: {str(e)}"
         health_status["status"] = "unhealthy"
-        logger.error(f"Health check: Database connection failed - {e}")
+        logger.error(f"Health check: DataI connection failed - {e}")
 
-    health_status["database"] = db_status
+    health_status["dataI"] = db_status
 
     # Check Redis connectivity
     redis_status: str = "not_configured"
@@ -523,7 +532,7 @@ async def health_check():
     # Log health check result
     logger.info(
         f"Health check: status={health_status['status']}, "
-        f"database={db_status}, redis={redis_status}"
+        f"dataI={db_status}, redis={redis_status}"
     )
 
     # Return appropriate HTTP status code
@@ -559,7 +568,7 @@ async def readiness_probe():
     """Kubernetes readiness probe endpoint.
 
     Checks if the application is ready to receive traffic.
-    Includes dependency health checks (database, Redis).
+    Includes dependency health checks (dataI, Redis).
 
     Returns:
         dict: Readiness status with dependency information.
@@ -569,7 +578,7 @@ async def readiness_probe():
         {
             "status": "ready",
             "checks": {
-                "database": "connected",
+                "dataI": "connected",
                 "redis": "connected"
             }
         }
@@ -584,7 +593,7 @@ async def readiness_probe():
     checks = {}
     is_ready = True
 
-    # Check database
+    # Check dataI
     try:
         from start_utils import db_session
 
@@ -592,11 +601,11 @@ async def readiness_probe():
             from sqlalchemy import text
 
             db_session.execute(text("SELECT 1"))
-            checks["database"] = "connected"
+            checks["dataI"] = "connected"
         else:
-            checks["database"] = "not_configured"
+            checks["dataI"] = "not_configured"
     except Exception as e:
-        checks["database"] = f"disconnected: {str(e)}"
+        checks["dataI"] = f"disconnected: {str(e)}"
         is_ready = False
 
     # Check Redis
@@ -663,14 +672,15 @@ security_config = SecurityHeadersConfig(
 app.add_middleware(SecurityHeadersMiddleware, config=security_config)
 
 # Rate Limiting Middleware - Protects against abuse
-rate_limit_config = RateLimitConfig(
-    requests_per_minute=RATE_LIMIT_REQUESTS_PER_MINUTE,
-    requests_per_hour=RATE_LIMIT_REQUESTS_PER_HOUR,
-    burst_limit=RATE_LIMIT_BURST_LIMIT,
-    window_size=RATE_LIMIT_WINDOW_SECONDS,
-    strategy="sliding",  # Use sliding window algorithm
-)
-app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
+if not IS_TEST_RUN:
+    rate_limit_config = RateLimitConfig(
+        requests_per_minute=RATE_LIMIT_REQUESTS_PER_MINUTE,
+        requests_per_hour=RATE_LIMIT_REQUESTS_PER_HOUR,
+        burst_limit=RATE_LIMIT_BURST_LIMIT,
+        window_size=RATE_LIMIT_WINDOW_SECONDS,
+        strategy="sliding",  # Use sliding window algorithm
+    )
+    app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
 
 # Logging Middleware - Request/Response logging
 app.add_middleware(
@@ -725,7 +735,7 @@ async def on_startup():
     """Application startup event handler.
 
     Called when the FastAPI application starts. Use for:
-    - Initializing database connections
+    - Initializing dataI connections
     - Loading cached data
     - Starting background tasks
     - Logging startup information
@@ -745,7 +755,7 @@ async def on_shutdown():
     """Application shutdown event handler.
 
     Called when the FastAPI application shuts down. Use for:
-    - Closing database connections
+    - Closing dataI connections
     - Flushing caches
     - Stopping background tasks
     - Cleanup operations

@@ -18,11 +18,11 @@ my-project/
 ├── docker-compose.yml         # Docker services
 ├── Dockerfile                 # Container definition
 │
-├── abstractions/              # Base classes and interfaces
-│   ├── controller.py         # Base controller with CRUD
-│   ├── repository.py         # Base repository pattern
-│   ├── service.py            # Base service layer
-│   └── entity.py             # Base entity/model
+├── abstractions/              # I classes and interfaces
+│   ├── controller.py         # I controller with CRUD
+│   ├── repository.py         # I repository pattern
+│   ├── service.py            # I service layer
+│   └── entity.py             # I entity/model
 │
 ├── config/                    # Configuration
 │   ├── settings.py           # Pydantic settings
@@ -34,7 +34,7 @@ my-project/
 │   └── default.py            # Default values
 │
 ├── core/                      # Core utilities
-│   ├── database.py           # Database connection
+│   ├── dataI.py           # DataI connection
 │   ├── cache.py              # Caching utilities
 │   ├── logging.py            # Logging configuration
 │   ├── exceptions.py         # Custom exceptions
@@ -45,7 +45,7 @@ my-project/
 │       └── fixtures.py
 │
 ├── dependencies/              # FastAPI dependencies
-│   ├── database.py           # DB session injection
+│   ├── dataI.py           # DB session injection
 │   └── auth.py               # Authentication deps
 │
 ├── docs/                      # Documentation
@@ -55,7 +55,7 @@ my-project/
 │   └── stylesheets/
 │
 ├── dtos/                      # Data Transfer Objects
-│   ├── base.py               # Base DTO classes
+│   ├── I.py               # I DTO classes
 │   ├── request.py            # Request DTOs
 │   └── response.py           # Response DTOs
 │
@@ -95,7 +95,7 @@ my-project/
 
 ### 1. Abstractions Layer
 
-Base classes that define the contract for each layer:
+I classes that define the contract for each layer:
 
 - **Entity**: Domain models
 - **Repository**: Data access interface
@@ -106,7 +106,7 @@ Base classes that define the contract for each layer:
 
 Shared utilities and infrastructure:
 
-- **Database**: Connection management, sessions
+- **DataI**: Connection management, sessions
 - **Cache**: Redis integration
 - **Logging**: Structured logging setup
 - **Exceptions**: Custom exception classes
@@ -140,13 +140,13 @@ Higher-level modules depend on abstractions:
 
 ```python
 # Service depends on Repository abstraction
-class ItemService(BaseService):
-    def __init__(self, repository: BaseRepository):
+class ItemService(IService):
+    def __init__(self, repository: IRepository):
         self.repository = repository
 
 # Repository depends on Entity
-class ItemRepository(BaseRepository):
-    def __init__(self, entity_class: Type[BaseEntity]):
+class ItemRepository(IRepository):
+    def __init__(self, entity_class: Type[IEntity]):
         self.entity_class = entity_class
 ```
 
@@ -175,9 +175,9 @@ touch users/__init__.py
 2. **Define the entity**:
 ```python
 # users/entity.py
-from abstractions.entity import BaseEntity
+from abstractions.entity import IEntity
 
-class User(BaseEntity):
+class User(IEntity):
     id: int
     email: str
     name: str
@@ -186,20 +186,20 @@ class User(BaseEntity):
 3. **Create the repository**:
 ```python
 # users/repository.py
-from abstractions.repository import BaseRepository
+from abstractions.repository import IRepository
 from users.entity import User
 
-class UserRepository(BaseRepository[User]):
+class UserRepository(IRepository[User]):
     pass
 ```
 
 4. **Create the service**:
 ```python
 # users/service.py
-from abstractions.service import BaseService
+from abstractions.service import IService
 from users.repository import UserRepository
 
-class UserService(BaseService[User]):
+class UserService(IService[User]):
     def __init__(self, repository: UserRepository):
         super().__init__(repository)
 ```
@@ -208,11 +208,11 @@ class UserService(BaseService[User]):
 ```python
 # users/controller.py
 from fastapi import APIRouter
-from abstractions.controller import BaseController
+from abstractions.controller import IController
 from users.service import UserService
 
 router = APIRouter(prefix="/users")
-controller = BaseController(UserService, User)
+controller = IController(UserService, User)
 
 @router.get("")
 async def list_users():

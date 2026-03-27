@@ -1,6 +1,6 @@
 # pyfastmvc
 
-**Production-grade MVC tooling for FastAPI** — Beautiful interactive CLI for project scaffolding, entity generation, Alembic migrations, and the reference framework layout that ties together the FastMVC ecosystem (SQLAlchemy, Redis, JWT, and optional integrations).
+**Production-grade MVC tooling for FastAPI** — Beautiful interactive CLInterface for project scaffolding, entity generation, Alembic migrations, and the reference framework layout that ties together the FastMVC ecosystem (SQLAlchemy, Redis, JWT, and optional integrations).
 
 **Python:** 3.10+
 
@@ -14,13 +14,13 @@
 - **VS Code integration** — Pre-configured debug profiles, tasks, and recommended extensions
 - **Makefile** — Common development commands (dev, test, lint, migrate, docker)
 - **Entity generation** — Scaffold controllers, services, repositories, and DTOs
-- **Alembic migrations** — Database migration management via CLI
+- **Alembic migrations** — DataI migration management via CLI
 - **App template** — FastAPI app structure, configuration, middleware, and services expected by extension packages (`fast_*`)
 - **Batteries** — FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, Redis, JWT, bcrypt, etc.
 
 ### New Features
 
-- **Database Migration CLI** — `fastmvc db migrate/upgrade/downgrade/reset`
+- **DataI Migration CLI** — `fastmvc db migrate/upgrade/downgrade/reset`
 - **Testing Framework** — ItemFactory, pytest fixtures, auth mocks
 - **Docker Compose Stack** — One-command full setup (Postgres + Redis + FastAPI)
 - **GitHub Actions CI/CD** — Auto-generated workflows for every project
@@ -87,9 +87,9 @@ make docker-up        # Start with Docker
 
 ## Feature Details
 
-### Database Migration CLI
+### DataI Migration CLI
 
-Manage database migrations directly from the CLI:
+Manage dataI migrations directly from the CLI:
 
 ```bash
 # Create migration from model changes
@@ -101,7 +101,7 @@ fastmvc db upgrade
 # Rollback one migration
 fastmvc db downgrade
 
-# Reset database (development only)
+# Reset dataI (development only)
 fastmvc db reset --seed
 
 # Check status

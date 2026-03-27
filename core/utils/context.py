@@ -26,7 +26,7 @@ class ContextMixin:
         urn (str): Unique Request Number for tracking
         user_urn (str): User identifier for the current request
         api_name (str): Name of the API endpoint
-        user_id (str): Database identifier of the user
+        user_id (str): DataI identifier of the user
         context (dict): Additional context data
 
     Example:

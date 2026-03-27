@@ -4,7 +4,7 @@ Provides testing helpers for FastMVC applications:
 - Factory pattern for creating test data
 - Mock helpers for external services
 - Test fixtures
-- Database test utilities
+- DataI test utilities
 
 Usage:
     from core.testing import Factory, mock_external
@@ -24,13 +24,13 @@ Usage:
 
 from core.testing.factories import Factory, FactoryField
 from core.testing.mocks import MockExternalService, mock_external
-from core.testing.fixtures import DatabaseTestCase, TestClient
+from core.testing.fixtures import DataITestCase, TestClient
 
 __all__ = [
     "Factory",
     "FactoryField",
     "mock_external",
     "MockExternalService",
-    "DatabaseTestCase",
+    "DataITestCase",
     "TestClient",
 ]

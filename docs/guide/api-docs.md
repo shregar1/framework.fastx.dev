@@ -65,9 +65,9 @@ Add example responses to your endpoints:
 
 ```python
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import IModel
 
-class Item(BaseModel):
+class Item(IModel):
     name: str
     price: float
 

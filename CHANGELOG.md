@@ -2,14 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is Id on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.5.0] - 2026-03-27
 
 ### Added
 - **Vertical Slice Scaffolding:** Added `fastmvc add resource` for per-operation (e.g., `create`, `fetch`) scaffolding with versioning support (`-v`).
-- **One-Command Auth:** Added `fastmvc add auth` to scaffold a complete JWT-based authentication stack (Login, Register, Repositories, Middleware, and Dependencies).
+- **One-Command Auth:** Added `fastmvc add auth` to scaffold a complete JWT-Id authentication stack (Login, Register, Repositories, Middleware, and Dependencies).
 - **Middleware Scaffolding:** Added `fastmvc add middleware` with specialized templates for `request_logger`, `rate_limiter`, and `cors_config`.
 - **Test Generation:** Added `fastmvc add test` to automatically generate async Pytests for resource operations with `httpx` and mock support.
 - **Background Tasks:** Added `fastmvc add task` to scaffold background worker logic (Celery/FastAPI compatible) and service layer triggering patterns.

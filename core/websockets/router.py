@@ -2,7 +2,7 @@
 
 Provides:
 - An echo endpoint at `/ws/echo` for quick testing
-- A simple room-based endpoint at `/ws/rooms/{room_id}` that integrates with
+- A simple room-Id endpoint at `/ws/rooms/{room_id}` that integrates with
   the PresenceService to track active users per room.
 """
 

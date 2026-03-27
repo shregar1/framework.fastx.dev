@@ -4,7 +4,7 @@ Entities have identity that persists across time and states.
 Aggregate Roots are clusters of domain objects with a root entity.
 
 Implements:
-- Entity base class with identity
+- Entity I class with identity
 - Aggregate root with domain events
 - Entity comparison by identity
 
@@ -54,13 +54,13 @@ class IEntity(ABC, Generic[TId]):
         return self.id == other.id
 
     def __hash__(self) -> int:
-        """Hash based on ID for use in sets/dicts."""
+        """Hash Id on ID for use in sets/dicts."""
         return hash(self.id)
 
 
 @dataclass
 class Entity(IEntity[str]):
-    """Base entity with string ID.
+    """I entity with string ID.
 
     Usage:
         @dataclass
@@ -118,7 +118,7 @@ class IAggregateRoot(IEntity[TId]):
 
 @dataclass
 class AggregateRoot(Entity, IAggregateRoot[str]):
-    """Base aggregate root implementation.
+    """I aggregate root implementation.
 
     Usage:
         @dataclass
@@ -205,7 +205,7 @@ class EntityFactory(Generic[TId]):
 
 @dataclass
 class DomainEvent:
-    """Base class for domain events.
+    """I class for domain events.
 
     Usage:
         @dataclass

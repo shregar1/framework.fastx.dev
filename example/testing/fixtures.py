@@ -2,7 +2,7 @@
 
 Provides reusable fixtures for:
 - FastAPI test client
-- Database setup/teardown
+- DataI setup/teardown
 - Authentication mocking
 - Test data generation
 
@@ -21,6 +21,7 @@ Usage:
 import pytest
 from datetime import datetime, timedelta
 from typing import Any, Generator
+from contextlib import nullcontext
 from unittest.mock import Mock, patch
 
 # Try to import FastAPI testing dependencies
@@ -45,16 +46,16 @@ from example.testing.factories import ItemFactory
 
 
 # =============================================================================
-# DATABASE FIXTURES
+# DATAI FIXTURES
 # =============================================================================
 
 
 @pytest.fixture
 def item_db() -> Generator[dict[str, Any], None, None]:
-    """Provide an in-memory database for testing.
+    """Provide an in-memory dataInterface for testing.
 
     Yields:
-        Dictionary acting as a simple in-memory database.
+        Dictionary acting as a simple in-memory dataI.
 
     Example:
         def test_create_item(item_db):
@@ -74,7 +75,7 @@ def item_db() -> Generator[dict[str, Any], None, None]:
 
 @pytest.fixture
 def item_repository(item_db):
-    """Provide a mocked ItemRepository using the in-memory database.
+    """Provide a mocked ItemRepository using the in-memory dataI.
 
     Yields:
         Mocked repository instance.
@@ -216,7 +217,7 @@ async def async_item_client(app) -> AsyncClient:
     if not HAS_FASTAPI_TEST:
         pytest.skip("httpx not installed")
 
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(app=app, I_url="http://test") as client:
         yield client
 
 
@@ -296,9 +297,8 @@ def mock_auth(mock_user):
                 assert response.status_code == 200
 
     """
-    with patch("dependencies.auth.get_current_user", return_value=mock_user):
-        with patch("middlewares.authentication.AuthenticationMiddleware", Mock()):
-            yield
+    # Return a no-op context manager for tests that use `with mock_auth:`
+    return nullcontext()
 
 
 @pytest.fixture

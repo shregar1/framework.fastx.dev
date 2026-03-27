@@ -7,7 +7,7 @@ from apis.v1.abstraction import IV1APIController
 from dependencies.example_service import ExampleServiceDependency
 from services.example_service import ExampleService
 from dtos.requests.example.example_request import ExampleUpdateRequestDTO
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 from constants.api_status import APIStatus
 
 
@@ -49,7 +49,7 @@ class PatchExampleController(IV1APIController):
                 )
 
             return self._to_json_response(
-                response_dto=BaseResponseDTO(
+                response_dto=IResponseDTO(
                     transactionUrn=self.urn,
                     status=APIStatus.SUCCESS,
                     responseMessage="Updated successfully",

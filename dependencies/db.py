@@ -1,4 +1,4 @@
-"""Database Dependency Module.
+"""DataI Dependency Module.
 
 Re-exports DBDependency from fast_db for backward compatibility.
 
@@ -24,7 +24,7 @@ except ImportError:
         def derive() -> Any:
             """Raise informative error about missing dependency."""
             raise ImportError(
-                "fast_db is required for database dependencies. "
+                "fast_db is required for dataI dependencies. "
                 "Install with: pip install pyfastmvc[platform]"
             )
 

@@ -1,12 +1,12 @@
 """FetchUser Dependencies."""
 
 from fastapi import Request
-from abstractions.dependency import IDependency
+from dependencies.services.v1.user.abstraction import IUserServiceDependency
 from services.user.fetch import FetchUserService
 from repositories.user.fetch import FetchUserRepository
 
 
-class FetchUserServiceDependency(IDependency):
+class FetchUserServiceDependency(IUserServiceDependency):
     """Represents the FetchUserServiceDependency class."""
 
     @staticmethod

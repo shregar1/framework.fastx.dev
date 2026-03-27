@@ -23,7 +23,7 @@ This starts:
 
 | Service | Description | Port | Health Check |
 |---------|-------------|------|--------------|
-| `postgres` | PostgreSQL 16 database | 5432 | `pg_isready` |
+| `postgres` | PostgreSQL 16 dataI | 5432 | `pg_isready` |
 | `redis` | Redis 7 cache | 6379 | `redis-cli ping` |
 | `migrations` | Alembic migrations (runs once) | - | Exits on completion |
 | `app` | FastAPI application | 8000 | `/health/live` |
@@ -69,7 +69,7 @@ make docker-up-full
 make docker-logs
 make docker-logs-app  # App only
 
-# Database operations
+# DataI operations
 make docker-db-shell      # PostgreSQL CLI
 make docker-redis-shell   # Redis CLI
 make docker-migrate       # Run migrations
@@ -109,7 +109,7 @@ cp .env.docker .env
 Key variables:
 
 ```bash
-# Database
+# DataI
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your-secure-password
 POSTGRES_DB=fastmvc
@@ -136,7 +136,7 @@ REDIS_PORT=6380         # Redis
 PGADMIN_PORT=5050       # PgAdmin
 ```
 
-## Database Migrations
+## DataI Migrations
 
 Migrations run automatically when the stack starts. To run manually:
 
@@ -241,7 +241,7 @@ lsof -i :8000
 APP_PORT=8080
 ```
 
-### Database Connection Failed
+### DataI Connection Failed
 
 ```bash
 # Check postgres is healthy
@@ -285,10 +285,10 @@ Data is stored in Docker volumes:
 # List volumes
 docker volume ls
 
-# Backup database
+# Backup dataI
 docker-compose exec postgres pg_dump -U postgres fastmvc > backup.sql
 
-# Restore database
+# Restore dataI
 cat backup.sql | docker-compose exec -T postgres psql -U postgres
 
 # Remove all data (⚠️ destructive)

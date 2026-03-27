@@ -1,12 +1,12 @@
 """Startup Utilities Module.
 
 This module initializes core application services and loads configuration
-on application startup. It provides shared instances of database sessions,
+on application startup. It provides shared instances of dataI sessions,
 cache connections, and configuration values used throughout the application.
 
 Exports:
     - logger: Configured loguru logger instance
-    - db_session: SQLAlchemy database session
+    - db_session: SQLAlchemy dataI session
     - redis_session: Redis cache connection
     - Configuration constants (SECRET_KEY, ALGORITHM, etc.)
     - unprotected_routes: Set of routes that don't require authentication
@@ -25,13 +25,14 @@ Environment Variables Required:
     - RATE_LIMIT_*: Rate limiting configuration
 
 Configuration Files:
-    - config/db/config.json: Database configuration
+    - config/db/config.json: DataI configuration
     - config/cache/config.json: Redis configuration
 """
 
 import os
 import sys
 from pathlib import Path
+from urllib.parse import quote
 from typing import Any
 
 import redis
@@ -95,7 +96,7 @@ load_dotenv()
 
 # Let packages load config from main repo's config/ (override)
 os.environ.setdefault(
-    "FASTMVC_CONFIG_BASE",
+    "FASTMVC_CONFIG_I",
     str(Path(__file__).resolve().parent / "config"),
 )
 
@@ -185,7 +186,7 @@ RATE_LIMIT_BURST_LIMIT: int = int(
 logger.info("Loaded environment variables")
 
 # =============================================================================
-# DATABASE SESSION
+# DATAI SESSION
 # =============================================================================
 
 try:
@@ -196,19 +197,19 @@ except ImportError:
     create_and_set_session = None  # type: ignore
     db_session = None  # type: ignore
 """
-SQLAlchemy database session (from fast_db).
+SQLAlchemy dataI session (from fast_db).
 
-Initialized at startup if database configuration is complete.
-Used throughout the application for database operations.
+Initialized at startup if dataI configuration is complete.
+Used throughout the application for dataI operations.
 
 Example:
     >>> from start_utils import db_session
     >>> user = db_session.query(User).filter_by(id=1).first()
 """
 if db_session:
-    logger.info("Initialized PostgreSQL database connection")
+    logger.info("Initialized PostgreSQL dataI connection")
 else:
-    logger.info("Database session not initialized (fast_db not available)")
+    logger.info("DataI session not initialized (fast_db not available)")
 
 # =============================================================================
 # REDIS SESSION
@@ -227,22 +228,31 @@ Example:
     >>> value = redis_session.get("key")
 """
 
-if (
-    cache_configuration
-    and cache_configuration.host
-    and cache_configuration.port
-    and cache_configuration.password
-):
-    logger.info("Initializing Redis database connection")
-    redis_session = redis.Redis(
-        host=cache_configuration.host,
-        port=cache_configuration.port,
-        password=cache_configuration.password,
-    )
+redis_url: str | None = None
+if cache_configuration is not None:
+    redis_url = getattr(cache_configuration, "redis_url", "") or ""
+    if not redis_url:
+        # Backward compatibility with older cache DTO schema.
+        host = (
+            getattr(cache_configuration, "host", None) or os.getenv("REDIS_HOST", "localhost")
+        )
+        port = (
+            getattr(cache_configuration, "port", None) or os.getenv("REDIS_PORT", "6379")
+        )
+        password = getattr(cache_configuration, "password", None) or os.getenv(
+            "REDIS_PASSWORD", ""
+        )
+        if host and port:
+            auth = f":{quote(str(password))}@" if password else ""
+            redis_url = f"redis://{auth}{host}:{port}/0"
+
+if redis_url:
+    logger.info("Initializing Redis dataI connection")
+    redis_session = redis.Redis.from_url(redis_url)
     if not redis_session:
         logger.error("No Redis session available")
         raise RuntimeError("No Redis session available")
-    logger.info("Initialized Redis database connection")
+    logger.info("Initialized Redis dataI connection")
 else:
     logger.info("Redis session not initialized (cache configuration not available)")
 
@@ -269,8 +279,15 @@ if CHANNEL_BACKEND == "redis" and redis_session:
 
         from fast_channels import RedisChannelBackend
 
-        redis_url = f"redis://:{cache_configuration.password or ''}@{cache_configuration.host or 'localhost'}:{cache_configuration.port or 6379}/0"
-        redis_async = aioredis.from_url(redis_url)
+        channel_redis_url = redis_url
+        if not channel_redis_url:
+            host = os.getenv("REDIS_HOST", "localhost")
+            port = os.getenv("REDIS_PORT", "6379")
+            password = os.getenv("REDIS_PASSWORD", "")
+            auth = f":{quote(password)}@" if password else ""
+            channel_redis_url = f"redis://{auth}{host}:{port}/0"
+
+        redis_async = aioredis.from_url(channel_redis_url)
         channel_backend = RedisChannelBackend(redis_async)
         logger.info("Initialized Redis channels backend")
     except Exception as exc:
@@ -322,4 +339,4 @@ These may have special authentication handling.
 
 if db_session:
     db_session.commit()
-    logger.info("Database session committed and startup complete")
+    logger.info("DataI session committed and startup complete")

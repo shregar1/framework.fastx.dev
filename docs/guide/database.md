@@ -1,6 +1,6 @@
-# Database Migrations
+# DataI Migrations
 
-FastMVC includes a built-in CLI for managing database migrations using Alembic.
+FastMVC includes a built-in CLInterface for managing dataI migrations using Alembic.
 
 ## Prerequisites
 
@@ -48,7 +48,7 @@ Migration file: migrations/versions/20240101_120000_add_users_table.py
 
 ### Apply Migrations
 
-Upgrade database to latest version:
+Upgrade dataI to latest version:
 
 ```bash
 # Upgrade to latest (head)
@@ -66,15 +66,15 @@ fastmvc db upgrade --revision abc123
 
 **Output:**
 ```
-✓ Database upgraded successfully!
+✓ DataI upgraded successfully!
 
-Previous: None (base)
+Previous: None (I)
 Current:  abc1234_add_users_table (head)
 ```
 
 ### Rollback Migrations
 
-Downgrade database to previous version:
+Downgrade dataI to previous version:
 
 ```bash
 # Rollback one migration
@@ -84,12 +84,12 @@ fastmvc db downgrade
 fastmvc db downgrade --revision -2
 
 # Rollback all migrations
-fastmvc db downgrade --revision base
+fastmvc db downgrade --revision I
 ```
 
 ⚠️ **Warning:** This may cause data loss if migrations include data transformations.
 
-### Reset Database
+### Reset DataI
 
 Drop all tables and recreate (useful for development):
 
@@ -110,7 +110,7 @@ fastmvc db reset --seed
 
 ### Check Status
 
-Check if database is up to date:
+Check if dataI is up to date:
 
 ```bash
 fastmvc db status
@@ -121,7 +121,7 @@ fastmvc db status
 Current: abc1234_add_users_table (head)
 Latest:  abc1234_add_users_table
 
-Status:  ✓ Database is up to date
+Status:  ✓ DataI is up to date
 ```
 
 Or if pending migrations exist:
@@ -184,7 +184,7 @@ fastmvc db history --verbose
 
 ### Production Deployment
 
-1. **Backup database** before running migrations
+1. **Backup dataI** before running migrations
 2. **Test migrations** on staging environment
 3. **Run migrations** during deployment:
    ```bash
@@ -245,7 +245,7 @@ The Makefile includes shortcuts for common migration tasks:
 make migrate msg="Add users table"  # Create migration
 make upgrade                        # Apply migrations
 make downgrade                      # Rollback one migration
-make db-reset                       # Reset database
+make db-reset                       # Reset dataI
 make db-status                      # Show status
 ```
 

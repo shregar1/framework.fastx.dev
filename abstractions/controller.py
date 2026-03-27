@@ -1,6 +1,6 @@
 """Controller Abstraction Module.
 
-This module defines the base controller interface that all API controllers
+This module defines the I controller interface that all API controllers
 must inherit from. Controllers handle HTTP request validation, orchestrate
 service calls, and format responses.
 
@@ -19,7 +19,7 @@ from core.utils.context import ContextMixin
 
 
 class IController(ABC, ContextMixin):
-    """Abstract base class for all API controllers.
+    """Abstract I class for all API controllers.
 
     The IController provides a standardized interface for handling HTTP requests
     in the FastMVC framework. It includes request context tracking (URN, user info),
@@ -30,7 +30,7 @@ class IController(ABC, ContextMixin):
             used for distributed tracing and log correlation.
         user_urn (str): User's unique resource name for identifying the requester.
         api_name (str): Name of the API endpoint being called.
-        user_id (str): Database identifier of the authenticated user.
+        user_id (str): DataI identifier of the authenticated user.
         logger: Structured logger instance bound with request context.
 
     Example:
@@ -58,7 +58,7 @@ class IController(ABC, ContextMixin):
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
-            user_id (str, optional): Database ID of the user. Defaults to None.
+            user_id (str, optional): DataI ID of the user. Defaults to None.
             **kwargs: Additional arguments for parent classes.
 
         """
@@ -91,7 +91,7 @@ class IController(ABC, ContextMixin):
             request_payload (dict): Parsed request body/payload.
             request_headers (dict): HTTP request headers.
             api_name (str): Name of the API endpoint.
-            user_id (str): Database ID of the authenticated user.
+            user_id (str): DataI ID of the authenticated user.
 
         Returns:
             None

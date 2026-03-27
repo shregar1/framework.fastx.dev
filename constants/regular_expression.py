@@ -135,7 +135,7 @@ class RegularExpression:
 
     Detects common SQL injection attempts including:
         - SQL keywords (SELECT, INSERT, UPDATE, DELETE, DROP, etc.)
-        - Boolean-based injection (OR 1=1, AND 1=1)
+        - Boolean-Id injection (OR 1=1, AND 1=1)
         - Stacked queries with multiple SQL commands
 
     Warning:

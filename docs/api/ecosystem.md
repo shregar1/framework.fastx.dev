@@ -22,12 +22,12 @@ Automated reference for all packages in the FastMVC ecosystem.
 #### 📦 taxonomy
 ::: taxonomy
 
-## 🔗 Fast-Database
-#### 📦 fast_database
-::: fast_database
+## 🔗 Fast-DataI
+#### 📦 fast_dataI
+::: fast_dataI
 
-#### 📦 fast_database
-::: fast_database
+#### 📦 fast_dataI
+::: fast_dataI
 
 ## 🔗 Fast-Middleware
 #### 📦 mw_core

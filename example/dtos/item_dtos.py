@@ -5,9 +5,10 @@ Demonstrates FastMVC DTO patterns for requests and responses.
 
 from typing import Self
 from datetime import datetime
+from uuid import uuid4
 
 from dtos.requests.abstraction import IRequestDTO
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 
 
 class CreateItemRequest(IRequestDTO):
@@ -19,15 +20,10 @@ class CreateItemRequest(IRequestDTO):
 
     """
 
-    def __init__(self, name: str, description: str = "") -> None:
-        """Execute __init__ operation.
-
-        Args:
-            name: The name parameter.
-            description: The description parameter.
-        """
-        self.name = name
-        self.description = description
+    reference_number: str = str(uuid4())
+    name: str
+    description: str = ""
+    completed: bool = False
 
     def validate(self) -> tuple[bool, list[str]]:
         """Validate the request data.
@@ -75,19 +71,9 @@ class UpdateItemRequest(IRequestDTO):
 
     """
 
-    def __init__(
-        self,
-        name: str | None = None,
-        description: str | None = None,
-    ) -> None:
-        """Execute __init__ operation.
-
-        Args:
-            name: The name parameter.
-            description: The description parameter.
-        """
-        self.name = name
-        self.description = description
+    reference_number: str = str(uuid4())
+    name: str | None = None
+    description: str | None = None
 
     def validate(self) -> tuple[bool, list[str]]:
         """Validate the request data.
@@ -129,7 +115,7 @@ class UpdateItemRequest(IRequestDTO):
         )
 
 
-class ItemResponse(BaseResponseDTO):
+class ItemResponse(IResponseDTO):
     """DTO for item responses.
 
     Attributes:
@@ -142,31 +128,18 @@ class ItemResponse(BaseResponseDTO):
 
     """
 
-    def __init__(
-        self,
-        id: str,
-        name: str,
-        description: str,
-        completed: bool,
-        created_at: str,
-        updated_at: str,
-    ) -> None:
-        """Execute __init__ operation.
-
-        Args:
-            id: The id parameter.
-            name: The name parameter.
-            description: The description parameter.
-            completed: The completed parameter.
-            created_at: The created_at parameter.
-            updated_at: The updated_at parameter.
-        """
-        self.id = id
-        self.name = name
-        self.description = description
-        self.completed = completed
-        self.created_at = created_at
-        self.updated_at = updated_at
+    transactionUrn: str = ""
+    status: str = "SUCCESS"
+    responseMessage: str = "Success"
+    responseKey: str = "success"
+    data: list | dict | None = None
+    errors: list | dict | None = None
+    id: str
+    name: str
+    description: str
+    completed: bool
+    created_at: str
+    updated_at: str
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -200,7 +173,7 @@ class ItemResponse(BaseResponseDTO):
         )
 
 
-class ItemListResponse(BaseResponseDTO):
+class ItemListResponse(IResponseDTO):
     """DTO for list of items response.
 
     Attributes:
@@ -211,25 +184,16 @@ class ItemListResponse(BaseResponseDTO):
 
     """
 
-    def __init__(
-        self,
-        items: list[ItemResponse],
-        total: int = 0,
-        completed_count: int = 0,
-        pending_count: int = 0,
-    ) -> None:
-        """Execute __init__ operation.
-
-        Args:
-            items: The items parameter.
-            total: The total parameter.
-            completed_count: The completed_count parameter.
-            pending_count: The pending_count parameter.
-        """
-        self.items = items
-        self.total = total or len(items)
-        self.completed_count = completed_count
-        self.pending_count = pending_count
+    transactionUrn: str = ""
+    status: str = "SUCCESS"
+    responseMessage: str = "Success"
+    responseKey: str = "success"
+    data: list | dict | None = None
+    errors: list | dict | None = None
+    items: list[ItemResponse]
+    total: int = 0
+    completed_count: int = 0
+    pending_count: int = 0
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""
@@ -262,7 +226,7 @@ class ItemListResponse(BaseResponseDTO):
         )
 
 
-class ItemStatsResponse(BaseResponseDTO):
+class ItemStatsResponse(IResponseDTO):
     """DTO for item statistics response.
 
     Attributes:
@@ -273,25 +237,16 @@ class ItemStatsResponse(BaseResponseDTO):
 
     """
 
-    def __init__(
-        self,
-        total: int,
-        completed: int,
-        pending: int,
-        completion_rate: float,
-    ) -> None:
-        """Execute __init__ operation.
-
-        Args:
-            total: The total parameter.
-            completed: The completed parameter.
-            pending: The pending parameter.
-            completion_rate: The completion_rate parameter.
-        """
-        self.total = total
-        self.completed = completed
-        self.pending = pending
-        self.completion_rate = completion_rate
+    transactionUrn: str = ""
+    status: str = "SUCCESS"
+    responseMessage: str = "Success"
+    responseKey: str = "success"
+    data: list | dict | None = None
+    errors: list | dict | None = None
+    total: int
+    completed: int
+    pending: int
+    completion_rate: float
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""

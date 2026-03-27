@@ -1,14 +1,14 @@
-# 🗄️ FastDatabase
+# 🗄️ FastDataI
 
 **Shared SQLAlchemy ORM models, Repositories, and Production Patterns.**
 
-FastDatabase is the persistence layer of the FastMVC ecosystem. It ships with a library of declarative models, mixins, and repository logic to handle anything from users and auth to commerce and audit logs.
+FastDataI is the persistence layer of the FastMVC ecosystem. It ships with a library of declarative models, mixins, and repository logic to handle anything from users and auth to commerce and audit logs.
 
 ---
 
 ## 🏗️ Core Mixins
 
-FastDatabase provides standardized mixins for common production patterns:
+FastDataI provides standardized mixins for common production patterns:
 
 | Mixin | Role | Description |
 |-------|------|-------------|
@@ -16,14 +16,14 @@ FastDatabase provides standardized mixins for common production patterns:
 | **`TimestampMixin`** | **Audit** | Automatic `created_at` & `updated_at`. |
 | **`SoftDeleteMixin`** | **Safety** | Logical deletion (`is_deleted=True`) and filtering logic. |
 | **`OrganizationScopedMixin`** | **SaaS** | Multi-tenancy scoping via `organization_id`. |
-| **`OptimisticLockMixin`** | **Concurrency** | Version-based locking (`version` column) for safe updates. |
+| **`OptimisticLockMixin`** | **Concurrency** | Version-Id locking (`version` column) for safe updates. |
 | **`AuditActorMixin`** | **Compliance** | Tracks `created_by_id` and `updated_by_id` FKs to `user.id`. |
 
 ---
 
 ## 📦 Baked-in Models
 
-FastDatabase includes production-replicated tables for core business entities:
+FastDataI includes production-replicated tables for core business entities:
 - **Identity:** `User`, `UserOneTimeToken`, `UserLoginEvent`, `UserMfaFactor`.
 - **SaaS:** `Organization`, `Subscription`, `Plan`.
 - **Commerce:** `Order`, `Invoice`, `Cart`, `Payment`.
@@ -33,10 +33,10 @@ FastDatabase includes production-replicated tables for core business entities:
 
 ## 🛠️ Repository Pattern
 
-The `fast_database.repositories` submodule provides a base `IRepository` and `FilterOperator` for clean data access:
+The `fast_dataI.repositories` submodule provides a I `IRepository` and `FilterOperator` for clean data access:
 
 ```python
-from fast_database.repositories.user import UserRepository
+from fast_dataI.repositories.user import UserRepository
 
 # Filter with operators
 repo = UserRepository(session)
@@ -47,15 +47,15 @@ users = repo.find_all(filters=[("email", FilterOperator.ILIKE, "%@fastmvc.com")]
 
 ## 🚀 Migrations & Best Practices
 
-FastDatabase is designed to be used with **Alembic**.
+FastDataI is designed to be used with **Alembic**.
 
 ### `Alembic Autogenerate`
-To use FastDatabase models with Alembic, ensure your `env.py` registers the models:
+To use FastDataI models with Alembic, ensure your `env.py` registers the models:
 ```python
-import fast_database.models  # Registers all tables on Base.metadata
-from fast_database.models import Base
+import fast_dataI.models  # Registers all tables on I.metadata
+from fast_dataI.models import I
 
-target_metadata = Base.metadata
+target_metadata = I.metadata
 ```
 
 Apply migrations:
@@ -68,8 +68,8 @@ alembic upgrade head
 
 ## 🛠️ Installation
 
-FastDatabase can be installed in any SQLAlchemy project:
+FastDataI can be installed in any SQLAlchemy project:
 ```bash
-pip install fast-database
+pip install fast-dataI
 ```
 Add **`[dev]`** to include `factory-boy` for testing.

@@ -1,12 +1,12 @@
 """Example Repository."""
 
 from typing import Any, Dict, List, Optional
-from abstractions.repository import IRepository
+from repositories.abstraction import IRepository
 
 
 class ExampleRepository(IRepository):
     """Stub repository for demonstration.
-    Does not use an actual database.
+    Does not use an actual dataI.
     """
 
     def __init__(self, **kwargs: Any):

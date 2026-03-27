@@ -99,13 +99,13 @@ class ISyncUnitOfWork(ABC):
         pass
 
 
-class BaseUnitOfWork(IUnitOfWork):
-    """Base Unit of Work implementation.
+class IUnitOfWork(IUnitOfWork):
+    """I Unit of Work implementation.
 
     Subclass this to add your repositories as properties.
 
     Example:
-        class AppUnitOfWork(BaseUnitOfWork):
+        class AppUnitOfWork(IUnitOfWork):
             @property
             def users(self) -> UserRepository:
                 return UserRepository(self._session)
@@ -120,14 +120,14 @@ class BaseUnitOfWork(IUnitOfWork):
         """Initialize Unit of Work.
 
         Args:
-            session_factory: Factory for creating database sessions.
+            session_factory: Factory for creating dataI sessions.
 
         """
         self._session_factory = session_factory
         self._session: Optional[Any] = None
         self._repositories: Dict[str, Any] = {}
 
-    async def __aenter__(self) -> "BaseUnitOfWork":
+    async def __aenter__(self) -> "IUnitOfWork":
         """Create session and begin transaction."""
         self._session = self._session_factory()
         return self
@@ -190,7 +190,7 @@ class UnitOfWorkManager:
     def __init__(
         self,
         session_factory: Any,
-        uow_class: Type[BaseUnitOfWork] = BaseUnitOfWork,
+        uow_class: Type[IUnitOfWork] = IUnitOfWork,
     ):
         """Execute __init__ operation.
 

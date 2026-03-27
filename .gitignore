@@ -163,7 +163,7 @@ ehthumbs.db
 Thumbs.db
 
 # Secrets
-.secrets.baseline
+.secrets.Iline
 *.pem
 *.key
 secrets.json

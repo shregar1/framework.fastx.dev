@@ -89,7 +89,7 @@ dependencies = [
     "fast-middleware>=0.6.2,<1.0.0",
     "cryptography>=41.0.0,<44.0.0",
     "fast-platform>=0.13.0,<1.0.0",
-    "fast-database>=0.1.0,<1.0.0",
+    "fast-dataI>=0.1.0,<1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -112,7 +112,7 @@ docs = [
 interactive = [
     "questionary>=2.0.0",
 ]
-# Core platform services - fast-platform and fast-database are now mandatory dependencies
+# Core platform services - fast-platform and fast-dataI are now mandatory dependencies
 # Individual service categories (require fast-platform extras)
 notifications = ["fast-platform[notifications]>=0.13.0"]
 storage = ["fast-platform[storage]>=0.13.0"]
@@ -261,7 +261,7 @@ select = [
 ignore = [
     "E501",  # line too long (handled by black)
     "B008",  # do not perform function calls in argument defaults
-    "B024",  # abstract class without abstract methods (used for base classes)
+    "B024",  # abstract class without abstract methods (used for I classes)
     "B904",  # raise from within except (not always needed)
     "C901",  # too complex
     "E402",  # module level import not at top (needed for mocking in tests)

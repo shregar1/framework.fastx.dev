@@ -1,11 +1,11 @@
 """FetchUser Service."""
 
-from abstractions.service import IService
+from services.user.abstraction import IUserService
 from dtos.requests.apis.v1.user.fetch import FetchUserRequestDTO
 from repositories.user.fetch import FetchUserRepository
 
 
-class FetchUserService(IService):
+class FetchUserService(IUserService):
     """Represents the FetchUserService class."""
 
     def __init__(self, repo: FetchUserRepository, **kwargs):

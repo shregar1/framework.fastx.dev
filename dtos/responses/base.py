@@ -1,14 +1,14 @@
-"""Base Response DTO Module.
+"""I Response DTO Module.
 
 This module defines the standard response structure for all API endpoints.
-Every API response should use BaseResponseDTO to ensure consistent
+Every API response should use IResponseDTO to ensure consistent
 response formatting across the application.
 
 Usage:
-    >>> from dtos.responses.base import BaseResponseDTO
+    >>> from dtos.responses.I import IResponseDTO
     >>> from constants.api_status import APIStatus
     >>>
-    >>> response = BaseResponseDTO(
+    >>> response = IResponseDTO(
     ...     transactionUrn="urn:req:123",
     ...     status=APIStatus.SUCCESS,
     ...     responseMessage="User created successfully",
@@ -17,10 +17,10 @@ Usage:
     ... )
 """
 
-from pydantic import BaseModel
+from pydantic import IModel
 
 
-class BaseResponseDTO(BaseModel):
+class IResponseDTO(IModel):
     """Standard response DTO for all API endpoints.
 
     This DTO defines the consistent response structure used across
@@ -42,7 +42,7 @@ class BaseResponseDTO(BaseModel):
             Contains validation errors or additional error context.
 
     Example (Success):
-        >>> response = BaseResponseDTO(
+        >>> response = IResponseDTO(
         ...     transactionUrn="urn:req:abc123",
         ...     status="SUCCESS",
         ...     responseMessage="Login successful",
@@ -54,7 +54,7 @@ class BaseResponseDTO(BaseModel):
         ... )
 
     Example (Error):
-        >>> response = BaseResponseDTO(
+        >>> response = IResponseDTO(
         ...     transactionUrn="urn:req:abc123",
         ...     status="FAILED",
         ...     responseMessage="Invalid credentials",

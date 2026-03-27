@@ -1,7 +1,7 @@
 """Example Service."""
 
 from typing import Dict, List, Optional, Any
-from abstractions.service import IService
+from services.abstraction import IService
 from dtos.requests.example.example_request import (
     ExampleCreateRequestDTO,
     ExampleUpdateRequestDTO,

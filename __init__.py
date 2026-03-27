@@ -43,7 +43,7 @@ With Optional Services:
     from fast_platform.storage import S3Client
 
 Modules:
-    - abstractions: Base interfaces (Controller, Service, Repository, etc.)
+    - abstractions: I interfaces (Controller, Service, Repository, etc.)
     - dtos: Data Transfer Objects and validation
     - dependencies: DI container and utilities
     - example: Complete working example (Item API)
@@ -64,11 +64,11 @@ from abstractions.controller import IController
 from abstractions.service import IService
 from abstractions.repository import IRepository
 from abstractions.entity import Entity, IEntity, AggregateRoot, IAggregateRoot
-from abstractions.unit_of_work import IUnitOfWork, BaseUnitOfWork
+from abstractions.unit_of_work import IUnitOfWork, IUnitOfWork
 from abstractions.result import Result, Success, Failure, success, failure
 
 # DTOs
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 from dtos.requests.abstraction import IRequestDTO
 
 # Application factory
@@ -82,10 +82,11 @@ try:
         ItemService,
         ItemController,
         item_router,
-        CreateItemRequest,
-        UpdateItemRequest,
-        ItemResponse,
-        ItemListResponse,
+        CreateItemRequestDTO,
+        UpdateItemRequestDTO,
+        ItemResponseDTO,
+        ItemListResponseDTO,
+        ItemStatsResponseDTO,
     )
 
     _EXAMPLE_AVAILABLE = True
@@ -106,7 +107,7 @@ __all__ = [
     "AggregateRoot",
     "IAggregateRoot",
     "IUnitOfWork",
-    "BaseUnitOfWork",
+    "IUnitOfWork",
     # Result pattern
     "Result",
     "Success",
@@ -114,7 +115,7 @@ __all__ = [
     "success",
     "failure",
     # DTOs
-    "BaseResponseDTO",
+    "IResponseDTO",
     "IRequestDTO",
     # App
     "FastMVCApp",
@@ -134,9 +135,10 @@ if _EXAMPLE_AVAILABLE:
             "ItemController",
             "item_router",
             # Example DTOs
-            "CreateItemRequest",
-            "UpdateItemRequest",
-            "ItemResponse",
-            "ItemListResponse",
+            "CreateItemRequestDTO",
+            "UpdateItemRequestDTO",
+            "ItemResponseDTO",
+            "ItemListResponseDTO",
+            "ItemStatsResponseDTO",
         ]
     )

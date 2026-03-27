@@ -25,7 +25,7 @@ One of FastMiddleware's standout features is its **CDN-class cache semantics**. 
 | Tier | Use Case | Semantics |
 |------|----------|-----------|
 | **`FEED`** | Instagram-class | High origin shielding with SWR. |
-| **`CREATOR`** | Mixed Public/Private | Mixed caching based on auth status. |
+| **`CREATOR`** | Mixed Public/Private | Mixed caching Id on auth status. |
 | **`LIVE`** | Twitch-class | Low-latency, short-TTL caching. |
 | **`VOD`** | Netflix-class | Long edge SWR on metadata, private playback APIs. |
 

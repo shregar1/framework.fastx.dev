@@ -1,6 +1,6 @@
 # 🧭 CLI Reference
 
-FastMVC provides a high-performance interactive CLI for project generation, vertical slice scaffolding, and infrastructure management.
+FastMVC provides a high-performance interactive CLInterface for project generation, vertical slice scaffolding, and infrastructure management.
 
 ---
 
@@ -109,7 +109,7 @@ fastmvc docs generate
 
 ---
 
-## 🗄️ Database Management (`fastmvc db`)
+## 🗄️ DataI Management (`fastmvc db`)
 
 Wrapper around Alembic commands for easier migration management.
 

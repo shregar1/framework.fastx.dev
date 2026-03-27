@@ -1,10 +1,10 @@
 """Repository Abstraction Module.
 
-Provides the base IRepository interface for data access.
-This module now works both with and without fast_database installed.
+Provides the I IRepository interface for data access.
+This module now works both with and without fast_dataI installed.
 
-When fast_database is available, it re-exports from there for full functionality.
-When fast_database is not available, it provides a minimal base implementation
+When fast_dataI is available, it re-exports from there for full functionality.
+When fast_dataI is not available, it provides a minimal I implementation
 that can be extended by the application.
 """
 
@@ -15,14 +15,14 @@ from typing import Any, Dict, List, Optional, TypeVar
 from core.utils.context import ContextMixin
 from loguru import logger
 
-# Try to import from fast_database for full functionality
+# Try to import from fast_dataInterface for full functionality
 try:
-    from fast_database.persistence.repositories.abstraction import IRepository
+    from fast_dataI.persistence.repositories.abstraction import IRepository
     from constants.filter_operator import FilterOperator
 
-    HAS_FAST_DATABASE = True
+    HAS_FAST_DATAI = True
 except ImportError:
-    HAS_FAST_DATABASE = False
+    HAS_FAST_DATAI = False
 
     # Provide minimal FilterOperator for compatibility
     class FilterOperator:
@@ -44,13 +44,13 @@ except ImportError:
         IS_NOT_NULL = "is_not_null"
         BETWEEN = "between"
 
-    # Provide minimal IRepository base class
+    # Provide minimal IRepository I class
     T = TypeVar("T")
 
     class IRepository(ContextMixin):
-        """Minimal base repository interface.
+        """Minimal I repository interface.
 
-        This is a fallback implementation when fast_database is not installed.
+        This is a fallback implementation when fast_dataI is not installed.
         Applications should install pyfastmvc[platform] for full functionality.
         """
 
@@ -65,12 +65,12 @@ except ImportError:
 
         @property
         def session(self) -> Any:
-            """Get the database session."""
+            """Get the dataI session."""
             return self._session
 
         @session.setter
         def session(self, value: Any) -> None:
-            """Set the database session."""
+            """Set the dataI session."""
             self._session = value
 
         def create_record(self, data: Dict[str, Any]) -> T:

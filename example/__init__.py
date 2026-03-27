@@ -27,11 +27,12 @@ from example.services.item_service import ItemService
 from example.controllers.item_controller import ItemController, router as item_router
 
 # DTOs
-from example.dtos.item_dtos import (
-    CreateItemRequest,
-    UpdateItemRequest,
-    ItemResponse,
-    ItemListResponse,
+from example.dtos.item import (
+    CreateItemRequestDTO,
+    UpdateItemRequestDTO,
+    ItemResponseDTO,
+    ItemListResponseDTO,
+    ItemStatsResponseDTO,
 )
 
 # Testing utilities (optional import)
@@ -61,10 +62,11 @@ __all__ = [
     "ItemController",
     "item_router",
     # DTOs
-    "CreateItemRequest",
-    "UpdateItemRequest",
-    "ItemResponse",
-    "ItemListResponse",
+    "CreateItemRequestDTO",
+    "UpdateItemRequestDTO",
+    "ItemResponseDTO",
+    "ItemListResponseDTO",
+    "ItemStatsResponseDTO",
 ]
 
 # Add testing exports if available

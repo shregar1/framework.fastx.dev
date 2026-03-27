@@ -83,7 +83,7 @@ my-project/
 │   ├── repository.py
 │   ├── service.py
 │   └── controller.py
-├── abstractions/          # Base classes
+├── abstractions/          # I classes
 ├── core/                  # Core utilities
 ├── middlewares/           # Middleware
 ├── dtos/                  # Data transfer objects

@@ -15,7 +15,7 @@ The framework uses familiar top-level folders:
 - **fast_cli** — CLI and scaffolding (product tooling)
 
 This maps conceptually to ``fast_platform`` sections (e.g. controllers/services → core;
-repositories + models (via ``fast_database``) → persistence; middlewares → operations).
+repositories + models (via ``fast_dataI``) → persistence; middlewares → operations).
 Physical folder names stay stable for the scaffolded app template.
 """
 

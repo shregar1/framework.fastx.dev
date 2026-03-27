@@ -1,10 +1,10 @@
-"""Database table name constants.
+"""DataI table name constants.
 
 Re-exports Table from fast_db for backward compatibility.
 
 Usage:
     >>> from constants.db.table import Table
-    >>> class User(Base):
+    >>> class User(I):
     ...     __tablename__ = Table.USER
 """
 

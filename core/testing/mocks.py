@@ -432,8 +432,8 @@ class MockRedis:
         self._data.clear()
 
 
-class MockDatabase:
-    """Mock database session for testing.
+class MockDataI:
+    """Mock dataI session for testing.
 
     Provides basic CRUD operations in memory.
     """

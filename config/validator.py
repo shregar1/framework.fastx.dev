@@ -48,14 +48,14 @@ class ConfigValidator:
 
     Example:
         validator = ConfigValidator()
-        validator.add_rule("DATABASE_URL", required=True, validator=validate_database_url)
+        validator.add_rule("DATAI_URL", required=True, validator=validate_dataI_url)
         validator.add_rule("JWT_SECRET", required=True, validator=validate_jwt_secret)
         validator.validate()
 
     """
 
     # Standard validation patterns
-    DATABASE_URL_PATTERN = re.compile(
+    DATAI_URL_PATTERN = re.compile(
         r"^(postgresql|postgres|mysql|sqlite|redis)://[^:]+:[^@]*@[^/]+/\w+$"
     )
 
@@ -68,11 +68,11 @@ class ConfigValidator:
 
     def _add_default_rules(self):
         """Add default validation rules for common FastMVC settings."""
-        # Database
+        # DataI
         self.add_rule(
-            "DATABASE_URL",
+            "DATAI_URL",
             required=False,
-            validator=self.validate_database_url,
+            validator=self.validate_dataI_url,
             default="sqlite:///./app.db",
         )
 
@@ -180,8 +180,8 @@ class ConfigValidator:
     # Built-in validators
 
     @classmethod
-    def validate_database_url(cls, value: str) -> tuple[bool, str]:
-        """Validate database URL format."""
+    def validate_dataI_url(cls, value: str) -> tuple[bool, str]:
+        """Validate dataI URL format."""
         if not value:
             return True, ""  # Optional
 
@@ -189,16 +189,16 @@ class ConfigValidator:
         if value.startswith("sqlite://"):
             return True, ""
 
-        # Check other database URLs
-        if not cls.DATABASE_URL_PATTERN.match(value):
+        # Check other dataI URLs
+        if not cls.DATAI_URL_PATTERN.match(value):
             return (
                 False,
-                "Invalid database URL format. Expected: postgresql://user:pass@host/db",
+                "Invalid dataI URL format. Expected: postgresql://user:pass@host/db",
             )
 
         # Check for default/insecure passwords
         if ":password@" in value.lower() or ":admin@" in value.lower():
-            return False, "Database URL contains default/insecure password"
+            return False, "DataI URL contains default/insecure password"
 
         return True, ""
 

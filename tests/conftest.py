@@ -31,7 +31,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import all fixtures from example testing module
 from example.testing.fixtures import (
-    # Database fixtures
+    # DataI fixtures
     item_db,
     item_repository,
     # Client fixtures
@@ -96,13 +96,13 @@ def pytest_configure(config):
     """
     config.addinivalue_line("markers", "unit: Unit tests (fast, isolated)")
     config.addinivalue_line(
-        "markers", "integration: Integration tests (may use database)"
+        "markers", "integration: Integration tests (may use dataI)"
     )
     config.addinivalue_line("markers", "e2e: End-to-end tests (full flow)")
     config.addinivalue_line("markers", "slow: Slow tests (skip in fast mode)")
     config.addinivalue_line("markers", "auth: Authentication-related tests")
     config.addinivalue_line("markers", "api: API endpoint tests")
-    config.addinivalue_line("markers", "db: Database-related tests")
+    config.addinivalue_line("markers", "db: DataI-related tests")
 
 
 # =============================================================================
@@ -121,7 +121,7 @@ def test_settings():
 
     """
     return {
-        "database_url": "sqlite:///./test.db",
+        "dataI_url": "sqlite:///./test.db",
         "jwt_secret": "test-secret-key-minimum-32-characters-long",
         "jwt_algorithm": "HS256",
         "jwt_expiration_hours": 24,

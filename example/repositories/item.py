@@ -6,7 +6,7 @@ from typing import Any
 Item Repository - Example repository implementation.
 
 Demonstrates the Repository pattern with in-memory storage.
-For production, replace with database-backed implementation.
+For production, replace with dataI-backed implementation.
 """
 
 from typing import Any, Self
@@ -20,7 +20,7 @@ from example.entities.item import ItemEntity
 class ItemRepository(IRepository):
     """Repository for ItemEntity with in-memory storage.
 
-    In production, replace the _storage dict with actual database calls.
+    In production, replace the _storage dict with actual dataI calls.
 
     Example:
         repo = ItemRepository()

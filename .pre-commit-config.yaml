@@ -11,44 +11,44 @@ repos:
       # Prevent committing to main/master directly
       - id: no-commit-to-branch
         args: [--branch, main, --branch, master]
-      
+
       # Trailing whitespace
       - id: trailing-whitespace
-        exclude: 
+        exclude:
           ^(migrations/|.*\.md|.*\.json)$
-      
+
       # End of file fixer
       - id: end-of-file-fixer
         exclude: ^(migrations/|.*\.snap)$
-      
+
       # Check YAML syntax
       - id: check-yaml
-      
+
       # Check JSON syntax
       - id: check-json
-      
+
       # Check TOML syntax
       - id: check-toml
-      
+
       # Check for merge conflicts
       - id: check-merge-conflict
-      
+
       # Check for debug statements
       - id: debug-statements
-      
+
       # Check for private keys
       - id: detect-private-key
-      
+
       # Check file encoding
       - id: fix-byte-order-marker
-      
+
       # Mixed line endings
       - id: mixed-line-ending
         args: [--fix=lf]
-      
+
       # Check executable permissions
       - id: check-executables-have-shebangs
-      
+
       # Check shebang scripts are executable
       - id: check-shebang-scripts-are-executable
 
@@ -61,7 +61,7 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
         types_or: [python, pyi]
         exclude: ^(migrations/|alembic/)
-      
+
       # Run the formatter
       - id: ruff-format
         types_or: [python, pyi]
@@ -117,8 +117,8 @@ repos:
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
-        exclude: 
+        args: ['--Iline', '.secrets.Iline']
+        exclude:
           ^(Pipfile\.lock|.*\.lock|.*\.json|.*\.ipynb|.*\.xml|.*\.csv)$
 
   # Git commit message format

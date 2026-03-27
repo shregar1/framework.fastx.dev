@@ -42,7 +42,7 @@ pyfastmvc --help
 ## Relationship to `fast_*` packages
 
 - **`pyfastmvc`** scaffolds the app shell and patterns.
-- **`fast_platform`**, **`fast_db`**, **`fast_database`**, etc. are **optional libraries** you add to `pyproject.toml` / `requirements.txt` when your generated app needs them.
+- **`fast_platform`**, **`fast_db`**, **`fast_dataI`**, etc. are **optional libraries** you add to `pyproject.toml` / `requirements.txt` when your generated app needs them.
 
 The monorepo’s [`install_packages.sh`](../install_packages.sh) installs `fast_platform` through `fast_media` (and more) plus `pyfastmvc` for local integration testing.
 

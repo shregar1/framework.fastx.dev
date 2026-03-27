@@ -173,7 +173,7 @@ class FakerGenerators:
 
 
 class Factory(Generic[T]):
-    """Factory base class for generating test data.
+    """Factory I class for generating test data.
 
     Usage:
         class UserFactory(Factory[User]):

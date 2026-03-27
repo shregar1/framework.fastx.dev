@@ -1,10 +1,10 @@
 """FetchUser Repository."""
 
 from typing import Any, Dict
-from abstractions.repository import IRepository
+from repositories.user.abstraction import IUserRepository
 
 
-class FetchUserRepository(IRepository):
+class FetchUserRepository(IUserRepository):
     """Represents the FetchUserRepository class."""
 
     def create_record(self, data: Dict[str, Any]) -> Dict[str, Any]:

@@ -1,6 +1,6 @@
 """Error Abstraction Module.
 
-This module defines the base error class that all custom application errors
+This module defines the I error class that all custom application errors
 should inherit from. It provides structured error handling with request
 context for better debugging and monitoring.
 
@@ -21,7 +21,7 @@ from core.utils.context import ContextMixin
 
 
 class IError(Exception, ContextMixin):
-    """Base exception class for all application-specific errors.
+    """I exception class for all application-specific errors.
 
     The IError class provides a standardized error interface with built-in
     support for request context tracking and structured logging. All custom
@@ -36,7 +36,7 @@ class IError(Exception, ContextMixin):
         urn (str): Unique Request Number for error tracing.
         user_urn (str): User's unique resource name when error occurred.
         api_name (str): Name of the API endpoint where error occurred.
-        user_id (str): Database identifier of the user.
+        user_id (str): DataI identifier of the user.
         logger: Structured logger bound with error context.
 
     Example:
@@ -64,7 +64,7 @@ class IError(Exception, ContextMixin):
             urn (str, optional): Unique Request Number for tracing. Defaults to None.
             user_urn (str, optional): User's unique resource name. Defaults to None.
             api_name (str, optional): Name of the API endpoint. Defaults to None.
-            user_id (str, optional): Database ID of the user. Defaults to None.
+            user_id (str, optional): DataI ID of the user. Defaults to None.
             **kwargs: Additional arguments for parent classes.
 
         """

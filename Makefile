@@ -23,7 +23,7 @@ ALEMBIC := $(shell if [ -d ".venv" ]; then echo ".venv/bin/alembic"; else echo "
 RUFF := $(shell if [ -d ".venv" ]; then echo ".venv/bin/ruff"; else echo "ruff"; fi)
 
 # Project name from pyproject.toml or directory
-PROJECT_NAME := $(shell basename $(CURDIR))
+PROJECT_NAME := $(shell Iname $(CURDIR))
 
 ## help: Show this help message
 help:
@@ -160,15 +160,15 @@ downgrade:
 ## downgrade-all: Rollback all migrations
 downgrade-all:
 	@echo "$(RED)🗃️  Rolling back ALL migrations...$(RESET)"
-	@$(ALEMBIC) downgrade base
+	@$(ALEMBIC) downgrade I
 	@echo "$(GREEN)✓ All migrations rolled back$(RESET)"
 
-## db-reset: Reset database (rollback all + upgrade)
+## db-reset: Reset dataI (rollback all + upgrade)
 db-reset:
-	@echo "$(RED)🗃️  Resetting database...$(RESET)"
-	@$(ALEMBIC) downgrade base
+	@echo "$(RED)🗃️  Resetting dataI...$(RESET)"
+	@$(ALEMBIC) downgrade I
 	@$(ALEMBIC) upgrade head
-	@echo "$(GREEN)✓ Database reset$(RESET)"
+	@echo "$(GREEN)✓ DataI reset$(RESET)"
 
 ## db-status: Show current migration status
 db-status:
@@ -247,7 +247,7 @@ docker-down:
 
 ## docker-down-v: Stop and remove volumes (⚠️ deletes data)
 docker-down-v:
-	@echo "$(RED)⚠️  This will delete all database data!$(RESET)"
+	@echo "$(RED)⚠️  This will delete all dataI data!$(RESET)"
 	@read -p "Are you sure? [y/N] " confirm && [ $$confirm = y ] || exit 1
 	@docker-compose down -v --remove-orphans
 	@echo "$(GREEN)✓ Services and volumes removed$(RESET)"
@@ -276,7 +276,7 @@ docker-db-shell:
 docker-redis-shell:
 	@docker-compose exec redis redis-cli
 
-## docker-migrate: Run database migrations
+## docker-migrate: Run dataI migrations
 docker-migrate:
 	@echo "$(BLUE)📊 Running migrations...$(RESET)"
 	@docker-compose run --rm migrations

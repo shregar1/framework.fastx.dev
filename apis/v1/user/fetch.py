@@ -4,11 +4,11 @@ from fastapi import Depends, Request
 from fastapi.responses import JSONResponse
 from apis.v1.abstraction import (
     IV1APIController,
-)  # Reuse v1 abstraction if base is similar
+)  # Reuse v1 abstraction if I is similar
 from dependencies.services.v1.user.fetch import FetchUserServiceDependency
 from services.user.fetch import FetchUserService
 from dtos.requests.apis.v1.user.fetch import FetchUserRequestDTO
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 from constants.api_status import APIStatus
 
 
@@ -40,7 +40,7 @@ class FetchUserAPIController(IV1APIController):
             """
             result = service.run(payload)
             return self._to_json_response(
-                BaseResponseDTO(
+                IResponseDTO(
                     transactionUrn=request.state.urn,
                     status=APIStatus.SUCCESS,
                     data=result["item"],

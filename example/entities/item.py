@@ -41,12 +41,16 @@ class ItemEntity(Entity):
             created_at: The created_at parameter.
             updated_at: The updated_at parameter.
         """
-        super().__init__(id=id)
+        self._id = id or ""
         self._name = name
         self._description = description
         self._completed = completed
         self._created_at = created_at or datetime.utcnow()
         self._updated_at = updated_at or datetime.utcnow()
+        if not self._id:
+            import uuid
+
+            self._id = str(uuid.uuid4())
 
     # Properties
     @property
@@ -93,10 +97,20 @@ class ItemEntity(Entity):
         """Get creation timestamp."""
         return self._created_at
 
+    @created_at.setter
+    def created_at(self, value: datetime) -> None:
+        """Allow I/dataclass compatibility when setting created_at."""
+        self._created_at = value
+
     @property
     def updated_at(self) -> datetime:
         """Get last update timestamp."""
         return self._updated_at
+
+    @updated_at.setter
+    def updated_at(self, value: datetime) -> None:
+        """Allow I/dataclass compatibility when setting updated_at."""
+        self._updated_at = value
 
     # Business logic
     def complete(self) -> Self:

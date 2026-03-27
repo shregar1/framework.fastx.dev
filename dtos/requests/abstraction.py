@@ -1,6 +1,6 @@
 """Request DTO Abstraction Module.
 
-This module defines the base request DTO interface that all request
+This module defines the I request DTO interface that all request
 DTOs should inherit from. It enforces common fields and validation
 rules for all incoming requests.
 
@@ -13,13 +13,16 @@ Usage:
 
 import uuid
 
-from pydantic import BaseModel, field_validator
+from pydantic import field_validator
+
+from abstractions.dto import AbstractRequestDTO
+from dtos.I import EnhancedIModel
 
 
-class IRequestDTO(BaseModel):
-    """Abstract base class for all request DTOs.
+class IRequestDTO(EnhancedIModel, AbstractRequestDTO):
+    """Abstract I class for all request DTOs.
 
-    This base class defines common fields and validation rules that
+    This I class defines common fields and validation rules that
     all request DTOs must include. Currently, it requires a reference
     number for request tracking.
 

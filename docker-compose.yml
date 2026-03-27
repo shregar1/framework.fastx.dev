@@ -1,16 +1,16 @@
-version: '3.8'
+version: "3.8"
 
 # =============================================================================
 # FastMVC Full Stack - Docker Compose
 # =============================================================================
-# 
+#
 # One command to run the entire stack:
 #   docker-compose up -d
 #
 # Services:
-#   - postgres: PostgreSQL database
+#   - postgres: PostgreSQL dataI
 #   - redis: Redis cache
-#   - migrations: Alembic database migrations (runs once)
+#   - migrations: Alembic dataI migrations (runs once)
 #   - app: FastAPI application
 #   - worker: Background task worker (optional)
 #   - scheduler: Task scheduler (optional)
@@ -25,7 +25,7 @@ version: '3.8'
 
 services:
   # ==========================================================================
-  # PostgreSQL Database
+  # PostgreSQL DataI
   # ==========================================================================
   postgres:
     image: postgres:16-alpine
@@ -44,12 +44,16 @@ services:
     networks:
       - fastmvc-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fastmvc}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fastmvc}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 10s
-    command: 
+    command:
       - "postgres"
       - "-c"
       - "max_connections=200"
@@ -77,7 +81,7 @@ services:
       retries: 5
 
   # ==========================================================================
-  # Database Migrations (runs once before app starts)
+  # DataI Migrations (runs once before app starts)
   # ==========================================================================
   migrations:
     build:
@@ -85,8 +89,8 @@ services:
       dockerfile: Dockerfile
     container_name: fastmvc-migrations
     environment:
-      # Database
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      # DataI
+      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       # Redis
       REDIS_URL: redis://redis:6379/0
       # Security
@@ -98,7 +102,7 @@ services:
     command: >
       sh -c "echo '⏳ Waiting for PostgreSQL...' &&
              sleep 5 &&
-             echo '📊 Running database migrations...' &&
+             echo '📊 Running dataI migrations...' &&
              alembic upgrade head &&
              echo '✅ Migrations complete!'"
     depends_on:
@@ -109,7 +113,7 @@ services:
     networks:
       - fastmvc-network
     profiles:
-      - ""  # Run by default
+      - "" # Run by default
       - "migrations"
 
   # ==========================================================================
@@ -122,8 +126,8 @@ services:
     container_name: fastmvc-app
     restart: unless-stopped
     environment:
-      # Database
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      # DataI
+      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       # Redis
       REDIS_URL: redis://redis:6379/0
       # Security
@@ -166,10 +170,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: "1"
           memory: 512M
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 128M
 
   # ==========================================================================
@@ -182,15 +186,15 @@ services:
     container_name: fastmvc-worker
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       APP_ENV: ${APP_ENV:-production}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     command: >
-      celery -A core.tasks worker 
-      --loglevel=${LOG_LEVEL:-INFO} 
-      --concurrency=2 
+      celery -A core.tasks worker
+      --loglevel=${LOG_LEVEL:-INFO}
+      --concurrency=2
       --max-tasks-per-child=1000
     depends_on:
       - postgres
@@ -211,15 +215,15 @@ services:
     container_name: fastmvc-scheduler
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       APP_ENV: ${APP_ENV:-production}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
     command: >
-      celery -A core.tasks beat 
+      celery -A core.tasks beat
       --loglevel=${LOG_LEVEL:-INFO}
-      --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      --scheduler django_celery_beat.schedulers:DataIScheduler
     depends_on:
       - postgres
       - redis
@@ -252,7 +256,7 @@ services:
       - "full"
 
   # ==========================================================================
-  # Database Admin (PgAdmin - Optional)
+  # DataI Admin (PgAdmin - Optional)
   # ==========================================================================
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -261,7 +265,7 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "${PGADMIN_PORT:-5050}:80"
     volumes:

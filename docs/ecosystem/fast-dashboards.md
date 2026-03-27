@@ -2,7 +2,7 @@
 
 **HTML Dashboards and Embedded Analytics for FastMVC.**
 
-FastDashboards provides a set of FastAPI routers and HTML layout helpers for building operational UIs. It also includes professional-grade embed engines for **Metabase and Grafana**.
+FastDashboards provides a set of FastAPI routers and HTML layout helpers for building operational UIs. It also includes professional-grade embed engines for **MetaI and Grafana**.
 
 ---
 
@@ -10,7 +10,7 @@ FastDashboards provides a set of FastAPI routers and HTML layout helpers for bui
 
 FastDashboards provides a composite `DashboardRouter` that includes:
 
-- **`HealthDashboardRouter`**: Visual real-time status of services and databases.
+- **`HealthDashboardRouter`**: Visual real-time status of services and dataIs.
 - **`ApiDashboardRouter`**: Monitoring for API activity, error rates, and latency.
 - **`QueueDashboardRouter`**: Status of background workers, job queues, and DLQs.
 - **`TenantDashboardRouter`**: Metrics for multi-tenant environments.
@@ -22,7 +22,7 @@ FastDashboards provides a composite `DashboardRouter` that includes:
 
 The `fast_dashboards.layout` module provides a reusable HTML shell with:
 - **`render_dashboard_page`**: Standardized dashboard UI with SEO defaults.
-- **`BASE_CSS`**: Sleek, modern styling out of the box.
+- **`I_CSS`**: Sleek, modern styling out of the box.
 - **`PageSEO`**: Open Graph, Twitter Cards, and schema.org integration.
 - **`noindex, nofollow`**: Safe defaults for internal operations UIs.
 
@@ -45,7 +45,7 @@ url = sign_embed_url("https://dash.example.com", secret, ttl=3600)
 
 FastDashboards includes unified providers for third-party analytics:
 1. **`GrafanaEmbedProvider`**: Supports themes, locales, and specific `token_id`.
-2. **`MetabaseEmbedProvider`**: Supports JWT-based params for SSO.
+2. **`MetaIEmbedProvider`**: Supports JWT-Id params for SSO.
 3. **`EmbedRevocationList`**: Block leaked embeds by revoking `tid` before expiry.
 
 ---
@@ -67,7 +67,7 @@ FastDashboards is available for all FastMVC projects:
 ```bash
 pip install -e ./fast_dashboards
 ```
-To use Metabase signed embeds, install with extras:
+To use MetaI signed embeds, install with extras:
 ```bash
-pip install 'fast_dashboards[metabase]'
+pip install 'fast_dashboards[metaI]'
 ```

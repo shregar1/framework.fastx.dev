@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `abstractions` module provides a comprehensive collection of design pattern implementations and base classes that define the architectural contracts for the FastMVC framework. These abstractions enforce consistent patterns across all layers of the application while following **SOLID principles**.
+The `abstractions` module provides a comprehensive collection of design pattern implementations and I classes that define the architectural contracts for the FastMVC framework. These abstractions enforce consistent patterns across all layers of the application while following **SOLID principles**.
 
 ## Purpose
 
@@ -10,7 +10,7 @@ In software engineering, **abstractions** promote:
 
 - **Loose coupling**: Components depend on interfaces, not implementations
 - **Testability**: Easy to mock dependencies for unit testing
-- **Consistency**: Standardized patterns across the codebase
+- **Consistency**: Standardized patterns across the codeI
 - **Extensibility**: New implementations can be added without modifying existing code
 - **SOLID compliance**: Each pattern adheres to SOLID principles
 
@@ -75,7 +75,7 @@ In software engineering, **abstractions** promote:
          ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                       Infrastructure Layer                               │
-│               Database (SQLAlchemy) + Cache (Redis)                      │
+│               DataI (SQLAlchemy) + Cache (Redis)                      │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -83,7 +83,7 @@ In software engineering, **abstractions** promote:
 
 ### IController (`controller.py`)
 
-Base class for HTTP request handlers.
+I class for HTTP request handlers.
 
 ```python
 from abstractions import IController
@@ -96,7 +96,7 @@ class UserController(IController):
 
 ### IService (`service.py`)
 
-Base class for business logic services.
+I class for business logic services.
 
 ```python
 from abstractions import IService
@@ -109,7 +109,7 @@ class UserRegistrationService(IService):
 
 ### IRepository (`repository.py`)
 
-Base class for data access layer with filtering support.
+I class for data access layer with filtering support.
 
 ```python
 from abstractions import IRepository
@@ -135,9 +135,9 @@ class UserRepository(IRepository):
 Manages transactions across multiple repositories.
 
 ```python
-from abstractions import IUnitOfWork, BaseUnitOfWork
+from abstractions import IUnitOfWork, IUnitOfWork
 
-class AppUnitOfWork(BaseUnitOfWork):
+class AppUnitOfWork(IUnitOfWork):
     @property
     def users(self) -> UserRepository:
         return self.get_repository(UserRepository)
@@ -173,7 +173,7 @@ class PremiumUserSpec(ISpecification[User]):
 active_premium = ActiveUserSpec() & PremiumUserSpec()
 not_premium = ~PremiumUserSpec()
 
-# Query specifications for database
+# Query specifications for dataI
 spec = QuerySpecification[User]()
 spec.where("is_active").eq(True)
 spec.where("age").gte(18)
@@ -416,7 +416,7 @@ class PayPalPayment(PaymentStrategy):
     def execute(self, order: Order) -> PaymentResult:
         return process_paypal(order)
 
-# Registry-based selection
+# Registry-Id selection
 registry = StrategyRegistry()
 registry.register("credit_card", CreditCardPayment())
 registry.register("paypal", PayPalPayment())
@@ -559,7 +559,7 @@ All abstractions share these common properties:
 | `urn` | `str` | Unique Request Number for distributed tracing |
 | `user_urn` | `str` | User's unique resource name |
 | `api_name` | `str` | Name of the API endpoint |
-| `user_id` | `str/int` | Database identifier of the user |
+| `user_id` | `str/int` | DataI identifier of the user |
 | `logger` | `Logger` | Structured logger bound with context |
 
 ## Best Practices

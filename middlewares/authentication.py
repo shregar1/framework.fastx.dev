@@ -11,7 +11,7 @@ from http import HTTPStatus
 from fastapi.responses import JSONResponse
 
 from constants.api_status import APIStatus
-from dtos.responses.base import BaseResponseDTO
+from dtos.responses.I import IResponseDTO
 
 # Optional dependencies (requires pyfastmvc[platform])
 try:
@@ -21,7 +21,7 @@ except ImportError:
     ErrorKind = None  # type: ignore
 
 try:
-    from fast_database.persistence.repositories.user import UserRepository
+    from fast_dataI.persistence.repositories.user import UserRepository
 except ImportError:
     UserRepository = None  # type: ignore
 
@@ -43,7 +43,7 @@ def _decode_bearer(token: str, urn: str) -> dict:
 
 
 def _load_user(user_data: dict, urn: str):
-    """Load user from database."""
+    """Load user from dataI."""
     if UserRepository and db_session:
         return UserRepository(
             urn=urn, session=db_session
@@ -66,7 +66,7 @@ if JWTBearerAuthMiddleware:
         callback_routes=callback_routes,
         error_response_factory=lambda request, error: JSONResponse(
             status_code=HTTPStatus.UNAUTHORIZED,
-            content=BaseResponseDTO(
+            content=IResponseDTO(
                 transactionUrn=getattr(request.state, "urn", None),
                 status=APIStatus.FAILED,
                 responseMessage=error.message,
