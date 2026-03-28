@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FastMVC — API</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg0: #070a12;
+      --bg1: #0f1629;
+      --accent: #2dd4bf;
+      --accent2: #a78bfa;
+      --text: #e8edf7;
+      --muted: #8b9ab8;
+      --card: rgba(18, 26, 44, 0.72);
+      --stroke: rgba(148, 163, 184, 0.2);
+      --glow: rgba(45, 212, 191, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg0);
+      background-image:
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(120, 80, 200, 0.25), transparent),
+        radial-gradient(ellipse 80% 50% at 100% 0%, rgba(45, 212, 191, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 0% 100%, rgba(167, 139, 250, 0.15), transparent),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 45%);
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem 3rem;
+    }
+
+    .orb {
+      position: fixed;
+      width: 42rem;
+      height: 42rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      filter: blur(40px);
+      opacity: 0.5;
+      pointer-events: none;
+      top: -10rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 0;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 40rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 1.25rem;
+      padding: 2.25rem 2rem;
+      backdrop-filter: blur(12px);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 24px 48px rgba(0, 0, 0, 0.45);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .badge::before {
+      content: "";
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+      margin: 0 0 1.75rem;
+    }
+
+    .origin {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.85rem;
+      color: var(--accent2);
+      background: rgba(167, 139, 250, 0.15);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 1.75rem;
+      word-break: break-all;
+    }
+
+    .origin span {
+      color: var(--muted);
+      font-size: 0.75rem;
+      display: block;
+      margin-bottom: 0.35rem;
+      font-family: "DM Sans", sans-serif;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .nav a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 0.65rem;
+      border: 1px solid var(--stroke);
+      background: rgba(255, 255, 255, 0.04);
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+
+    .nav a:hover {
+      border-color: rgba(45, 212, 191, 0.45);
+      background: rgba(45, 212, 191, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .nav a.primary {
+      border-color: rgba(45, 212, 191, 0.45);
+      background: rgba(45, 212, 191, 0.1);
+      color: var(--accent);
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb" aria-hidden="true"></div>
+  <div class="wrap">
+    <main>
+      <div class="card">
+        <div class="badge">Running</div>
+        <h1>FastMVC API</h1>
+        <p class="subtitle">
+          Production-grade FastAPI stack. Use the links below to explore the interactive docs, health checks, and sample APIs.
+        </p>
+        <div class="origin" id="origin-box">
+          <span>Base URL</span>
+          <span id="origin">—</span>
+        </div>
+        <nav class="nav" aria-label="Quick links">
+          <a class="primary" href="/docs">Swagger UI</a>
+          <a href="/redoc">ReDoc</a>
+          <a href="/health">Health</a>
+          <a href="/items">Items</a>
+        </nav>
+      </div>
+    </main>
+    <footer>
+      <p><a href="https://github.com/shregar1/fastMVC">FastMVC</a> · MVC + DI for FastAPI</p>
+    </footer>
+  </div>
+  <script>
+    (function () {
+      var el = document.getElementById("origin");
+      if (el) {
+        el.textContent = window.location.origin || "";
+      }
+    })();
+  </script>
+</body>
+</html>

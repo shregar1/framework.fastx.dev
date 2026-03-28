@@ -42,6 +42,7 @@ Example API (if example module is available):
 
 import os
 from http import HTTPStatus
+from pathlib import Path
 from importlib.metadata import PackageNotFoundError, version
 from typing import cast
 
@@ -49,7 +50,7 @@ import uvicorn  # pyright: ignore[reportMissingImports]
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 # Import middlewares from fast-middleware package
 from fastmiddleware import (  # pyright: ignore[reportMissingImports]
@@ -239,6 +240,24 @@ if configure_otel and os.getenv("TELEMETRY_ENABLED", "").lower() in {
     "yes",
 }:
     configure_otel(app)
+
+# Static launch page at GET /
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
+_LAUNCH_HTML = _STATIC_DIR / "launch.html"
+
+
+@app.get("/", include_in_schema=False)
+async def launch_page() -> HTMLResponse:
+    """Serve the landing page at the application root (same host/port as the API)."""
+    if _LAUNCH_HTML.is_file():
+        return HTMLResponse(
+            _LAUNCH_HTML.read_text(encoding="utf-8"),
+            headers={"Cache-Control": "no-cache"},
+        )
+    return HTMLResponse(
+        "<!DOCTYPE html><html><body><p>FastMVC API</p></body></html>",
+        status_code=HTTPStatus.OK,
+    )
 
 
 @app.exception_handler(RequestValidationError)
@@ -694,7 +713,7 @@ app.add_middleware(
     LoggingMiddleware,
     log_request_body=False,  # Don't log sensitive request bodies
     log_response_body=False,
-    exclude_paths={"/health", "/docs", "/redoc", "/openapi.json"},
+    exclude_paths={"/", "/health", "/docs", "/redoc", "/openapi.json"},
 )
 
 # Timing Middleware - Response time tracking

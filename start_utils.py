@@ -301,6 +301,7 @@ elif CHANNEL_BACKEND == "kafka":
 # =============================================================================
 
 unprotected_routes: set = {
+    "/",
     "/health",
     "/health/live",
     "/health/ready",
@@ -315,6 +316,7 @@ unprotected_routes: set = {
 Set of routes that bypass authentication middleware.
 
 These routes are accessible without a valid JWT token:
+    - /: Launch landing page (static HTML)
     - /health: Comprehensive health check endpoint
     - /health/live: Kubernetes liveness probe
     - /health/ready: Kubernetes readiness probe
