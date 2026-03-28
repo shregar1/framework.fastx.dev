@@ -44,7 +44,7 @@ import os
 from http import HTTPStatus
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import uvicorn  # pyright: ignore[reportMissingImports]
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
@@ -710,6 +710,15 @@ security_config = SecurityHeadersConfig(
 app.add_middleware(SecurityHeadersMiddleware, config=security_config)
 
 # Rate Limiting Middleware - Protects against abuse
+# Base middleware matches exclude_paths by exact URL only; liveness/readiness live under
+# /health/* so we skip the whole prefix (including /health/live) for probes.
+class _HealthPrefixRateLimitMiddleware(RateLimitMiddleware):
+    def should_skip(self, request: Request) -> bool:
+        if request.url.path.startswith("/health"):
+            return True
+        return super().should_skip(request)
+
+
 if not IS_TEST_RUN:
     rate_limit_config = RateLimitConfig(
         requests_per_minute=RATE_LIMIT_REQUESTS_PER_MINUTE,
@@ -719,13 +728,9 @@ if not IS_TEST_RUN:
         strategy="sliding",  # Use sliding window algorithm
     )
     app.add_middleware(
-        RateLimitMiddleware,
+        cast(Any, _HealthPrefixRateLimitMiddleware),
         config=rate_limit_config,
-        exclude_paths={
-            "/health",
-            "/health/live",
-            "/health/ready",
-        },
+        exclude_paths=None,
     )
 
 # Logging Middleware - Request/Response logging
