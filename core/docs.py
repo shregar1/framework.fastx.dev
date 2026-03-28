@@ -8,10 +8,12 @@ Usage:
 """
 
 from pathlib import Path
+from typing import Any, Optional
 
 from fastapi import FastAPI
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import HTMLResponse
 
 # FastMVC Brand Colors
 FASTMVC_THEME = {
@@ -466,6 +468,20 @@ SWAGGER_UI_JS = """
 """
 
 
+def _merge_html_response(base: HTMLResponse, *extra_parts: str) -> HTMLResponse:
+    """Append HTML fragments to a Starlette HTMLResponse (get_*_html now returns Response, not str)."""
+    body = base.body
+    text = body.decode("utf-8") if isinstance(body, (bytes, bytearray)) else str(body)
+    for part in extra_parts:
+        text += part
+    return HTMLResponse(
+        content=text,
+        status_code=base.status_code,
+        media_type=base.media_type,
+        headers=dict(base.headers),
+    )
+
+
 def setup_custom_docs(app: FastAPI) -> None:
     """Set up custom FastMVC branded documentation for FastAPI.
 
@@ -526,14 +542,13 @@ def setup_custom_docs(app: FastAPI) -> None:
         """Custom Swagger UI with FastMVC branding."""
         # Use standalone HTML file if available
         if swagger_html_path.exists():
-            from fastapi.responses import HTMLResponse
-
             return HTMLResponse(content=swagger_html_path.read_text())
 
         # Fallback to embedded Swagger UI
-        return (
+        openapi_url = app.openapi_url or "/openapi.json"
+        return _merge_html_response(
             get_swagger_ui_html(
-                openapi_url=app.openapi_url,
+                openapi_url=openapi_url,
                 title=f"{app.title} - API Documentation",
                 swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js",
                 swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css",
@@ -546,29 +561,30 @@ def setup_custom_docs(app: FastAPI) -> None:
                     "scopeSeparator": " ",
                     "additionalQueryStringParams": {},
                 },
-            )
-            + SWAGGER_UI_CSS
-            + SWAGGER_UI_JS
+            ),
+            SWAGGER_UI_CSS,
+            SWAGGER_UI_JS,
         )
 
     # Override ReDoc endpoint
     @app.get("/redoc", include_in_schema=False)
     async def custom_redoc_html():
         """Custom ReDoc with FastMVC branding."""
-        return (
+        openapi_url = app.openapi_url or "/openapi.json"
+        return _merge_html_response(
             get_redoc_html(
-                openapi_url=app.openapi_url,
+                openapi_url=openapi_url,
                 title=f"{app.title} - ReDoc",
                 redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@2.1.3/bundles/redoc.standalone.js",
                 redoc_favicon_url="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E",
-            )
-            + """
+            ),
+            """
         <style>
             body { background: #0f0f1a !important; }
             .menu-content { background: #1a1a2e !important; }
             .api-content { background: #0f0f1a !important; }
         </style>
-        """
+        """,
         )
 
     print("✅ Custom FastMVC API documentation configured")
@@ -580,9 +596,9 @@ def add_examples_to_schema(
     app: FastAPI,
     path: str,
     method: str,
-    request_example: dict = None,
-    response_examples: dict = None,
-):
+    request_example: Optional[dict[str, Any]] = None,
+    response_examples: Optional[dict[str, Any]] = None,
+) -> None:
     """Add example requests/responses to OpenAPI schema.
 
     Args:
@@ -597,6 +613,8 @@ def add_examples_to_schema(
         app.openapi()
 
     schema = app.openapi_schema
+    if schema is None:
+        return
     path_data = schema.get("paths", {}).get(path, {})
     method_data = path_data.get(method.lower(), {})
 

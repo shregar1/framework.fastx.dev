@@ -692,7 +692,15 @@ security_config = SecurityHeadersConfig(
     x_content_type_options="nosniff",
     x_xss_protection="1; mode=block",
     referrer_policy="strict-origin-when-cross-origin",
-    content_security_policy="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
+    # Allow Swagger/ReDoc assets from jsdelivr and Google Fonts (launch page, docs UIs)
+    content_security_policy=(
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+        "font-src 'self' data: https://fonts.gstatic.com; "
+        "img-src 'self' data: https: blob:; "
+        "connect-src 'self'"
+    ),
     remove_server_header=True,
 )
 app.add_middleware(SecurityHeadersMiddleware, config=security_config)
@@ -706,7 +714,15 @@ if not IS_TEST_RUN:
         window_size=RATE_LIMIT_WINDOW_SECONDS,
         strategy="sliding",  # Use sliding window algorithm
     )
-    app.add_middleware(RateLimitMiddleware, config=rate_limit_config)
+    app.add_middleware(
+        RateLimitMiddleware,
+        config=rate_limit_config,
+        exclude_paths={
+            "/health",
+            "/health/live",
+            "/health/ready",
+        },
+    )
 
 # Logging Middleware - Request/Response logging
 app.add_middleware(

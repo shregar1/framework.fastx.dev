@@ -17,7 +17,14 @@ Usage:
     ... )
 """
 
-from pydantic import BaseModel
+from datetime import datetime, timezone
+from typing import Any
+
+from pydantic import BaseModel, Field
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class IResponseDTO(BaseModel):
@@ -40,6 +47,10 @@ class IResponseDTO(BaseModel):
             Contains the requested data or created resource details.
         errors (List | Dict, optional): Error details on failure.
             Contains validation errors or additional error context.
+        metadata (Dict, optional): Cross-cutting metadata (pagination, timings,
+            API version hints, feature flags, etc.). Not the primary resource payload.
+        timestamp (datetime): When the response envelope was produced (UTC). Defaults
+            to "now" if omitted.
 
     Example (Success):
         >>> response = IResponseDTO(
@@ -71,7 +82,9 @@ class IResponseDTO(BaseModel):
             "responseMessage": "Operation completed",
             "responseKey": "success_operation",
             "data": {...},
-            "errors": null
+            "errors": null,
+            "metadata": {"page": 1, "pageSize": 20},
+            "timestamp": "2024-01-15T12:00:00Z"
         }
         ```
 
@@ -98,3 +111,16 @@ class IResponseDTO(BaseModel):
 
     errors: list | dict | None = None
     """Error details when status is FAILED."""
+
+    metadata: dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "Optional envelope metadata (pagination, timings, version, "
+            "feature flags). Distinct from `data`, which holds the main payload."
+        ),
+    )
+
+    timestamp: datetime = Field(
+        default_factory=_utc_now,
+        description="Server time (UTC) when this response envelope was generated.",
+    )
