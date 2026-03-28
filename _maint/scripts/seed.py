@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """DataI Seed Script.
 
-Populate the dataI with initial data after migrations.
+Populate the database with initial data after migrations.
 Run automatically with: fastmvc db reset --seed
 
 Usage:
@@ -22,16 +22,16 @@ from sqlalchemy.orm import sessionmaker
 # from example.entity import Item
 
 # DataI URL from environment or default
-DATAI_URL = "sqlite:///./app.db"
+DATABASE_URL = "sqlite:///./app.db"
 # For PostgreSQL: "postgresql://user:pass@localhost/dbname"
 
 
 def seed_data():
-    """Seed the dataI with initial data."""
-    print("🌱 Seeding dataI...")
+    """Seed the database with initial data."""
+    print("🌱 Seeding database...")
 
     # Create engine and session
-    engine = create_engine(DATAI_URL)
+    engine = create_engine(DATABASE_URL)
     SessionLocal = sessionmaker(bind=engine)
     db = SessionLocal()
 
@@ -51,7 +51,7 @@ def seed_data():
         print("✅ Seed data applied successfully!")
 
     except Exception as e:
-        print(f"❌ Error seeding dataI: {e}")
+        print(f"❌ Error seeding database: {e}")
         db.rollback()
         raise
     finally:

@@ -48,14 +48,14 @@ class ConfigValidator:
 
     Example:
         validator = ConfigValidator()
-        validator.add_rule("DATAI_URL", required=True, validator=validate_dataI_url)
+        validator.add_rule("DATABASE_URL", required=True, validator=validate_dataI_url)
         validator.add_rule("JWT_SECRET", required=True, validator=validate_jwt_secret)
         validator.validate()
 
     """
 
     # Standard validation patterns
-    DATAI_URL_PATTERN = re.compile(
+    DATABASE_URL_PATTERN = re.compile(
         r"^(postgresql|postgres|mysql|sqlite|redis)://[^:]+:[^@]*@[^/]+/\w+$"
     )
 
@@ -70,7 +70,7 @@ class ConfigValidator:
         """Add default validation rules for common FastMVC settings."""
         # DataI
         self.add_rule(
-            "DATAI_URL",
+            "DATABASE_URL",
             required=False,
             validator=self.validate_dataI_url,
             default="sqlite:///./app.db",
@@ -181,7 +181,7 @@ class ConfigValidator:
 
     @classmethod
     def validate_dataI_url(cls, value: str) -> tuple[bool, str]:
-        """Validate dataI URL format."""
+        """Validate database URL format."""
         if not value:
             return True, ""  # Optional
 
@@ -189,11 +189,11 @@ class ConfigValidator:
         if value.startswith("sqlite://"):
             return True, ""
 
-        # Check other dataI URLs
-        if not cls.DATAI_URL_PATTERN.match(value):
+        # Check other database URLs
+        if not cls.DATABASE_URL_PATTERN.match(value):
             return (
                 False,
-                "Invalid dataI URL format. Expected: postgresql://user:pass@host/db",
+                "Invalid database URL format. Expected: postgresql://user:pass@host/db",
             )
 
         # Check for default/insecure passwords

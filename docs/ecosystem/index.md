@@ -11,7 +11,7 @@ Each package is decoupled and can be used independently, but they are designed t
 | Package | Role | Key Feature |
 |---------|------|-------------|
 | [**FastCLI**](fast-cli.md) | **Orchestration** | Vertical slice scaffolding & dev-ops automation. |
-| [**FastDataI**](fast-dataI.md) | **Persistence** | Production-ready SQLAlchemy models, Mixins, and Repositories. |
+| [**FastDataI**](fast-database.md) | **Persistence** | Production-ready SQLAlchemy models, Mixins, and Repositories. |
 | [**FastMiddleware**](fast-middleware.md) | **Cross-Cutting** | 90+ ASGI middlewares for security, performance, and observability. |
 | [**FastDashboards**](fast-dashboards.md) | **Operations** | HTML dashboards for health, logs, and embedded analytics. |
 | [**FastPlatform**](fast-platform.md) | **Infrastructure** | Unified distribution for 30+ services (Messaging, Search, LLM, etc.). |
@@ -34,6 +34,6 @@ If you are using the FastMVC CLI, most of these packages are already available i
 To install a specific part of the ecosystem in any Python project:
 ```bash
 pip install fast-platform      # Get the whole platform
-pip install fast-dataI      # Persistence only
+pip install fast-database      # Persistence only
 pip install fast-middleware    # HTTP utilities only
 ```

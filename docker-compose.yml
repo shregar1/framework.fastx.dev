@@ -6,9 +6,9 @@
 #   docker-compose up -d
 #
 # Services:
-#   - postgres: PostgreSQL dataI
+#   - postgres: PostgreSQL database
 #   - redis: Redis cache
-#   - migrations: Alembic dataI migrations (runs once)
+#   - migrations: Alembic database migrations (runs once)
 #   - app: FastAPI application
 #   - worker: Background task worker (optional)
 #   - scheduler: Task scheduler (optional)
@@ -88,7 +88,7 @@ services:
     container_name: fastmvc-migrations
     environment:
       # DataI
-      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       # Redis
       REDIS_URL: redis://redis:6379/0
       # Security
@@ -126,7 +126,7 @@ services:
     restart: unless-stopped
     environment:
       # DataI
-      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       # Redis
       REDIS_URL: redis://redis:6379/0
       # Security
@@ -189,7 +189,7 @@ services:
     container_name: fastmvc-worker
     restart: unless-stopped
     environment:
-      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-LocalDev_Secret_ChangeInProduction_32min!}
       APP_ENV: ${APP_ENV:-production}
@@ -223,7 +223,7 @@ services:
     container_name: fastmvc-scheduler
     restart: unless-stopped
     environment:
-      DATAI_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-fastmvc}
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY:-LocalDev_Secret_ChangeInProduction_32min!}
       APP_ENV: ${APP_ENV:-production}

@@ -60,11 +60,11 @@ jobs:
 
             - name: Run tests
               env:
-                  DATAI_HOST: localhost
-                  DATAI_PORT: 5432
-                  DATAI_NAME: fast_test
-                  DATAI_USER: postgres
-                  DATAI_PASSWORD: postgres123
+                  DATABASE_HOST: localhost
+                  DATABASE_PORT: 5432
+                  DATABASE_NAME: fast_test
+                  DATABASE_USER: postgres
+                  DATABASE_PASSWORD: postgres123
                   REDIS_HOST: localhost
                   REDIS_PORT: 6379
                   REDIS_PASSWORD: ""

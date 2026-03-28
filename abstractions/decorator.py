@@ -221,7 +221,7 @@ def cache(ttl_seconds: Optional[int] = None) -> Callable:
     Usage:
         @cache(ttl_seconds=60)
         def get_user(user_id: str) -> User:
-            return dataI.get_user(user_id)
+            return database.get_user(user_id)
     """
 
     def decorator(func: Callable) -> Callable:

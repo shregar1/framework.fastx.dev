@@ -433,7 +433,7 @@ class MockRedis:
 
 
 class MockDataI:
-    """Mock dataI session for testing.
+    """Mock database session for testing.
 
     Provides basic CRUD operations in memory.
     """

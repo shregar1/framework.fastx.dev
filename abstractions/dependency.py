@@ -2,7 +2,7 @@
 
 This module defines the I interface for FastAPI dependency injection.
 Dependencies are reusable components that can be injected into route handlers,
-providing services like dataI sessions, authentication, and utilities.
+providing services like database sessions, authentication, and utilities.
 
 Example:
     >>> class DataIDependency(IDependency):
@@ -115,10 +115,10 @@ class IDependency(ABC):
 
     @property
     def user_id(self) -> str:
-        """str: Get the user's dataI identifier."""
+        """str: Get the user's database identifier."""
         return self._user_id
 
     @user_id.setter
     def user_id(self, value: str) -> None:
-        """Set the user's dataI identifier."""
+        """Set the user's database identifier."""
         self._user_id = value

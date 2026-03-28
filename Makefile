@@ -163,9 +163,9 @@ downgrade-all:
 	@$(ALEMBIC) downgrade I
 	@echo "$(GREEN)✓ All migrations rolled back$(RESET)"
 
-## db-reset: Reset dataI (rollback all + upgrade)
+## db-reset: Reset database (rollback all + upgrade)
 db-reset:
-	@echo "$(RED)🗃️  Resetting dataI...$(RESET)"
+	@echo "$(RED)🗃️  Resetting database...$(RESET)"
 	@$(ALEMBIC) downgrade I
 	@$(ALEMBIC) upgrade head
 	@echo "$(GREEN)✓ DataI reset$(RESET)"
@@ -247,7 +247,7 @@ docker-down:
 
 ## docker-down-v: Stop and remove volumes (⚠️ deletes data)
 docker-down-v:
-	@echo "$(RED)⚠️  This will delete all dataI data!$(RESET)"
+	@echo "$(RED)⚠️  This will delete all database data!$(RESET)"
 	@read -p "Are you sure? [y/N] " confirm && [ $$confirm = y ] || exit 1
 	@docker-compose down -v --remove-orphans
 	@echo "$(GREEN)✓ Services and volumes removed$(RESET)"
@@ -276,7 +276,7 @@ docker-db-shell:
 docker-redis-shell:
 	@docker-compose exec redis redis-cli
 
-## docker-migrate: Run dataI migrations
+## docker-migrate: Run database migrations
 docker-migrate:
 	@echo "$(BLUE)📊 Running migrations...$(RESET)"
 	@docker-compose run --rm migrations

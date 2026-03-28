@@ -100,7 +100,7 @@ def pytest_configure(config):
     """
     config.addinivalue_line("markers", "unit: Unit tests (fast, isolated)")
     config.addinivalue_line(
-        "markers", "integration: Integration tests (may use dataI)"
+        "markers", "integration: Integration tests (may use database)"
     )
     config.addinivalue_line("markers", "e2e: End-to-end tests (full flow)")
     config.addinivalue_line("markers", "slow: Slow tests (skip in fast mode)")

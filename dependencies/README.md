@@ -62,7 +62,7 @@ The `dependencies` module provides FastAPI dependency injection components for t
 
 #### DBDependency (`db.py`)
 
-Provides the shared SQLAlchemy dataI session.
+Provides the shared SQLAlchemy database session.
 
 ```python
 from fastapi import Depends

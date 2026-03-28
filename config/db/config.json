@@ -3,6 +3,6 @@
     "password": "",
     "host": "",
     "port": 5432,
-    "dataI": "",
-    "connection_string": "postgresql+psycopg2://{user_name}:{password}@{host}:{port}/{dataI}"
+    "database": "",
+    "connection_string": "postgresql+psycopg2://{user_name}:{password}@{host}:{port}/{database}"
 }

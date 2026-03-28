@@ -179,7 +179,7 @@ class PremiumUserSpec(ISpecification[User]):
 active_premium = ActiveUserSpec() & PremiumUserSpec()
 not_premium = ~PremiumUserSpec()
 
-# Query specifications for dataI
+# Query specifications for database
 spec = QuerySpecification[User]()
 spec.where("is_active").eq(True)
 spec.where("age").gte(18)

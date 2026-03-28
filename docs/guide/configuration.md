@@ -23,8 +23,8 @@ PORT=8000
 LOG_LEVEL=INFO
 
 # DataI (optional)
-DATAI_URL=sqlite:///./app.db
-# DATAI_URL=postgresql://user:pass@localhost/dbname
+DATABASE_URL=sqlite:///./app.db
+# DATABASE_URL=postgresql://user:pass@localhost/dbname
 
 # Redis (optional)
 REDIS_URL=redis://localhost:6379/0
@@ -54,7 +54,7 @@ The `SECRET_KEY` must:
 
 ### DataI URL Validation
 
-Supported dataI schemes:
+Supported database schemes:
 
 - `sqlite`
 - `postgresql` / `postgres`
@@ -158,7 +158,7 @@ def load_secrets_from_aws():
 secrets = load_secrets_from_aws()
 settings = Settings(
     SECRET_KEY=secrets['SECRET_KEY'],
-    DATAI_URL=secrets['DATAI_URL']
+    DATABASE_URL=secrets['DATABASE_URL']
 )
 ```
 
@@ -176,7 +176,7 @@ from config.settings import Settings
 def test_client():
     # Override settings for testing
     app.state.settings = Settings(
-        DATAI_URL="sqlite:///./test.db",
+        DATABASE_URL="sqlite:///./test.db",
         SECRET_KEY="test-secret-key-for-testing-only-32chars",
         DEBUG=True
     )

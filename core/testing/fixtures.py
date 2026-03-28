@@ -63,7 +63,7 @@ class TestClient(FastAPITestClient):
 
 
 class DataITestCase:
-    """I class for dataI tests.
+    """I class for database tests.
 
     Provides transaction rollback for test isolation.
 
@@ -80,12 +80,12 @@ class DataITestCase:
 
     @classmethod
     def setup_class(cls) -> None:
-        """Setup test dataI connection."""
+        """Setup test database connection."""
         pass
 
     @classmethod
     def teardown_class(cls) -> None:
-        """Cleanup test dataI connection."""
+        """Cleanup test database connection."""
         pass
 
     def setup_method(self) -> None:
@@ -112,12 +112,12 @@ class AsyncDataITestCase:
 
     @classmethod
     async def setup_class(cls) -> None:
-        """Setup async dataI connection."""
+        """Setup async database connection."""
         pass
 
     @classmethod
     async def teardown_class(cls) -> None:
-        """Cleanup async dataI connection."""
+        """Cleanup async database connection."""
         pass
 
     @asynccontextmanager

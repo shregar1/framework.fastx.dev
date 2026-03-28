@@ -224,7 +224,7 @@ class DBConfigurationDTO(IModel):
     password: str
     host: str
     port: int
-    dataI: str
+    database: str
     connection_string: str
 ```
 

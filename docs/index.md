@@ -84,7 +84,7 @@ make docs-serve
 - [CLI Reference](guide/cli.md) - Project generation and management
 - [Configuration](guide/configuration.md) - Environment variables and validation
 - [API Documentation](guide/api-docs.md) - Swagger UI and ReDoc
-- [DataI Migrations](guide/dataI.md) - Manage dataI schema changes
+- [DataI Migrations](guide/database.md) - Manage database schema changes
 - [Testing](guide/testing.md) - Testing framework and best practices
 - [Docker](guide/docker.md) - Docker Compose stack and deployment
 - [CI/CD](guide/ci-cd.md) - GitHub Actions workflows and deployment

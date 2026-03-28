@@ -82,8 +82,8 @@ Fixtures are automatically available in tests via `conftest.py`.
 
 ```python
 def test_with_db(item_db, item_repository):
-    """Use in-memory dataI."""
-    # item_db: Dict-Id in-memory dataI
+    """Use in-memory database."""
+    # item_db: Dict-Id in-memory database
     # item_repository: Mocked repository
     pass
 ```
@@ -342,7 +342,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 ### DataI Locked (SQLite)
 
-Use `:memory:` dataI or ensure proper cleanup:
+Use `:memory:` database or ensure proper cleanup:
 
 ```python
 @pytest.fixture

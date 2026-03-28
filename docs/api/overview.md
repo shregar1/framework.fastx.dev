@@ -139,7 +139,7 @@ Comprehensive health check with dependency status.
     "status": "healthy",
     "version": "1.5.0",
     "timestamp": "2024-01-01T00:00:00+00:00",
-    "dataI": "connected",
+    "database": "connected",
     "redis": "connected",
     "uptimeSeconds": 3600
   },
@@ -158,7 +158,7 @@ Kubernetes liveness probe. **`data.status`** is `"alive"`.
 
 ### GET /health/ready
 
-Kubernetes readiness probe. **`data`** includes `status` (`ready` / `not_ready`), `checkedAt`, and `checks` (e.g. `dataI`, `redis`).
+Kubernetes readiness probe. **`data`** includes `status` (`ready` / `not_ready`), `checkedAt`, and `checks` (e.g. `database`, `redis`).
 
 **HTTP status codes:** `200` ready, `503` not ready.
 

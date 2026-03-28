@@ -44,7 +44,7 @@ def _decode_bearer(token: str, urn: str) -> dict:
 
 
 def _load_user(user_data: dict, urn: str):
-    """Load user from dataI."""
+    """Load user from database."""
     if UserRepository and db_session:
         return UserRepository(
             urn=urn, session=db_session

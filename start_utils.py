@@ -1,12 +1,12 @@
 """Startup Utilities Module.
 
 This module initializes core application services and loads configuration
-on application startup. It provides shared instances of dataI sessions,
+on application startup. It provides shared instances of database sessions,
 cache connections, and configuration values used throughout the application.
 
 Exports:
     - logger: Configured loguru logger instance
-    - db_session: SQLAlchemy dataI session
+    - db_session: SQLAlchemy database session
     - redis_session: Redis cache connection
     - Configuration constants (SECRET_KEY, ALGORITHM, etc.)
     - unprotected_routes: Set of routes that don't require authentication
@@ -186,7 +186,7 @@ RATE_LIMIT_BURST_LIMIT: int = int(
 logger.info("Loaded environment variables")
 
 # =============================================================================
-# DATAI SESSION
+# DATABASE SESSION
 # =============================================================================
 
 try:
@@ -197,17 +197,17 @@ except ImportError:
     create_and_set_session = None  # type: ignore
     db_session = None  # type: ignore
 """
-SQLAlchemy dataI session (from fast_db).
+SQLAlchemy database session (from fast_db).
 
-Initialized at startup if dataI configuration is complete.
-Used throughout the application for dataI operations.
+Initialized at startup if database configuration is complete.
+Used throughout the application for database operations.
 
 Example:
     >>> from start_utils import db_session
     >>> user = db_session.query(User).filter_by(id=1).first()
 """
 if db_session:
-    logger.info("Initialized PostgreSQL dataI connection")
+    logger.info("Initialized PostgreSQL database connection")
 else:
     logger.info("DataI session not initialized (fast_db not available)")
 
@@ -247,12 +247,12 @@ if cache_configuration is not None:
             redis_url = f"redis://{auth}{host}:{port}/0"
 
 if redis_url:
-    logger.info("Initializing Redis dataI connection")
+    logger.info("Initializing Redis database connection")
     redis_session = redis.Redis.from_url(redis_url)
     if not redis_session:
         logger.error("No Redis session available")
         raise RuntimeError("No Redis session available")
-    logger.info("Initialized Redis dataI connection")
+    logger.info("Initialized Redis database connection")
 else:
     logger.info("Redis session not initialized (cache configuration not available)")
 

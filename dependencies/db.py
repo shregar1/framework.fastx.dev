@@ -24,7 +24,7 @@ except ImportError:
         def derive() -> Any:
             """Raise informative error about missing dependency."""
             raise ImportError(
-                "fast_db is required for dataI dependencies. "
+                "fast_db is required for database dependencies. "
                 "Install with: pip install pyfastmvc[platform]"
             )
 

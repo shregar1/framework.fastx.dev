@@ -89,7 +89,7 @@ make docker-up        # Start with Docker
 
 ### DataI Migration CLI
 
-Manage dataI migrations directly from the CLI:
+Manage database migrations directly from the CLI:
 
 ```bash
 # Create migration from model changes
@@ -101,7 +101,7 @@ fastmvc db upgrade
 # Rollback one migration
 fastmvc db downgrade
 
-# Reset dataI (development only)
+# Reset database (development only)
 fastmvc db reset --seed
 
 # Check status

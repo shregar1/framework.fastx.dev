@@ -525,7 +525,7 @@ async def health_check(request: Request):
             "responseKey": "success_health",
             "data": {
                 "status": "healthy",
-                "dataI": "connected",
+                "database": "connected",
                 "redis": "connected",
                 "version": "1.5.0",
                 "timestamp": "2024-01-01T00:00:00Z",
@@ -554,7 +554,7 @@ async def health_check(request: Request):
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
-    # Check dataI connectivity
+    # Check database connectivity
     db_status: str = "not_configured"
     try:
         from start_utils import db_session
@@ -576,7 +576,7 @@ async def health_check(request: Request):
         health_status["status"] = "unhealthy"
         logger.error(f"Health check: DataI connection failed - {e}")
 
-    health_status["dataI"] = db_status
+    health_status["database"] = db_status
 
     # Check Redis connectivity
     redis_status: str = "not_configured"
@@ -609,7 +609,7 @@ async def health_check(request: Request):
     # Log health check result
     logger.info(
         f"Health check: status={health_status['status']}, "
-        f"dataI={db_status}, redis={redis_status}"
+        f"database={db_status}, redis={redis_status}"
     )
 
     ok = health_status["status"] == "healthy"
@@ -617,7 +617,7 @@ async def health_check(request: Request):
         "status": health_status["status"],
         "version": health_status["version"],
         "timestamp": health_status["timestamp"],
-        "dataI": db_status,
+        "database": db_status,
         "redis": redis_status,
     }
     if "uptime_seconds" in health_status:
@@ -672,7 +672,7 @@ async def readiness_probe(request: Request):
     """Kubernetes readiness probe endpoint.
 
     Checks if the application is ready to receive traffic.
-    Includes dependency health checks (dataI, Redis).
+    Includes dependency health checks (database, Redis).
 
     Returns:
         IResponseDTO envelope with readiness and checks in ``data``.
@@ -687,7 +687,7 @@ async def readiness_probe(request: Request):
             "data": {
                 "status": "ready",
                 "checkedAt": "2024-01-01T00:00:00+00:00",
-                "checks": {"dataI": "connected", "redis": "connected"}
+                "checks": {"database": "connected", "redis": "connected"}
             },
             ...
         }
@@ -700,7 +700,7 @@ async def readiness_probe(request: Request):
     checks = {}
     is_ready = True
 
-    # Check dataI
+    # Check database
     try:
         from start_utils import db_session
 
@@ -708,11 +708,11 @@ async def readiness_probe(request: Request):
             from sqlalchemy import text
 
             db_session.execute(text("SELECT 1"))
-            checks["dataI"] = "connected"
+            checks["database"] = "connected"
         else:
-            checks["dataI"] = "not_configured"
+            checks["database"] = "not_configured"
     except Exception as e:
-        checks["dataI"] = f"disconnected: {str(e)}"
+        checks["database"] = f"disconnected: {str(e)}"
         is_ready = False
 
     # Check Redis
@@ -884,7 +884,7 @@ async def on_startup():
     """Application startup event handler.
 
     Called when the FastAPI application starts. Use for:
-    - Initializing dataI connections
+    - Initializing database connections
     - Loading cached data
     - Starting background tasks
     - Logging startup information
@@ -904,7 +904,7 @@ async def on_shutdown():
     """Application shutdown event handler.
 
     Called when the FastAPI application shuts down. Use for:
-    - Closing dataI connections
+    - Closing database connections
     - Flushing caches
     - Stopping background tasks
     - Cleanup operations

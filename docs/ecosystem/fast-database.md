@@ -70,6 +70,6 @@ alembic upgrade head
 
 FastDataI can be installed in any SQLAlchemy project:
 ```bash
-pip install fast-dataI
+pip install fast-database
 ```
 Add **`[dev]`** to include `factory-boy` for testing.

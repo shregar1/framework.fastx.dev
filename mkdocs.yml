@@ -98,7 +98,7 @@ nav:
     - CLI Reference: guide/cli.md
     - Configuration: guide/configuration.md
     - API Documentation: guide/api-docs.md
-    - DataI Migrations: guide/dataI.md
+    - DataI Migrations: guide/database.md
     - Testing: guide/testing.md
     - Docker: guide/docker.md
     - CI/CD: guide/ci-cd.md
@@ -113,7 +113,7 @@ nav:
   - Ecosystem:
     - Overview: ecosystem/index.md
     - FastCLI: ecosystem/fast-cli.md
-    - FastDataI: ecosystem/fast-dataI.md
+    - FastDataI: ecosystem/fast-database.md
     - FastMiddleware: ecosystem/fast-middleware.md
     - FastDashboards: ecosystem/fast-dashboards.md
     - FastPlatform: ecosystem/fast-platform.md

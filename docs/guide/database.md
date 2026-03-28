@@ -1,6 +1,6 @@
 # DataI Migrations
 
-FastMVC includes a built-in CLInterface for managing dataI migrations using Alembic.
+FastMVC includes a built-in CLInterface for managing database migrations using Alembic.
 
 ## Prerequisites
 
@@ -51,7 +51,7 @@ Migration file: migrations/versions/20240101_120000_add_users_table.py
 
 ### Apply Migrations
 
-Upgrade dataI to latest version:
+Upgrade database to latest version:
 
 ```bash
 # Upgrade to latest (head)
@@ -79,7 +79,7 @@ Current:  abc1234_add_users_table (head)
 
 ### Rollback Migrations
 
-Downgrade dataI to previous version:
+Downgrade database to previous version:
 
 ```bash
 # Rollback one migration
@@ -116,7 +116,7 @@ fastmvc db reset --seed
 
 ### Check Status
 
-Check if dataI is up to date:
+Check if database is up to date:
 
 ```bash
 fastmvc db status
@@ -204,7 +204,7 @@ fastmvc db history --verbose
 
 ### Production Deployment
 
-1. **Backup dataI** before running migrations
+1. **Backup database** before running migrations
 
 2. **Test migrations** on staging environment
 
@@ -271,7 +271,7 @@ The Makefile includes shortcuts for common migration tasks:
 make migrate msg="Add users table"  # Create migration
 make upgrade                        # Apply migrations
 make downgrade                      # Rollback one migration
-make db-reset                       # Reset dataI
+make db-reset                       # Reset database
 make db-status                      # Show status
 ```
 

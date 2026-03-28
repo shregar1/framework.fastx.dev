@@ -72,7 +72,7 @@ class CreateItemRequest(IDTO):
 ### DataI
 
 ```python
-from core.dataI import get_db, DataI
+from core.database import get_db, DataI
 
 db = DataI("sqlite:///./app.db")
 ```

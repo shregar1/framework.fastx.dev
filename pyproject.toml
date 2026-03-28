@@ -112,7 +112,7 @@ interactive = [
     "questionary>=2.0.0",
 ]
 # Core platform services - fast-platform is mandatory.
-# fast-dataI is optional at runtime (see `abstractions/repository.py` fallback).
+# fast-database is optional at runtime (see `abstractions/repository.py` fallback).
 # Individual service categories (require fast-platform extras)
 notifications = ["fast-platform[notifications]>=0.13.0"]
 storage = ["fast-platform[storage]>=0.13.0"]

@@ -34,7 +34,7 @@ my-project/
 │   └── default.py            # Default values
 │
 ├── core/                      # Core utilities
-│   ├── dataI.py           # DataI connection
+│   ├── database.py           # DataI connection
 │   ├── cache.py              # Caching utilities
 │   ├── logging.py            # Logging configuration
 │   ├── exceptions.py         # Custom exceptions
@@ -45,7 +45,7 @@ my-project/
 │       └── fixtures.py
 │
 ├── dependencies/              # FastAPI dependencies
-│   ├── dataI.py           # DB session injection
+│   ├── database.py           # DB session injection
 │   └── auth.py               # Authentication deps
 │
 ├── docs/                      # Documentation

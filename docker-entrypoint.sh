@@ -2,7 +2,7 @@
 # =============================================================================
 # FastMVC Docker Entrypoint
 # =============================================================================
-# This script handles dataI migrations and application startup
+# This script handles database migrations and application startup
 # =============================================================================
 
 set -e
@@ -33,7 +33,7 @@ echo "✅ Redis is up"
 # =============================================================================
 
 if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
-    echo "📊 Running dataI migrations..."
+    echo "📊 Running database migrations..."
     alembic upgrade head
     echo "✅ Migrations complete"
 else

@@ -120,7 +120,7 @@ class IUnitOfWork(IUnitOfWork):
         """Initialize Unit of Work.
 
         Args:
-            session_factory: Factory for creating dataI sessions.
+            session_factory: Factory for creating database sessions.
 
         """
         self._session_factory = session_factory

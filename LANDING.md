@@ -262,7 +262,7 @@ Other generator options:
 - `--venv/--no-venv`
 - `--install/--no-install`
 
-The dataI backend (Postgres/MySQL/SQLite) and features like auth/user CRUD are driven by the interactive wizard (`fastmvc init`) or by editing `config/db/config.json`/`.env` after generation.
+The database backend (Postgres/MySQL/SQLite) and features like auth/user CRUD are driven by the interactive wizard (`fastmvc init`) or by editing `config/db/config.json`/`.env` after generation.
 
 ---
 

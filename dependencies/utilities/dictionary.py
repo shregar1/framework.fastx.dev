@@ -61,7 +61,7 @@ class DictionaryUtilityDependency:
             urn (str): Unique Request Number for tracing.
             user_urn (str): User's unique resource name.
             api_name (str): Name of the API endpoint.
-            user_id (str): User's dataI identifier.
+            user_id (str): User's database identifier.
 
         Example:
             >>> factory = DictionaryUtilityDependency.derive()
@@ -87,7 +87,7 @@ class DictionaryUtilityDependency:
                 urn (str): Unique Request Number for tracing.
                 user_urn (str): User's unique resource name.
                 api_name (str): Name of the API endpoint.
-                user_id (str): User's dataI identifier.
+                user_id (str): User's database identifier.
 
             Returns:
                 DictionaryUtility: Configured utility instance.

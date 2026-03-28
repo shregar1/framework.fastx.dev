@@ -1,4 +1,4 @@
-"""Item repository — in-memory sample; production uses dataI/SQLAlchemy as needed."""
+"""Item repository — in-memory sample; production uses database/SQLAlchemy as needed."""
 
 from datetime import datetime
 from typing import Any

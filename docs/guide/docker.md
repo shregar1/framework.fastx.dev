@@ -32,7 +32,7 @@ This starts:
 
 | Service | Description | Port | Health Check |
 |---------|-------------|------|--------------|
-| `postgres` | PostgreSQL 16 dataI | 5432 | `pg_isready` |
+| `postgres` | PostgreSQL 16 database | 5432 | `pg_isready` |
 | `redis` | Redis 7 cache | 6379 | `redis-cli ping` |
 | `migrations` | Alembic migrations (runs once) | - | Exits on completion |
 | `app` | FastAPI application | 8000 | `/health/live` |
@@ -296,10 +296,10 @@ Data is stored in Docker volumes:
 # List volumes
 docker volume ls
 
-# Backup dataI
+# Backup database
 docker-compose exec postgres pg_dump -U postgres fastmvc > backup.sql
 
-# Restore dataI
+# Restore database
 cat backup.sql | docker-compose exec -T postgres psql -U postgres
 
 # Remove all data (⚠️ destructive)

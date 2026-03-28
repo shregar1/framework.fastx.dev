@@ -51,7 +51,7 @@ structlog>=24.1.0
 
 ### Optional Dependencies
 
-For dataI support:
+For database support:
 ```bash
 pip install sqlalchemy alembic asyncpg
 ```
