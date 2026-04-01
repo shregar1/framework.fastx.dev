@@ -13,6 +13,9 @@ Usage:
 Environment Variables:
     HOST: Server host address (default: 0.0.0.0)
     PORT: Server port (default: 8000)
+    POSTMAN_EXPORT_ENVIRONMENT: Set to 1/true to also write postman_environment.json on boot
+    POSTMAN_COLLECTION_NAME: Override Postman collection/env title (default: git repo folder name)
+    POSTMAN_NEGATIVE_TESTS: Set to 0/false to skip extra pm.sendRequest validation scripts per request
     RATE_LIMIT_REQUESTS_PER_MINUTE: Rate limit per minute
     RATE_LIMIT_REQUESTS_PER_HOUR: Rate limit per hour
     RATE_LIMIT_BURST_LIMIT: Maximum burst requests
@@ -53,12 +56,8 @@ from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 load_dotenv()
 
-from fastapi import APIRouter, FastAPI, Request
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse, JSONResponse
-
 # Import middlewares from fast-middleware package
-from fastmiddleware import (  # pyright: ignore[reportMissingImports]
+from fast_middleware import (  # pyright: ignore[reportMissingImports]
     CORSMiddleware,
     LoggingMiddleware,
     RateLimitConfig,
@@ -68,10 +67,11 @@ from fastmiddleware import (  # pyright: ignore[reportMissingImports]
     SecurityHeadersMiddleware,
     TrustedHostMiddleware,
 )
+from fastapi import APIRouter, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse, JSONResponse
 from loguru import logger
 
-from utilities.cors import get_cors_middleware_kwargs
-from utilities.security_headers import get_security_headers_middleware_config
 from constants.api_status import APIStatus
 from constants.default import Default
 from constants.health import (
@@ -85,9 +85,10 @@ from constants.health import (
     READINESS_READY,
     dependency_disconnected_message,
 )
-from constants.http_header import (
-    HttpHeader
-)
+from constants.http_header import HttpHeader
+from core.route_export_engine import RouteExportEngine
+from utilities.cors import get_cors_middleware_kwargs
+from utilities.security_headers import get_security_headers_middleware_config
 
 # Optional example controllers (can be removed for minimal core)
 try:
@@ -169,15 +170,15 @@ from middlewares import (
 # Configuration validation - fail fast on misconfig
 # Set VALIDATE_CONFIG=false to skip validation
 # Tests skip strict startup validation to avoid env-coupled imports.
-IS_TEST_RUN = (
-    os.getenv("PYTEST_CURRENT_TEST") is not None
-    or os.getenv("TESTING", "").lower() in ("true", "1", "yes", "on")
-)
+IS_TEST_RUN = os.getenv("PYTEST_CURRENT_TEST") is not None or os.getenv(
+    "TESTING", ""
+).lower() in ("true", "1", "yes", "on")
 try:
-    if (
-        not IS_TEST_RUN
-        and os.getenv("VALIDATE_CONFIG", "true").lower()
-        not in ("false", "0", "no", "off")
+    if not IS_TEST_RUN and os.getenv("VALIDATE_CONFIG", "true").lower() not in (
+        "false",
+        "0",
+        "no",
+        "off",
     ):
         from utilities.validator import validate_config_or_exit
 
@@ -219,6 +220,8 @@ app = FastAPI(
     redoc_url=None,
     openapi_url=normalized_openapi_url(),
 )
+route_export_engine = RouteExportEngine(app)
+route_export_engine.install()
 
 # Setup custom FastMVC branded documentation
 try:
@@ -810,6 +813,7 @@ app.add_middleware(
     config=get_security_headers_middleware_config(),
 )
 
+
 # Rate Limiting Middleware - Protects against abuse
 # Base middleware matches exclude_paths by exact URL only; liveness/readiness live under
 # /health/* so we skip the whole prefix (including /health/live) for probes.
@@ -913,6 +917,19 @@ async def on_startup():
     logger.info("Application startup event triggered")
     logger.info(f"FastMVC API starting on {HOST}:{PORT}")
     logger.info("Using fast-middleware for request processing")
+    curl_examples = route_export_engine.build_curl_examples()
+    app.state.route_curl_examples = curl_examples
+    collection_path, env_path = route_export_engine.export_postman_collection()
+    env_msg = (
+        f", environment {env_path}"
+        if env_path is not None
+        else " (collection-only; set POSTMAN_EXPORT_ENVIRONMENT=1 to also write environment file)"
+    )
+    logger.info(
+        f"Generated {len(curl_examples)} cURL examples; Postman collection {collection_path}"
+        f"{env_msg} — variables: base_url, reference_id, reference_number, token"
+    )
+    route_export_engine.clear_memory()
 
 
 @app.on_event("shutdown")

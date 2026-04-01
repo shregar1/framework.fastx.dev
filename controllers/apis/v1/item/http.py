@@ -10,7 +10,11 @@ from fastapi.responses import JSONResponse
 
 from abstractions.result import Result
 from constants.http_header import HttpHeader
-from dtos.responses.item import ItemListResponseDTO, ItemResponseDTO, ItemStatsResponseDTO
+from dtos.responses.item import (
+    ItemListResponseDTO,
+    ItemResponseDTO,
+    ItemStatsResponseDTO,
+)
 from models.item import Item
 
 _TVal = TypeVar("_TVal")
@@ -21,7 +25,7 @@ def item_ref_headers(
     body_reference: str | None,
     http_request: Request | None,
 ) -> dict[str, str]:
-    """Prefer body ``reference_number``; else echo ``x-reference-urn`` from the request."""
+    """Prefer body ``reference_urn``; else echo ``x-reference-urn`` from the request."""
     ref = body_reference
     if ref is None and http_request is not None:
         ref = http_request.headers.get(HttpHeader.X_REFERENCE_URN)
@@ -64,8 +68,7 @@ def json_item(
         status_code=status_code,
         content=dto.to_dict(),
         headers=item_ref_headers(
-            body_reference=reference_urn,
-            http_request=http_request
+            body_reference=reference_urn, http_request=http_request
         ),
     )
 
@@ -73,20 +76,16 @@ def json_item(
 def json_item_list(entities: list[Item], http_request: Request | None) -> JSONResponse:
     return JSONResponse(
         content=ItemListResponseDTO.from_entities(entities).to_dict(),
-        headers=item_ref_headers(
-            body_reference=None,
-            http_request=http_request
-        ),
+        headers=item_ref_headers(body_reference=None, http_request=http_request),
     )
 
 
-def json_item_stats(stats: dict[str, Any], http_request: Request | None) -> JSONResponse:
+def json_item_stats(
+    stats: dict[str, Any], http_request: Request | None
+) -> JSONResponse:
     return JSONResponse(
         content=ItemStatsResponseDTO.from_stats(stats).to_dict(),
-        headers=item_ref_headers(
-            body_reference=None,
-            http_request=http_request
-        ),
+        headers=item_ref_headers(body_reference=None, http_request=http_request),
     )
 
 
