@@ -9,10 +9,9 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from abstractions.controller import IController
+from controllers.apis.v1.item import http as item_http
 from dtos.requests.item import CreateItemRequestDTO, UpdateItemRequestDTO
 from services.item.item_service import ItemService
-
-from controllers.apis.v1.item import http as item_http
 
 # Create router
 router = APIRouter(
@@ -58,10 +57,12 @@ class ItemController(IController):
                 description=body.description,
             ),
             http_request,
-            reference_urn=body.reference_number,
+            reference_urn=body.reference_urn,
         )
 
-    async def get_by_id(self, item_id: str, http_request: Request | None = None) -> JSONResponse:
+    async def get_by_id(
+        self, item_id: str, http_request: Request | None = None
+    ) -> JSONResponse:
         """Get item by ID."""
         result = await self._service.get_item(item_id)
         entity = item_http.unwrap_item_or_404(result, item_id=item_id)
@@ -89,34 +90,44 @@ class ItemController(IController):
                 description=body.description,
             ),
             http_request,
-            reference_urn=body.reference_number,
+            reference_urn=body.reference_urn,
         )
 
-    async def delete(self, item_id: str, http_request: Request | None = None) -> JSONResponse:
+    async def delete(
+        self, item_id: str, http_request: Request | None = None
+    ) -> JSONResponse:
         """Delete an item."""
         result = await self._service.delete_item(item_id)
         item_http.unwrap_deleted_or_404(result, item_id=item_id)
         return item_http.json_delete_message(item_id, http_request)
 
-    async def complete(self, item_id: str, http_request: Request | None = None) -> JSONResponse:
+    async def complete(
+        self, item_id: str, http_request: Request | None = None
+    ) -> JSONResponse:
         """Mark item as completed."""
         return item_http.respond_item(
             await self._service.complete_item(item_id), http_request
         )
 
-    async def uncomplete(self, item_id: str, http_request: Request | None = None) -> JSONResponse:
+    async def uncomplete(
+        self, item_id: str, http_request: Request | None = None
+    ) -> JSONResponse:
         """Mark item as not completed."""
         return item_http.respond_item(
             await self._service.uncomplete_item(item_id), http_request
         )
 
-    async def toggle(self, item_id: str, http_request: Request | None = None) -> JSONResponse:
+    async def toggle(
+        self, item_id: str, http_request: Request | None = None
+    ) -> JSONResponse:
         """Toggle item completion status."""
         return item_http.respond_item(
             await self._service.toggle_item(item_id), http_request
         )
 
-    async def search(self, query: str = "", http_request: Request | None = None) -> JSONResponse:
+    async def search(
+        self, query: str = "", http_request: Request | None = None
+    ) -> JSONResponse:
         """Search items by name."""
         return item_http.respond_item_list(
             await self._service.search_items(query), http_request
