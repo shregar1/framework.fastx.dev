@@ -10,13 +10,13 @@
 ### Using pip
 
 ```bash
-pip install fastx
+pip install fastx-mvc
 ```
 
 ### Using uv (recommended)
 
 ```bash
-uv pip install fastx
+uv pip install fastx-mvc
 ```
 
 ## Verify Installation

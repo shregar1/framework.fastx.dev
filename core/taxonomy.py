@@ -1,4 +1,4 @@
-"""Logical layout of the ``fastx`` application tree (aligned with ``fast_platform.taxonomy``).
+"""Logical layout of the ``fastx-mvc`` application tree (aligned with ``fast_platform.taxonomy``).
 
 The framework uses familiar top-level folders:
 

@@ -20,7 +20,7 @@ A production-grade MVC framework for FastAPI with clean architecture, powerful a
 
 ```bash
 # Install FastX
-pip install fastx
+pip install fastx-mvc
 
 # Generate a new project
 fastx generate

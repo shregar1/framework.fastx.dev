@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-# PyPI: pip install fastx
-name = "fastx"
+# PyPI: pip install fastx-mvc  (wheels: fastx_mvc-*.whl)
+name = "fastx-mvc"
 version = "1.5.0"
 description = "Production-grade MVC Framework for FastAPI - Generate projects, entities, and migrations with a single command"
 readme = "README.md"
@@ -143,7 +143,7 @@ media = ["fast-platform[storage]>=0.13.0"]
 analytics = ["fast-platform[observability]>=0.13.0"]
 # Install everything (all optional extras)
 all = [
-    "fastx[dev,docs,dashboards,admin,feature-flags,interactive]",
+    "fastx-mvc[dev,docs,dashboards,admin,feature-flags,interactive]",
 ]
 
 [project.urls]

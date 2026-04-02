@@ -1,4 +1,4 @@
-# FastX (`fastx` on PyPI)
+# FastX (`fastx-mvc` on PyPI)
 
 **Production-grade MVC tooling for FastAPI** — Interactive CLI for project scaffolding, entity generation, Alembic migrations, and a reference framework layout that ties together the FastX ecosystem (SQLAlchemy, Redis, JWT, and optional integrations).
 
@@ -6,7 +6,7 @@ FastX is a **project generator for FastAPI** with a clean MVC stack and a **menu
 
 **Python:** 3.10+
 
-**Package name on PyPI:** `fastx`  
+**Package name on PyPI:** `fastx-mvc` (install: `pip install fastx-mvc-mvc`; wheel files use `fastx_mvc-…`)  
 **Version:** see `[project]` in [`pyproject.toml`](pyproject.toml).
 
 ## Capabilities
@@ -33,10 +33,10 @@ FastX is a **project generator for FastAPI** with a clean MVC stack and a **menu
 ## Install
 
 ```bash
-pip install fastx
+pip install fastx-mvc-mvc
 
 # For best interactive experience
-pip install fastx[interactive]
+pip install fastx-mvc-mvc[interactive]
 ```
 
 Editable from this directory (when developing the framework):
@@ -296,7 +296,7 @@ fastx generate my_api \
 ### End-to-end quick start (generated app)
 
 ```bash
-pip install fastx
+pip install fastx-mvc
 fastx generate my_api   # add your flags
 cd my_api
 pip install -r requirements.txt
@@ -322,7 +322,7 @@ Day-to-day commands: see [`Makefile`](Makefile) (`make test`, `make lint`, `make
 
 ## Contributing
 
-Thank you for contributing to **FastX** (`fastx`).
+Thank you for contributing to **FastX** (`fastx-mvc`).
 
 ### Monorepo layout
 
@@ -419,7 +419,7 @@ export TWINE_PASSWORD=<pypi-token>
 twine upload dist/*
 ```
 
-- **PyPI project name:** `fastx`
+- **PyPI project name:** `fastx-mvc`
 - **Repository / homepage:** https://github.com/shregar1/fastMVC
 
 ---

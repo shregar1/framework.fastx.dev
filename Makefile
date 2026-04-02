@@ -206,7 +206,7 @@ shell:
 	@$(PYTHON) -c "import sys; sys.path.insert(0, '.'); import app; print('Loaded app'); print('Available: app, FastAPI, etc.')"
 	@$(PYTHON) -i -c "import sys; sys.path.insert(0, '.'); import app; print('\n=== FastX Shell ===\n'); print('Variables available:'); print('  app - FastAPI application')"
 
-## build: Remove dist/ then build sdist and wheel for PyPI (fastx)
+## build: Remove dist/ then build sdist and wheel for PyPI (fastx-mvc)
 build:
 	@echo "$(BLUE)📦 Building package (rm -rf dist first)...$(RESET)"
 	@rm -rf dist && $(PYTHON) -m build
