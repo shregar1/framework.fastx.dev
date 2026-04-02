@@ -7,6 +7,7 @@ Usage:
     setup_custom_docs(app)
 """
 
+import os
 from pathlib import Path
 from typing import Any, Optional
 
@@ -14,6 +15,18 @@ from fastapi import FastAPI
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import HTMLResponse
+
+
+def _public_base_url() -> str:
+    """Build a browser-friendly base URL from ``HOST`` / ``PORT`` (same as ``app.py`` / uvicorn)."""
+    host = (os.getenv("HOST") or "0.0.0.0").strip()
+    port = (os.getenv("PORT") or "8000").strip()
+    if host in ("0.0.0.0", "::", "[::]", ""):
+        display_host = "localhost"
+    else:
+        display_host = host
+    return f"http://{display_host}:{port}"
+
 
 # FastX Brand Colors
 FASTMVC_THEME = {
@@ -508,9 +521,9 @@ def setup_custom_docs(app: FastAPI) -> None:
             "altText": "FastX Logo",
         }
 
-        # Add example servers
+        # Add example servers (local URL follows HOST/PORT from env)
         openapi_schema["servers"] = [
-            {"url": "http://localhost:8000", "description": "Local Development"},
+            {"url": _public_base_url(), "description": "Local Development"},
             {"url": "https://api.example.com", "description": "Production"},
         ]
 
@@ -590,9 +603,7 @@ def setup_custom_docs(app: FastAPI) -> None:
         """,
         )
 
-    print("✅ Custom FastX API documentation configured")
-    print("   - Swagger UI: http://localhost:8000/docs")
-    print("   - ReDoc:      http://localhost:8000/redoc")
+    base = _public_base_url()
 
 
 def add_examples_to_schema(
