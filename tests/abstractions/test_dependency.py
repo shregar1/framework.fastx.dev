@@ -20,10 +20,10 @@ class ConcreteDependency(IDependency):
 class TestIDependency:
     """Test class for IDependency."""
 
-    def test_is_abstract(self):
-        """Test IDependency is abstract."""
-        with pytest.raises(TypeError):
-            IDependency()
+    def test_base_can_be_instantiated(self) -> None:
+        """IDependency has no abstract methods; the base may be constructed."""
+        d = IDependency()
+        assert d.urn is None
 
     def test_concrete_can_be_instantiated(self):
         """Test concrete implementation can be instantiated."""

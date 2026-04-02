@@ -1,48 +1,62 @@
-"""Tests for FastMVC authentication middleware wiring."""
+"""Tests for JWT authentication middleware wiring (``fastmiddleware``)."""
 
 from __future__ import annotations
 
-import pytest
-from fastapi import FastAPI, Depends
-from fastapi.testclient import TestClient
+from collections.abc import Awaitable, Callable
 from http import HTTPStatus
 
-from middlewares.authentication import AuthenticationMiddleware
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+
+from fastmiddleware import (  # pyright: ignore[reportMissingImports]
+    AuthConfig,
+    AuthenticationMiddleware,
+    JWTAuthBackend,
+)
 
 
-def test_auth_middleware_wiring():
-    """Verify AuthenticationMiddleware is correctly configured and injectable."""
+class _NoOpAuthMiddleware(BaseHTTPMiddleware):
+    """Pass-through stack entry for tests (replaces removed ``NoOpAuthMiddleware``)."""
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
+        return await call_next(request)
+
+
+def test_auth_middleware_wiring() -> None:
+    """JWT auth stack rejects unauthenticated requests to protected routes."""
     app = FastAPI()
-    
-    # If AuthenticationMiddleware is configured (partial or class), add it
-    if AuthenticationMiddleware:
-        app.add_middleware(AuthenticationMiddleware)
-    
+    backend = JWTAuthBackend(
+        secret="0" * 32,
+        algorithm="HS256",
+    )
+    config = AuthConfig(exclude_paths=set())
+    app.add_middleware(AuthenticationMiddleware, backend=backend, config=config)
+
     @app.get("/test-protected")
     async def protected_route():
         return {"message": "success"}
 
     client = TestClient(app)
-    
-    # If it's the real JWT middleware (not NoOp), it should block by default
-    # If it's NoOp (development fallback), it will pass.
     response = client.get("/test-protected")
-    
-    # We just want to ensure it doesn't crash during initialization and dispatch
-    assert response.status_code in (HTTPStatus.OK, HTTPStatus.UNAUTHORIZED)
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
 
-@pytest.mark.asyncio
-async def test_auth_noop_fallback():
-    """Ensure the fallback middleware works when dependencies are missing."""
-    from middlewares.authentication import NoOpAuthMiddleware
-    
+
+def test_auth_noop_fallback() -> None:
+    """Pass-through middleware does not block requests."""
     app = FastAPI()
-    app.add_middleware(NoOpAuthMiddleware)
-    
+    app.add_middleware(_NoOpAuthMiddleware)
+
     @app.get("/")
     async def index():
         return {"ok": True}
-        
+
     client = TestClient(app)
     response = client.get("/")
     assert response.status_code == 200

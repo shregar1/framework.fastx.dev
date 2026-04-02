@@ -1,6 +1,8 @@
 # fast-mvc
 
-**Production-grade MVC tooling for FastAPI** — Beautiful interactive CLInterface for project scaffolding, entity generation, Alembic migrations, and the reference framework layout that ties together the FastMVC ecosystem (SQLAlchemy, Redis, JWT, and optional integrations).
+**Production-grade MVC tooling for FastAPI** — Interactive CLI for project scaffolding, entity generation, Alembic migrations, and a reference framework layout that ties together the FastMVC ecosystem (SQLAlchemy, Redis, JWT, and optional integrations).
+
+FastMVC is a **project generator for FastAPI** with a clean MVC stack and a **menu of production features** you can turn on from the CLI (or from a visual configurator on your site: collect options, then paste the generated `fastmvc generate …` command). Generated projects stay **lean**: only the services you enable are scaffolded; the rest is pruned.
 
 **Python:** 3.10+
 
@@ -9,23 +11,24 @@
 
 ## Capabilities
 
-- **Interactive CLI** — Beautiful terminal UI with Rich library for project generation
-- **Auto venv setup** — Creates virtual environment, installs dependencies, updates `.gitignore`
-- **VS Code integration** — Pre-configured debug profiles, tasks, and recommended extensions
-- **Makefile** — Common development commands (dev, test, lint, migrate, docker)
-- **Entity generation** — Scaffold controllers, services, repositories, and DTOs
-- **Alembic migrations** — DataI migration management via CLI
-- **App template** — FastAPI app structure, configuration, middleware, and services expected by extension packages (`fast_*`)
-- **Batteries** — FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, Redis, JWT, bcrypt, etc.
+- **Interactive CLI** — Terminal UI (Rich) for project generation: `fastmvc generate`, `fastmvc quickstart`, and ecosystem commands such as `fastmvc init` / `fastmvc add entity` where provided by your CLI install.
+- **Auto venv setup** — Virtual environment, dependencies, `.gitignore` updates.
+- **VS Code integration** — Debug profiles, tasks, recommended extensions.
+- **Makefile** — `make dev`, `test`, `lint`, `migrate`, `docker`, etc.
+- **Entity generation** — Controllers, services, repositories, DTOs.
+- **Alembic migrations** — `fastmvc db migrate/upgrade/downgrade/reset` (see below).
+- **App template** — FastAPI structure, config, middleware, and hooks expected by extension packages (`fast_*`).
+- **Batteries** — FastAPI, SQLAlchemy 2, Alembic, Pydantic v2, Redis, JWT, bcrypt, optional dashboards, observability, payments, and more via flags (see [Optional platform features](#optional-platform-features)).
 
-### New Features
+### New features (high level)
 
-- **DataI Migration CLI** — `fastmvc db migrate/upgrade/downgrade/reset`
-- **Testing Framework** — ItemFactory, pytest fixtures, auth mocks
-- **Docker Compose Stack** — One-command full setup (Postgres + Redis + FastAPI)
-- **GitHub Actions CI/CD** — Auto-generated workflows for every project
-- **Dark-themed API Docs** — FastMVC-branded Swagger UI with dark mode
-- **Production Health Checks** — Kubernetes-ready endpoints
+- **DataI migration CLI** — `fastmvc db migrate/upgrade/downgrade/reset`
+- **Testing** — Factories, pytest fixtures, auth mocks
+- **Docker Compose** — Postgres, Redis, FastAPI, optional dev tools
+- **GitHub Actions** — CI/CD templates in generated projects
+- **Dark-themed API docs** — FastMVC-branded Swagger/ReDoc
+- **Production health** — `/health`, `/health/live`, `/health/ready`
+- **Dashboards** (when enabled) — e.g. `/dashboard/health`, `/dashboard/api` for health and API activity samples
 
 ## Install
 
@@ -42,9 +45,9 @@ Editable from this directory (when developing the framework):
 pip install -e .
 ```
 
-## CLI Usage
+## CLI usage
 
-### Interactive Project Generation
+### Interactive project generation
 
 ```bash
 # Run the wizard
@@ -57,17 +60,17 @@ fastmvc generate --name my_api --author "John Doe"
 fastmvc quickstart --name my_api
 ```
 
-### Generated Project Features
+### Generated project features
 
 Every generated project includes:
 
 - **Virtual environment** — Auto-created at `.venv/` (configurable)
 - **VS Code settings** — Debug configs, tasks, recommended extensions
 - **Makefile** — `make dev`, `make test`, `make lint`, `make migrate`
-- **Example API** — Working Item CRUD at `/items`
-- **Test structure** — Unit and integration test setup
+- **Example API** — Working Item CRUD at `/items` (typical template)
+- **Test structure** — Unit and integration layout
 
-### Development Commands
+### Development commands
 
 ```bash
 cd my_api
@@ -85,9 +88,9 @@ make docker-up        # Start with Docker
 # Press F5 to debug or Cmd/Ctrl+Shift+P → "Tasks: Run Task"
 ```
 
-## Feature Details
+## Feature details
 
-### DataI Migration CLI
+### DataI migration CLI
 
 Manage database migrations directly from the CLI:
 
@@ -108,7 +111,7 @@ fastmvc db reset --seed
 fastmvc db status
 ```
 
-### Docker Compose Stack
+### Docker Compose stack
 
 One command starts the full stack:
 
@@ -126,9 +129,9 @@ make docker-up-dev
 # - Redis Insight: http://localhost:5540
 ```
 
-### Testing Framework
+### Testing framework
 
-Generated projects include comprehensive testing utilities:
+Generated projects include testing utilities:
 
 ```python
 from tests.factories.apis.v1.item import ItemFactory
@@ -146,21 +149,21 @@ def test_create_item(item_client, create_item_payload, mock_auth):
 
 ### GitHub Actions CI/CD
 
-Auto-generated workflows include:
+Auto-generated workflows often include:
 
-- **CI/CD workflow** — Test, lint, build Docker images
-- **PR Checks** — Fast validation and test runs
-- **Release workflow** — Build and push on version tags
+- **CI/CD** — Test, lint, build Docker images
+- **PR checks** — Fast validation
+- **Release** — Build and push on version tags
 
-### API Documentation
+### API documentation
 
 - Dark-themed Swagger UI at `/docs`
-- FastMVC branding with cyan/fuchsia color scheme
+- FastMVC branding (cyan/fuchsia)
 - Kubernetes health endpoints at `/health`, `/health/live`, `/health/ready`
 
 ### Postman collection
 
-The repo includes `postman_collection.json` (and optionally `postman_environment.json`). They are produced from the **same export path** as application startup (`app.on_startup` → `RouteExportEngine`), so the OpenAPI-derived requests, folder layout, and tests stay aligned with `core/route_export_engine.py`. Prefer **regenerating** over hand-editing structure.
+The repo may include `postman/postman_collection.json` (and optionally `postman/postman_environment.json`). They follow the same export path as application startup (`lifespan` → `RouteExportEngine`), so OpenAPI-derived requests and tests stay aligned with `core/route_export_engine.py`. Prefer **regenerating** over hand-editing structure.
 
 **Regenerate** (same Python environment as `make dev`; run from this directory):
 
@@ -175,10 +178,12 @@ If startup validation blocks the import, ensure `.env` exists (see `.env.example
 
 | Variable | Purpose |
 |----------|---------|
-| `POSTMAN_EXPORT_ENVIRONMENT` | Set to `1` or `true` to also write `postman_environment.json` (default is collection-only). |
+| `POSTMAN_EXPORT_ENVIRONMENT` | Set to `1` or `true` to also write the environment JSON (default is collection-only). |
+| `POSTMAN_OUTPUT_DIR` | Directory for exports (default: `postman`). |
+| `POSTMAN_COLLECTION_FILE` | Path to collection JSON (default: `postman/postman_collection.json`). |
 | `POSTMAN_COLLECTION_NAME` | Override the collection/environment title (default: git repository folder name). |
 | `POSTMAN_BASE_URL` | Override the `base_url` variable (default: `http://HOST:PORT` from env). |
-| `POSTMAN_ENV_FILE` | Filename for the optional environment export (default: `postman_environment.json`). |
+| `POSTMAN_ENV_FILE` | Environment JSON path or basename under `POSTMAN_OUTPUT_DIR` (default: `postman/postman_environment.json`). |
 | `POSTMAN_NEGATIVE_TESTS` | Set to `0` or `false` to skip extra per-request `pm.sendRequest` “negative” scripts. |
 
 On startup, the app logs the written paths and variable names, for example: `variables: base_url, reference_urn, reference_number, token, refresh_token`.
@@ -191,6 +196,117 @@ On startup, the app logs the written paths and variable names, for example: `var
 - Send one request and confirm `{{reference_urn}}` on `x-reference-urn` and JSON bodies behave as expected; run login first or set `token` manually if the route uses Bearer auth.
 - **Collection Runner** executes tests, including negative cases that issue additional HTTP calls to `{{base_url}}`. Use a dev or staging URL before running the full collection against a shared or production API.
 
+---
+
+## Optional platform features
+
+The sections below describe **optional** stacks and `--with-*` flags your generator or website configurator can expose. Not every flag exists in every CLI version; treat this as the intended matrix for the full FastMVC ecosystem.
+
+### Built-in dashboards (when enabled)
+
+**Service health — `/dashboard/health`**
+
+- Status cards for primary DB (Postgres/MySQL/SQLite), Redis, and optional backends (MongoDB, Cassandra, ScyllaDB, DynamoDB, Cosmos DB, Elasticsearch, Kafka, etc., as you extend).
+- Shows **Healthy / Unhealthy / Skipped** based on config and env.
+
+**API activity — `/dashboard/api`**
+
+- Lists endpoints registered via `register_endpoint_sample(...)`.
+- Configure method, path, description, sample JSON body, query params, headers.
+- Run sample requests from the UI; see status codes and latency.
+
+### Datastores and cache
+
+**Primary database** — PostgreSQL, MySQL, or SQLite via wizard / `config/db` and `.env`.
+
+**Optional datastores** (typical CLI flags; exact names may vary by CLI version):
+
+| Feature | Typical flag |
+|---------|----------------|
+| Redis (cache, rate limit, sessions) | `--with-redis` / `--no-redis` |
+| MongoDB | `--with-mongo` |
+| Cassandra | `--with-cassandra` |
+| ScyllaDB | `--with-scylla` |
+| DynamoDB | `--with-dynamo` |
+| Azure Cosmos DB | `--with-cosmos` |
+| Elasticsearch | `--with-elasticsearch` |
+
+Grouped configuration in code often uses DTOs such as `DatastoresConfigurationDTO` (DB, cache, mongo, cassandra, scylla, dynamo, cosmos, elasticsearch).
+
+### Communications and notifications
+
+- **Email (SMTP / SendGrid)** — `EmailService`; `--with-email`
+- **Slack** — `SlackService`; `--with-slack`
+- **Push (APNS / FCM)** — scaffolding via `PushNotificationService` / config
+
+Grouped DTOs may live under `CommunicationsConfigurationDTO` (email, slack, push).
+
+### Observability and telemetry
+
+- **Core** — Structured logging, metrics, tracing hooks.
+- **Datadog** (optional) — `configure_datadog()`, `DATADOG_ENABLED`, `--with-datadog`
+- **OpenTelemetry** (optional) — `configure_otel(app)`, `TELEMETRY_ENABLED`, `--with-telemetry`
+
+### Payments
+
+Stripe, Razorpay, PayPal, PayU, pay-by-link — high-level `PaymentService` patterns, `config/payments`, provider DTOs, `--with-payments`.
+
+### CLI flags summary
+
+| Category | Feature | Typical flag |
+|----------|---------|----------------|
+| Datastore | Redis | `--with-redis` / `--no-redis` |
+| Datastore | MongoDB | `--with-mongo` |
+| Datastore | Cassandra | `--with-cassandra` |
+| Datastore | ScyllaDB | `--with-scylla` |
+| Datastore | DynamoDB | `--with-dynamo` |
+| Datastore | Cosmos DB | `--with-cosmos` |
+| Datastore | Elasticsearch | `--with-elasticsearch` |
+| Communications | Email | `--with-email` |
+| Communications | Slack | `--with-slack` |
+| Observability | Datadog | `--with-datadog` |
+| Observability | OpenTelemetry | `--with-telemetry` |
+| Payments | Providers | `--with-payments` |
+
+Other common generator options: `--output-dir`, `--git` / `--no-git`, `--venv` / `--no-venv`, `--install` / `--no-install`.
+
+### Building a website configurator (command assembly)
+
+1. Collect inputs: `projectName`, optional `outputDir`, booleans for git/venv/install, and toggles for Redis, Mongo, Cassandra, Scylla, Dynamo, Cosmos, Elasticsearch, email, Slack, Datadog, telemetry, payments.
+2. Start with: `fastmvc generate <projectName>`.
+3. Append flags, e.g. `--output-dir`, `--no-git`, `--venv`, `--install`.
+4. Append `--with-*` / `--no-redis` as above.
+5. Join into the final shell command for users to copy/paste.
+
+Example:
+
+```bash
+fastmvc generate my_api \
+  --output-dir ./projects \
+  --with-redis \
+  --with-mongo \
+  --with-elasticsearch \
+  --with-email \
+  --with-slack \
+  --with-datadog \
+  --with-telemetry \
+  --with-payments
+```
+
+### End-to-end quick start (generated app)
+
+```bash
+pip install fast-mvc
+fastmvc generate my_api   # add your flags
+cd my_api
+pip install -r requirements.txt
+python -m uvicorn app:app --reload
+```
+
+Then open `http://localhost:8000/docs`, and when dashboards are enabled, `/dashboard/health` and `/dashboard/api`.
+
+---
+
 ## Links
 
 - **Repository:** [github.com/shregar1/fastMVC](https://github.com/shregar1/fastMVC) (see `[project.urls]` in `pyproject.toml`).
@@ -200,9 +316,111 @@ On startup, the app logs the written paths and variable names, for example: `var
 
 The **`fast_*`** libraries in the monorepo are optional add-ons (DB, queues, LLM, storage, …). See the [parent README](../README.md) for the full package table and [`install_packages.sh`](../install_packages.sh) to install them in editable mode.
 
-## Tooling
+Day-to-day commands: see [`Makefile`](Makefile) (`make test`, `make lint`, `make format`, `make build`, …).
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [Makefile](Makefile), and [PUBLISHING.md](PUBLISHING.md).
+---
+
+## Contributing
+
+Thank you for contributing to **fast-mvc**.
+
+### Monorepo layout
+
+This package usually lives inside the **FastMVC** monorepo. From the repo root, install in editable mode:
+
+```bash
+cd fast_mvc_main
+pip install -e ".[dev]" || pip install -e .
+pip install -r requirements.txt
+pre-commit install
+```
+
+Standalone clone (if this package is its own git remote):
+
+```bash
+git clone https://github.com/shregar1/fastMVC.git
+cd fast-mvc
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[dev]" || pip install -e .
+pip install -r requirements.txt
+pre-commit install
+```
+
+Canonical repository URL from `pyproject.toml`: `https://github.com/shregar1/fastMVC`.
+
+### `_maint` (do not touch casually)
+
+The **`_maint/`** directory is **critical infrastructure** (Docker nginx, DB `init-scripts`, seed/tooling scripts). It is **not** part of the application feature tree. **Do not rename, relocate, or edit** it without updating every reference (`docker-compose.yml`, `docker-entrypoint.sh`, `.pre-commit-config.yaml`, docs) and without maintainer review.
+
+Authoritative doc: [`docs/guide/maint-folder.md`](docs/guide/maint-folder.md) (also published under **Getting Started** in MkDocs).
+
+To copy EditorConfig, pre-commit config, and other shared files from `fast_middleware/` into every package (from monorepo root):
+
+```bash
+python3 scripts/sync_package_tooling.py
+```
+
+### Test coverage
+
+Many FastMVC libraries enforce **≥95% line coverage** via `pytest-cov` (`fail_under` in `pyproject.toml`). From this package directory:
+
+```bash
+python3 -m pytest tests/ -q --cov=src --cov-fail-under=95
+```
+
+(`fast_database` may use different `--cov=` paths — see that package’s `pyproject.toml`.)
+
+Overview: [../docs/COVERAGE.md](../docs/COVERAGE.md).
+
+### DTOs (one class per file)
+
+Under `dtos/requests/<segment>/`, keep **one concrete Pydantic model per module** (e.g. `create.py` → `ExampleCreateRequestDTO`). **Nested** models that only support a single parent may live in the **same** file. Shared bases live in `abstraction.py`. Details: [`docs/guide/new-api-scaffolding.md`](docs/guide/new-api-scaffolding.md#one-concrete-class-per-file-dtos), [`dtos/README.md`](dtos/README.md#one-concrete-class-per-file).
+
+### Quality checks
+
+```bash
+make test
+make lint
+make format
+```
+
+### Commits
+
+Use clear commit messages (e.g. conventional commits: `feat:`, `fix:`, `docs:`). Pull requests against `main` are welcome.
+
+---
+
+## Publishing to PyPI
+
+### Prerequisites
+
+- PyPI account and [API token](https://pypi.org/manage/account/token/)
+- `pip install build twine` (or use your environment / `requirements.txt`)
+
+### Version and changelog
+
+1. Bump `version` in `pyproject.toml`.
+2. Update `CHANGELOG.md` under `## [Unreleased]` and add a dated section when you tag a release.
+
+### Monorepo releases
+
+If you use the **FastMVC** monorepo scripts, see [../RELEASE.md](../RELEASE.md) and `scripts/release_all.sh` at the repository root.
+
+### Package upload (this project)
+
+1. Run tests: `make test` or `pytest`.
+2. Build: `make build` or `python -m build`.
+3. Upload:
+
+```bash
+export TWINE_USERNAME=__token__
+export TWINE_PASSWORD=<pypi-token>
+twine upload dist/*
+```
+
+- **PyPI project name:** `fast-mvc`
+- **Repository / homepage:** https://github.com/shregar1/fastMVC
 
 ---
 
@@ -210,9 +428,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [Makefile](Makefile), and [PUBLISHING.md
 
 | Document | Purpose |
 |----------|---------|
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Dev setup, tests, monorepo sync |
-| [PUBLISHING.md](PUBLISHING.md) | PyPI and releases |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 | [CHANGELOG.md](CHANGELOG.md) | Version history |
+
+**Contributing & PyPI:** sections [Contributing](#contributing) and [Publishing to PyPI](#publishing-to-pypi) in this file.
 
 **Monorepo:** [../README.md](../README.md) · **Coverage:** [../docs/COVERAGE.md](../docs/COVERAGE.md)

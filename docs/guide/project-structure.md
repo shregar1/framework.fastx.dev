@@ -8,9 +8,7 @@ Understanding the FastMVC project layout and organization.
 my-project/
 ├── app.py                      # Application entry point
 ├── pyproject.toml             # Project metadata and dependencies
-├── requirements.txt           # Python dependencies
-├── requirements-dev.txt       # Development dependencies
-├── requirements-docs.txt      # Documentation dependencies
+├── requirements.txt           # Optional dev tooling, ecosystem packages, and docs
 ├── Makefile                   # Development commands
 ├── .env                       # Environment variables (git-ignored)
 ├── .env.example               # Example environment file

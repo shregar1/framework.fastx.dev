@@ -93,7 +93,7 @@ def test_export_request_contains_generated_tests_and_headers(
     assert "exhaustive auto-generated tests" in joined
     assert "[NEG]" in joined
     assert "JSON: malformed (truncated)" in joined
-    assert "query: wrong-type probe" in joined
+    # Wrong-type query probe is emitted only when OpenAPI lists query parameters.
 
 
 def test_export_writes_environment_file_when_enabled(

@@ -24,14 +24,27 @@ class RouteExportEngine:
     def __init__(
         self,
         app: FastAPI,
-        output_file: str = "postman_collection.json",
+        output_file: Optional[str] = None,
         environment_file: Optional[str] = None,
     ) -> None:
         self.app = app
+        postman_dir = Path(os.getenv("POSTMAN_OUTPUT_DIR", "postman"))
+        if output_file is None:
+            output_file = os.getenv(
+                "POSTMAN_COLLECTION_FILE",
+                str(postman_dir / "postman_collection.json"),
+            )
         self.output_file = output_file
-        self.environment_file = environment_file or os.getenv(
-            "POSTMAN_ENV_FILE", "postman_environment.json"
-        )
+        if environment_file is None:
+            raw = os.getenv("POSTMAN_ENV_FILE", "postman_environment.json")
+            ep = Path(raw)
+            if ep.is_absolute() or ep.parent != Path("."):
+                environment_file = raw
+            else:
+                environment_file = str(postman_dir / ep.name)
+        else:
+            environment_file = environment_file
+        self.environment_file = environment_file
         self.base_url = os.getenv("POSTMAN_BASE_URL") or (
             f"http://{os.getenv('HOST', '0.0.0.0')}:{os.getenv('PORT', '8000')}"
         )
@@ -161,8 +174,9 @@ class RouteExportEngine:
 
         Postman cannot attach an Environment from inside a Collection JSON. For **one import**,
         defaults are stored on the collection as ``variable`` (no environment needed). Set
-        ``POSTMAN_EXPORT_ENVIRONMENT=1`` to also write ``POSTMAN_ENV_FILE`` for workspace-style
-        environments; you can then **Import** and multi-select both files in one dialog.
+        ``POSTMAN_EXPORT_ENVIRONMENT=1`` to also write ``POSTMAN_ENV_FILE`` (under
+        ``POSTMAN_OUTPUT_DIR``, default ``postman/``) for workspace-style environments;
+        you can then **Import** and multi-select both files in one dialog.
         """
         path_tree: dict[str, Any] = {}
         for operation in self._collect_operation_specs():
@@ -238,10 +252,12 @@ class RouteExportEngine:
         }
 
         output_path = Path(self.output_file)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         if not also_env:
             return output_path, None
         env_path = Path(self.environment_file)
+        env_path.parent.mkdir(parents=True, exist_ok=True)
         env_path.write_text(
             json.dumps(self._build_postman_environment(), indent=2),
             encoding="utf-8",
@@ -267,7 +283,7 @@ class RouteExportEngine:
                 "environment-scoped variables."
             )
         return (
-            base + " To also emit a separate `postman_environment.json`, set env var "
+            base + " To also emit a separate environment JSON under `postman/`, set env var "
             "`POSTMAN_EXPORT_ENVIRONMENT=1` before boot."
         )
 

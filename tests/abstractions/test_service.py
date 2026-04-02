@@ -3,18 +3,25 @@
 from __future__ import annotations
 
 from typing import Any, Optional
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
+from pydantic import BaseModel
 
 from abstractions.service import IService
+
+
+class _DummyDTO(BaseModel):
+    """Minimal request DTO for exercising :meth:`IService.run`."""
+
+    ref: str = "ok"
 
 
 class ConcreteService(IService):
     """Concrete implementation for testing."""
 
-    async def execute(self, **kwargs: Any) -> dict:
-        return {"status": "success"}
+    def run(self, request_dto: BaseModel) -> dict:
+        return {"status": "success", "dto_type": type(request_dto).__name__}
 
 
 class TestIService:
@@ -23,7 +30,7 @@ class TestIService:
     def test_is_abstract(self):
         """Test IService is abstract."""
         with pytest.raises(TypeError):
-            IService()
+            IService()  # pyright: ignore[reportAbstractUsage]
 
     def test_concrete_can_be_instantiated(self):
         """Test concrete implementation can be instantiated."""
@@ -107,19 +114,18 @@ class TestIService:
         service.logger = new_logger
         assert service.logger == new_logger
 
-    @pytest.mark.asyncio
-    async def test_execute_method(self):
-        """Test execute method."""
+    def test_run_method(self):
+        """Test run method."""
         service = ConcreteService()
-        result = await service.execute()
-        assert result == {"status": "success"}
+        result = service.run(_DummyDTO())
+        assert result["status"] == "success"
+        assert result["dto_type"] == "_DummyDTO"
 
-    @pytest.mark.asyncio
-    async def test_execute_with_kwargs(self):
-        """Test execute with kwargs."""
+    def test_run_accepts_subclass_dto(self):
+        """``run`` accepts any Pydantic model."""
         service = ConcreteService()
-        result = await service.execute(param1="value1", param2="value2")
-        assert result == {"status": "success"}
+        result = service.run(_DummyDTO(ref="x"))
+        assert result["status"] == "success"
 
     def test_service_context_propagation(self):
         """Test context propagates through service."""
@@ -158,8 +164,10 @@ class TestIServiceEdgeCases:
             urn="服务-urn",
             api_name="api-测试"
         )
-        assert "服务" in service.urn
-        assert "测试" in service.api_name
+        urn = service.urn
+        api = service.api_name
+        assert urn is not None and "服务" in urn
+        assert api is not None and "测试" in api
 
     def test_special_characters_in_properties(self):
         """Test special characters."""
@@ -181,27 +189,17 @@ class TestIServiceEdgeCases:
         assert service is not None
 
 
-class TestIServiceWithAsync:
-    """Test async behavior."""
+class TestIServiceRunRepeated:
+    """``run`` is synchronous; repeated calls stay independent."""
 
-    @pytest.mark.asyncio
-    async def test_async_execute_returns_dict(self):
-        """Test async execute returns dict."""
+    def test_run_returns_dict(self) -> None:
         service = ConcreteService()
-        result = await service.execute()
+        result = service.run(_DummyDTO())
         assert isinstance(result, dict)
 
-    @pytest.mark.asyncio
-    async def test_async_execute_multiple_calls(self):
-        """Test multiple async calls."""
+    def test_run_multiple_calls(self) -> None:
         service = ConcreteService()
-        results = await asyncio.gather(
-            service.execute(),
-            service.execute(),
-            service.execute()
-        )
+        dto = _DummyDTO()
+        results = [service.run(dto) for _ in range(3)]
         assert len(results) == 3
-        assert all(r == {"status": "success"} for r in results)
-
-
-import asyncio
+        assert all(r["status"] == "success" for r in results)

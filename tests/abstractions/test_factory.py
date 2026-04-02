@@ -20,10 +20,10 @@ class ConcreteFactory(IFactory):
 class TestIFactory:
     """Test class for IFactory."""
 
-    def test_is_abstract(self):
-        """Test IFactory is abstract."""
-        with pytest.raises(TypeError):
-            IFactory()
+    def test_base_can_be_instantiated(self) -> None:
+        """IFactory has no abstract methods; the base may be constructed."""
+        f = IFactory()
+        assert f._urn is None
 
     def test_concrete_can_be_instantiated(self):
         """Test concrete implementation can be instantiated."""

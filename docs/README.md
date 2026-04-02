@@ -23,13 +23,13 @@ docs/
 ## How to work with it
 
 1. **Edit** Markdown under `docs/`; **nav** is updated in `mkdocs.yml`.  
-2. **Build locally**: `mkdocs serve` (see `requirements-docs.txt`).  
+2. **Build locally**: `mkdocs serve` (after `pip install -r requirements.txt` or `make docs-install`).  
 3. **Link** to code with `mkdocstrings` where configured in `mkdocs.yml`.  
 
 ## Related files
 
 - **`mkdocs.yml`** — theme, nav, plugins  
-- **`requirements-docs.txt`** — MkDocs and Material dependencies  
+- **`requirements.txt`** — MkDocs section includes Material and related doc build tools (see file comments).  
 
 ## Practices
 

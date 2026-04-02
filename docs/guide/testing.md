@@ -10,10 +10,10 @@ Install testing dependencies:
 pip install pytest pytest-asyncio httpx faker freezegun
 ```
 
-Or use the provided requirements:
+Or use the provided requirements (dev tooling section):
 
 ```bash
-pip install -r requirements-dev.txt
+pip install -r requirements.txt
 ```
 
 ## Test Structure

@@ -1,7 +1,0 @@
-# Optional FastMVC packages (fast_platform + fast_db are in requirements.txt)
-# Install only the ones you need, e.g.:
-#   pip install -r requirements-optional.txt
-#   or: pip install fast_dashboards 'fast-platform[...]'
-
-fast_dashboards>=0.1.0
-fast-platform>=0.12.0

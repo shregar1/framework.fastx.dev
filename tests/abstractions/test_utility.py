@@ -20,10 +20,10 @@ class ConcreteUtility(IUtility):
 class TestIUtility:
     """Test class for IUtility."""
 
-    def test_is_abstract(self):
-        """Test IUtility is abstract."""
-        with pytest.raises(TypeError):
-            IUtility()
+    def test_base_can_be_instantiated(self) -> None:
+        """IUtility has no abstract methods; the base class is instantiable."""
+        util = IUtility()
+        assert util.urn is None
 
     def test_concrete_can_be_instantiated(self):
         """Test concrete implementation can be instantiated."""
@@ -109,11 +109,16 @@ class TestIUtility:
         util.logger = new_logger
         assert util.logger == new_logger
 
-    def test_args_kwargs_forwarding(self):
-        """Test *args and **kwargs are forwarded."""
-        util = ConcreteUtility("arg1", "arg2", custom_kwarg="value")
-        # Should not raise
-        assert util is not None
+    def test_positional_context_parameters(self) -> None:
+        """First positional args map to ``urn`` and ``user_urn`` (see ``IUtility.__init__``)."""
+        util = ConcreteUtility("arg1", "arg2")
+        assert util.urn == "arg1"
+        assert util.user_urn == "arg2"
+
+    def test_unknown_kwargs_not_consumed_by_mro(self) -> None:
+        """Extra kwargs are forwarded to ``object.__init__`` and raise."""
+        with pytest.raises(TypeError):
+            ConcreteUtility(urn="test", extra_param1="value1")
 
     def test_inheritance_chain(self):
         """Test inheritance chain."""
@@ -182,15 +187,6 @@ class TestIUtilityEdgeCases:
 
 class TestIUtilityWithKwargs:
     """Test IUtility with various kwargs."""
-
-    def test_extra_kwargs_ignored(self):
-        """Test extra kwargs don't break initialization."""
-        util = ConcreteUtility(
-            urn="test",
-            extra_param1="value1",
-            extra_param2="value2"
-        )
-        assert util.urn == "test"
 
     def test_kwargs_override(self):
         """Test kwargs properly override defaults."""

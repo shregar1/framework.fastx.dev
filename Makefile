@@ -75,7 +75,7 @@ dev-no-reload:
 	@echo "$(BLUE)🚀 Starting FastAPI server (no reload)...$(RESET)"
 	@$(UVICORN) app:app --host 0.0.0.0 --port 8000
 
-## postman-export: Regenerate postman_collection.json from the live app (same code path as startup)
+## postman-export: Regenerate postman/postman_collection.json from the live app (same code path as startup)
 postman-export:
 	@echo "$(BLUE)📮 Exporting Postman collection...$(RESET)"
 	@$(PYTHON) _maint/scripts/export_postman_collection.py
@@ -338,7 +338,7 @@ generate-secret:
 ## docs-install: Install documentation dependencies
 docs-install:
 	@echo "$(BLUE)📚 Installing documentation dependencies...$(RESET)"
-	@$(PIP) install -r requirements-docs.txt
+	@$(PIP) install -r requirements.txt
 	@echo "$(GREEN)✓ Documentation dependencies installed$(RESET)"
 
 ## docs-serve: Serve documentation locally with hot reload

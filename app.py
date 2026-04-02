@@ -18,10 +18,12 @@ Environment Variables:
     RATE_LIMIT_REQUESTS_PER_HOUR: Rate limit per hour (default: 1000)
     RATE_LIMIT_WINDOW_SECONDS: Rate limit window size in seconds (default: 60)
     RATE_LIMIT_BURST_LIMIT: Maximum burst requests allowed (default: 10)
-    POSTMAN_EXPORT_ENVIRONMENT: Set to 1/true to also write postman_environment.json on boot
+    POSTMAN_EXPORT_ENVIRONMENT: Set to 1/true to also write environment JSON under postman/ on boot
     POSTMAN_COLLECTION_NAME: Override Postman collection/env title (default: git repo folder name)
     POSTMAN_BASE_URL: Override default base_url in collection/environment (else HOST:PORT)
-    POSTMAN_ENV_FILE: Filename for optional environment export (default: postman_environment.json)
+    POSTMAN_OUTPUT_DIR: Directory for Postman exports (default: postman)
+    POSTMAN_COLLECTION_FILE: Collection JSON path (default: postman/postman_collection.json)
+    POSTMAN_ENV_FILE: Environment JSON filename or path (default: postman/postman_environment.json)
     POSTMAN_NEGATIVE_TESTS: Set to 0/false to skip extra pm.sendRequest validation scripts per request
     RATE_LIMIT_REQUESTS_PER_MINUTE: Rate limit per minute
     RATE_LIMIT_REQUESTS_PER_HOUR: Rate limit per hour
@@ -38,6 +40,8 @@ Endpoints:
 """
 
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import datetime
 from http import HTTPStatus
 from importlib.metadata import PackageNotFoundError, version
@@ -50,9 +54,12 @@ from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 load_dotenv()
 
-# Import middlewares from fast-middleware package
-from fast_middleware import (  # pyright: ignore[reportMissingImports]
+# Import middlewares from fast-middleware package (distribution exposes ``fastmiddleware``)
+from fastmiddleware import (  # pyright: ignore[reportMissingImports]
+    AuthConfig,
+    AuthenticationMiddleware,
     CORSMiddleware,
+    JWTAuthBackend,
     LoggingMiddleware,
     RateLimitConfig,
     RateLimitMiddleware,
@@ -60,7 +67,6 @@ from fast_middleware import (  # pyright: ignore[reportMissingImports]
     ResponseTimingMiddleware,
     SecurityHeadersMiddleware,
     TrustedHostMiddleware,
-    JwtBearerAuthMiddleware,
 )
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -82,6 +88,7 @@ from constants.health import (
     READINESS_READY,
 )
 from constants.http_header import HttpHeader
+from constants.route import RouteConstant
 from constants.response_key import ResponseKey
 from core.exception_handlers import ApplicationExceptionHandlers
 from core.route_export_engine import RouteExportEngine
@@ -196,6 +203,33 @@ if not IS_TEST_RUN and EnvironmentParserUtility.get_bool_with_logging(
     from utilities.validator import validate_config_or_exit  # pyright: ignore[reportMissingImports]
     validate_config_or_exit()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Startup and shutdown (replaces deprecated ``@app.on_event`` handlers)."""
+    app.state.start_time = DateTimeUtility.utc_now()
+    logger.info("Application startup event triggered")
+    logger.info(f"FastMVC API starting on {HOST}:{PORT}")
+    logger.info("Using fast-middleware for request processing")
+    curl_examples = route_export_engine.build_curl_examples()
+    app.state.route_curl_examples = curl_examples
+    collection_path, env_path = route_export_engine.export_postman_collection()
+    env_msg = (
+        f", environment {env_path}"
+        if env_path is not None
+        else " (collection-only; set POSTMAN_EXPORT_ENVIRONMENT=1 to also write environment file)"
+    )
+    logger.info(
+        f"Generated {len(curl_examples)} cURL examples; Postman collection {collection_path}"
+        f"{env_msg} — variables: base_url, reference_urn, reference_number, token, refresh_token"
+    )
+    route_export_engine.clear_memory()
+
+    yield
+
+    logger.info("Application shutdown event triggered")
+
+
 # Initialize FastAPI application (openapi_url must match middlewares.docs_auth)
 app = FastAPI(
     title=EnvironmentParserUtility.parse_str(EnvironmentVar.APP_NAME, "FastMVC API"),
@@ -204,6 +238,7 @@ app = FastAPI(
     docs_url=None,  # Custom docs setup below
     redoc_url=None,
     openapi_url=DocsAuthConfig.normalized_openapi_url(),
+    lifespan=lifespan,
 )
 route_export_engine = RouteExportEngine(app)
 route_export_engine.install()
@@ -649,9 +684,26 @@ app.add_middleware(
     header_name=HttpHeader.X_PROCESS_TIME,
 )
 
-# Authentication Middleware - JWT validation (custom, app-specific)
+# Authentication Middleware — JWT via fastmiddleware (Bearer + pyjwt)
 if JWT_AUTH_ENABLED:
-    app.add_middleware(JwtBearerAuthMiddleware)
+    _jwt_secret = EnvironmentParserUtility.parse_str(
+        EnvironmentVar.SECRET_KEY,
+        Default.SECRET_KEY,
+    )
+    _jwt_algorithm = EnvironmentParserUtility.parse_str(
+        EnvironmentVar.ALGORITHM,
+        Default.ALGORITHM,
+    )
+    if not _jwt_secret.strip():
+        logger.warning(
+            "JWT_AUTH_ENABLED is true but SECRET_KEY is empty; JWT middleware not registered."
+        )
+    else:
+        app.add_middleware(
+            AuthenticationMiddleware,
+            backend=JWTAuthBackend(secret=_jwt_secret, algorithm=_jwt_algorithm),
+            config=AuthConfig(exclude_paths=set(RouteConstant.UNPROTECTED_ROUTES)),
+        )
 
 # OpenAPI /docs, /redoc, /openapi.json — HTTP Basic when DOCS_USERNAME + DOCS_PASSWORD are set
 app.add_middleware(DocsBasicAuthMiddleware)
@@ -690,57 +742,6 @@ if MainApiRouter is not None:
     app.include_router(MainApiRouter)
     logger.info("Nested Production API enabled at /api/v1/examples")
 logger.info("Initialized routers")
-
-
-# =============================================================================
-# LIFECYCLE EVENTS
-# =============================================================================
-
-
-@app.on_event("startup")
-async def on_startup():
-    """Application startup event handler.
-
-    Called when the FastAPI application starts. Use for:
-    - Initializing database connections
-    - Loading cached data
-    - Starting background tasks
-    - Logging startup information
-    """
-    from utilities.datetime import DateTimeUtility
-
-    # Track application start time for uptime calculation
-    app.state.start_time = DateTimeUtility.utc_now()
-
-    logger.info("Application startup event triggered")
-    logger.info(f"FastMVC API starting on {HOST}:{PORT}")
-    logger.info("Using fast-middleware for request processing")
-    curl_examples = route_export_engine.build_curl_examples()
-    app.state.route_curl_examples = curl_examples
-    collection_path, env_path = route_export_engine.export_postman_collection()
-    env_msg = (
-        f", environment {env_path}"
-        if env_path is not None
-        else " (collection-only; set POSTMAN_EXPORT_ENVIRONMENT=1 to also write environment file)"
-    )
-    logger.info(
-        f"Generated {len(curl_examples)} cURL examples; Postman collection {collection_path}"
-        f"{env_msg} — variables: base_url, reference_urn, reference_number, token, refresh_token"
-    )
-    route_export_engine.clear_memory()
-
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    """Application shutdown event handler.
-
-    Called when the FastAPI application shuts down. Use for:
-    - Closing database connections
-    - Flushing caches
-    - Stopping background tasks
-    - Cleanup operations
-    """
-    logger.info("Application shutdown event triggered")
 
 
 # =============================================================================

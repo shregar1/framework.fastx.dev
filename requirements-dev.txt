@@ -1,7 +1,0 @@
-# FastMVC packages (editable install from monorepo)
-# Run from fast_mvc_main directory (parent = repo root):
-#   pip install -r requirements-dev.txt
-# Or from repo root: ./install_packages.sh
-
--e ../fast_platform
--e ../fast_dashboards

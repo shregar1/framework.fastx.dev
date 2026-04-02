@@ -44,7 +44,7 @@ class IService(ABC, ContextMixin):
         urn (str): Unique Request Number for tracing.
         user_urn (str): User's unique resource name.
         api_name (str): Name of the API endpoint.
-        user_id (int): DataI identifier of the user.
+        user_id (str | None): User identifier (aligned with :class:`~core.utils.context.ContextMixin`).
         logger: Structured logger bound with service context.
 
     Abstract Methods:
@@ -70,7 +70,7 @@ class IService(ABC, ContextMixin):
         urn: Optional[str] = None,
         user_urn: Optional[str] = None,
         api_name: Optional[str] = None,
-        user_id: int = None,
+        user_id: Optional[str] = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:

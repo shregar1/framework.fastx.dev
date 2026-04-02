@@ -32,10 +32,10 @@ class ConcreteController(IController):
 class TestIController:
     """Test class for IController."""
 
-    def test_is_abstract(self):
-        """Test IController is abstract."""
-        with pytest.raises(TypeError):
-            IController()
+    def test_base_can_be_instantiated(self) -> None:
+        """IController has no abstract methods; the base may be constructed."""
+        c = IController()
+        assert c.urn is None
 
     def test_concrete_can_be_instantiated(self):
         """Test concrete implementation can be instantiated."""

@@ -39,4 +39,4 @@ Misplaced edits break **local Docker**, **database init**, and **git hooks** wit
 ## See also
 
 - [`docs/guide/maint-folder.md`](../docs/guide/maint-folder.md) — full policy and checklist  
-- [`CONTRIBUTING.md`](../CONTRIBUTING.md) — contributor note on `_maint`  
+- [README.md — Contributing](../README.md#contributing) — contributor note on `_maint`  

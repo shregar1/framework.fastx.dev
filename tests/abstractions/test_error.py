@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional, Dict
-from unittest.mock import patch, MagicMock
+from typing import Any, Dict
+
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -13,6 +14,13 @@ from abstractions.error import IError
 class ConcreteError(IError):
     """Concrete implementation for testing."""
 
+    def __init__(self, message: str = "", **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._message = message
+
+    def __str__(self) -> str:
+        return self._message
+
     def to_dict(self) -> Dict[str, Any]:
         return {"error": "test", "message": str(self)}
 
@@ -20,10 +28,10 @@ class ConcreteError(IError):
 class TestIError:
     """Test class for IError."""
 
-    def test_is_abstract(self):
-        """Test IError is abstract."""
-        with pytest.raises(TypeError):
-            IError()
+    def test_base_can_be_instantiated(self) -> None:
+        """IError is a concrete Exception base with context; it may be constructed directly."""
+        err = IError(urn="u1")
+        assert err.urn == "u1"
 
     def test_concrete_can_be_instantiated(self):
         """Test concrete implementation can be instantiated."""

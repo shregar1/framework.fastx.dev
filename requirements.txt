@@ -1,9 +1,12 @@
-# Optional development dependencies for this package.
-# Primary install: pip install -e ".[dev]" (see pyproject.toml).
-# Then optionally: pip install -r requirements.txt
+# =============================================================================
+# FastMVC — consolidated optional requirements
 #
-# Monorepo: python3 scripts/sync_package_tooling.py refreshes this file from the template.
+# Primary install: pip install -e ".[dev]" (see pyproject.toml).
+# This file adds dev tooling, optional ecosystem wheels, and docs build tools:
+#   pip install -r requirements.txt
+# =============================================================================
 
+# --- Development & tooling ---
 pytest>=7.0.0
 pytest-asyncio>=0.21.0
 pytest-cov>=4.0.0
@@ -14,3 +17,19 @@ bandit>=1.7.0
 twine>=4.0.0
 build>=0.10.0
 pre-commit>=3.0.0
+
+# --- Optional FastMVC ecosystem packages (install only what you need) ---
+fast_dashboards>=0.1.0
+fast-platform>=0.13.0
+
+# --- Documentation (MkDocs) ---
+mkdocs>=1.5.0
+mkdocs-material>=9.5.0
+mkdocstrings[python]>=0.24.0
+mkdocs-swagger-ui-tag>=0.6.0
+pymdown-extensions>=10.7
+mkdocs-glightbox>=0.3.0
+mike>=2.0.0
+watchdog>=3.0.0
+Pygments>=2.17.0
+mkdocs-minify-plugin>=0.7.0

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Regenerate Postman artifacts using the same export path as app startup.
 
-Writes ``postman_collection.json`` in the repository root (and optionally
-``postman_environment.json``) by importing the live ``app`` module and calling
+Writes ``postman/postman_collection.json`` (and optionally
+``postman/postman_environment.json``) by importing the live ``app`` module and calling
 :class:`RouteExportEngine` — same routes and OpenAPI as ``uvicorn app:app``.
 
 Usage (from repo root, with dependencies installed)::
