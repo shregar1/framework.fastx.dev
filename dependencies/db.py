@@ -25,7 +25,7 @@ except ImportError:
             """Raise informative error about missing dependency."""
             raise ImportError(
                 "fast_db is required for database dependencies. "
-                "Install with: pip install fast-mvc[platform]"
+                "Install with: pip install fastx-mvc[platform]"
             )
 
     DBDependency = _DBDependencyFallback  # type: ignore

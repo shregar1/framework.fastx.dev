@@ -32,7 +32,7 @@ from typing import Any
 from loguru import logger
 from pydantic import BaseModel, field_validator
 
-# Optional fast_utilities (requires fast-mvc[platform])
+# Optional fast_utilities (requires fastx-mvc[platform])
 try:
     from fast_utilities.validation import (  # pyright: ignore[reportMissingImports]
         SecurityValidators,

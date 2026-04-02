@@ -3,7 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fast-mvc"
+# PyPI install: pip install fastx-mvc  (name ``fastx`` is already taken on PyPI — unrelated FASTA/Q package)
+name = "fastx"
 version = "1.5.0"
 description = "Production-grade MVC Framework for FastAPI - Generate projects, entities, and migrations with a single command"
 readme = "README.md"
@@ -100,7 +101,7 @@ dev = [
     "coverage>=7.0.0,<8.0.0",
     "time-machine>=2.10.0,<3.0.0",
     "ruff>=0.1.0,<1.0.0",
-    "twine>=4.0.0,<6.0.0",
+    "twine>=6.0.0,<7.0.0",
     "build>=1.0.0,<2.0.0",
 ]
 docs = [
@@ -142,7 +143,7 @@ media = ["fast-platform[storage]>=0.13.0"]
 analytics = ["fast-platform[observability]>=0.13.0"]
 # Install everything (all optional extras)
 all = [
-    "fast-mvc[dev,docs,dashboards,admin,feature-flags,interactive]",
+    "fastx[dev,docs,dashboards,admin,feature-flags,interactive]",
 ]
 
 [project.urls]
@@ -296,6 +297,6 @@ dev = [
     "coverage>=7.0.0,<8.0.0",
     "time-machine>=2.10.0,<3.0.0",
     "ruff>=0.1.0,<1.0.0",
-    "twine>=4.0.0,<6.0.0",
+    "twine>=6.0.0,<7.0.0",
     "build>=1.0.0,<2.0.0",
 ]

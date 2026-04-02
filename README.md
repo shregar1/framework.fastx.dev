@@ -1,4 +1,4 @@
-# fast-mvc
+# FastX (`fastx` on PyPI)
 
 **Production-grade MVC tooling for FastAPI** — Interactive CLI for project scaffolding, entity generation, Alembic migrations, and a reference framework layout that ties together the FastX ecosystem (SQLAlchemy, Redis, JWT, and optional integrations).
 
@@ -6,7 +6,7 @@ FastX is a **project generator for FastAPI** with a clean MVC stack and a **menu
 
 **Python:** 3.10+
 
-**Package name on PyPI:** `fast-mvc`  
+**Package name on PyPI:** `fastx` (the name `fastx` is already used on PyPI by another project)  
 **Version:** see `[project]` in [`pyproject.toml`](pyproject.toml).
 
 ## Capabilities
@@ -33,10 +33,10 @@ FastX is a **project generator for FastAPI** with a clean MVC stack and a **menu
 ## Install
 
 ```bash
-pip install fast-mvc
+pip install fastx
 
 # For best interactive experience
-pip install fast-mvc[interactive]
+pip install fastx[interactive]
 ```
 
 Editable from this directory (when developing the framework):
@@ -296,7 +296,7 @@ fastx generate my_api \
 ### End-to-end quick start (generated app)
 
 ```bash
-pip install fast-mvc
+pip install fastx
 fastx generate my_api   # add your flags
 cd my_api
 pip install -r requirements.txt
@@ -322,7 +322,7 @@ Day-to-day commands: see [`Makefile`](Makefile) (`make test`, `make lint`, `make
 
 ## Contributing
 
-Thank you for contributing to **fast-mvc**.
+Thank you for contributing to **FastX** (`fastx`).
 
 ### Monorepo layout
 
@@ -339,7 +339,7 @@ Standalone clone (if this package is its own git remote):
 
 ```bash
 git clone https://github.com/shregar1/fastMVC.git
-cd fast-mvc
+cd fast_mvc
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[dev]" || pip install -e .
@@ -419,7 +419,7 @@ export TWINE_PASSWORD=<pypi-token>
 twine upload dist/*
 ```
 
-- **PyPI project name:** `fast-mvc`
+- **PyPI project name:** `fastx`
 - **Repository / homepage:** https://github.com/shregar1/fastMVC
 
 ---

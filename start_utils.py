@@ -43,7 +43,7 @@ from loguru import logger
 from typing import Any
 from urllib.parse import quote
 
-# Optional fast_platform configuration (requires fast-mvc[platform])
+# Optional fast_platform configuration (requires fastx-mvc[platform])
 try:
     from fast_platform import (  # pyright: ignore[reportMissingImports]
         CacheConfiguration, CacheConfigurationDTO,

@@ -13,7 +13,7 @@ Usage:
 """
 
 # Optional fast_platform services - gracefully degrade if not installed
-# These require: pip install fast-mvc[platform] or specific extras
+# These require: pip install fastx-mvc[platform] or specific extras
 
 # Observability (fast_platform.observability)
 try:
