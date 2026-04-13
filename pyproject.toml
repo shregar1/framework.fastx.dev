@@ -87,10 +87,10 @@ dependencies = [
     "httpx>=0.24.0,<1.0.0",
     "cachetools>=5.0.0,<6.0.0",
     "mako>=1.2.0,<2.0.0",
-    "fast-middleware>=1.5.0,<2.0.0",
-    "fast-database>=1.5.0,<2.0.0",
+    "fastx-middleware>=1.5.0,<2.0.0",
+    "fastx-database>=1.5.0,<2.0.0",
     "cryptography>=41.0.0,<44.0.0",
-    "fast-platform>=1.5.0,<2.0.0",
+    "fastx-platform>=1.5.0,<2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -116,32 +116,32 @@ interactive = [
 # Core platform services - fast-platform is mandatory.
 # fast-database is optional at runtime (see `abstractions/repository.py` fallback).
 # Individual service categories (require fast-platform extras)
-notifications = ["fast-platform[notifications]>=0.13.0"]
-storage = ["fast-platform[storage]>=0.13.0"]
-messaging = ["fast-platform[messaging]>=0.13.0"]
-payments = ["fast-platform[payments]>=0.13.0"]
-observability = ["fast-platform[observability]>=0.13.0"]
-llm = ["fast-platform[llm]>=0.13.0"]
-search = ["fast-platform[search]>=0.13.0"]
-resilience = ["fast-platform[resilience]>=0.13.0"]
-realtime = ["fast-platform[realtime]>=0.13.0"]
-jobs = ["fast-platform[jobs]>=0.13.0"]
-secrets = ["fast-platform[secrets]>=0.13.0"]
-vectors = ["fast-platform[vectors]>=0.13.0"]
-tenancy = ["fast-platform[tenancy]>=0.13.0"]
+notifications = ["fastx-platform[notifications]>=0.13.0"]
+storage = ["fastx-platform[storage]>=0.13.0"]
+messaging = ["fastx-platform[messaging]>=0.13.0"]
+payments = ["fastx-platform[payments]>=0.13.0"]
+observability = ["fastx-platform[observability]>=0.13.0"]
+llm = ["fastx-platform[llm]>=0.13.0"]
+search = ["fastx-platform[search]>=0.13.0"]
+resilience = ["fastx-platform[resilience]>=0.13.0"]
+realtime = ["fastx-platform[realtime]>=0.13.0"]
+jobs = ["fastx-platform[jobs]>=0.13.0"]
+secrets = ["fastx-platform[secrets]>=0.13.0"]
+vectors = ["fastx-platform[vectors]>=0.13.0"]
+tenancy = ["fastx-platform[tenancy]>=0.13.0"]
 # External packages
-dashboards = ["fast-dashboards>=1.5.0"]
-admin = ["fast-admin>=0.1.0"]
-feature-flags = ["fast-feature-flags>=0.1.0"]
+dashboards = ["fastx-dashboards>=1.5.0"]
+admin = ["fastx-admin>=0.1.0"]
+feature-flags = ["fastx-feature-flags>=0.1.0"]
 # Legacy aliases for backward compatibility
-channels = ["fast-platform[notifications]>=0.13.0"]
-kafka = ["fast-platform[messaging]>=0.13.0"]
-webrtc = ["fast-platform[realtime]>=0.13.0"]
-identity = ["fast-platform>=0.13.0"]
-queues = ["fast-platform[messaging]>=0.13.0"]
-webhooks = ["fast-platform[notifications]>=0.13.0"]
-media = ["fast-platform[storage]>=0.13.0"]
-analytics = ["fast-platform[observability]>=0.13.0"]
+channels = ["fastx-platform[notifications]>=0.13.0"]
+kafka = ["fastx-platform[messaging]>=0.13.0"]
+webrtc = ["fastx-platform[realtime]>=0.13.0"]
+identity = ["fastx-platform>=0.13.0"]
+queues = ["fastx-platform[messaging]>=0.13.0"]
+webhooks = ["fastx-platform[notifications]>=0.13.0"]
+media = ["fastx-platform[storage]>=0.13.0"]
+analytics = ["fastx-platform[observability]>=0.13.0"]
 # Install everything (all optional extras)
 all = [
     "fastx-mvc[dev,docs,dashboards,admin,feature-flags,interactive]",
