@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from constants.api_lk import APILK
 from controllers.apis.v1.abstraction import IV1APIController
 from dependencies.db import DBDependency
+from dependencies.services.mfa import MFAServiceDependency
 from dependencies.services.user.mfa.verify import MFAVerifyServiceDependency
 from dependencies.utilities.dictionary import DictionaryUtilityDependency
 from dtos.requests.user.mfa.verify import MFAVerifyRequestDTO
@@ -26,6 +27,7 @@ class MFAVerifyController(IV1APIController):
         body: MFAVerifyRequestDTO,
         session: Session = Depends(DBDependency.derive),
         service_factory: Callable = Depends(MFAVerifyServiceDependency.derive),
+        mfa_service_factory: Callable = Depends(MFAServiceDependency.derive),
         dictionary_utility: Callable = Depends(DictionaryUtilityDependency.derive),
     ) -> JSONResponse:
         """POST /user/mfa/verify – Verify TOTP code and enable MFA."""
@@ -35,12 +37,19 @@ class MFAVerifyController(IV1APIController):
         )
 
         try:
+            mfa_service = mfa_service_factory(
+                urn=self.urn,
+                user_urn=self.user_urn,
+                api_name=self.api_name,
+                user_id=self.user_id,
+            )
             service = service_factory(
                 urn=self.urn,
                 user_urn=self.user_urn,
                 api_name=self.api_name,
                 user_id=self.user_id,
                 session=session,
+                mfa_service=mfa_service,
             )
             response_dto = await service.run(body.code)
             http_status = HTTPStatus.OK
@@ -54,12 +63,7 @@ class MFAVerifyController(IV1APIController):
                 fallback_message="MFA verification failed.",
             )
 
-        content = (
-            self.dictionary_utility.convert_dict_keys_to_camel_case(response_dto.model_dump())
-            if self.dictionary_utility is not None
-            else response_dto.model_dump()
-        )
-        return JSONResponse(status_code=http_status, content=content)
+        return self.build_json_response(response_dto, status_code=http_status)
 
 
 __all__ = ["MFAVerifyController"]

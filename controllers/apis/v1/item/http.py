@@ -10,7 +10,13 @@ from fastapi.responses import JSONResponse
 
 from abstractions.result import Result
 from dtos.requests.item import CreateItemRequestDTO, UpdateItemRequestDTO
+from dtos.responses.apis.v1.item import ItemResponseDTO
 from models.item import Item
+
+
+def _item_payload(entity: Item) -> dict[str, Any]:
+    """Serialize a domain :class:`Item` via the response DTO."""
+    return ItemResponseDTO.from_entity(entity).to_payload()
 
 
 class ItemHttpResponseBuilder:
@@ -20,12 +26,8 @@ class ItemHttpResponseBuilder:
     def raise_unprocessable_if_dto_invalid(
         body: CreateItemRequestDTO | UpdateItemRequestDTO,
     ) -> None:
-        ok, errs = body.validate()
-        if not ok:
-            raise HTTPException(
-                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=errs,
-            )
+        # Pydantic field/model validators run at instantiation; nothing to do here.
+        del body
 
     @staticmethod
     def respond_created_item(
@@ -41,7 +43,7 @@ class ItemHttpResponseBuilder:
                 content={"detail": str(result.error)},
             )
         item = result.value
-        payload: dict[str, Any] = item.to_dict()
+        payload: dict[str, Any] = _item_payload(item)
         if reference_urn:
             payload["reference_urn"] = reference_urn
         return JSONResponse(status_code=HTTPStatus.CREATED, content=payload)
@@ -67,7 +69,7 @@ class ItemHttpResponseBuilder:
     @staticmethod
     def json_item(entity: Item, http_request: Request | None) -> JSONResponse:
         del http_request
-        return JSONResponse(content=entity.to_dict())
+        return JSONResponse(content=_item_payload(entity))
 
     @staticmethod
     def respond_item_list(
@@ -81,7 +83,7 @@ class ItemHttpResponseBuilder:
                 content={"detail": str(result.error)},
             )
         items = result.value
-        return JSONResponse(content=[i.to_dict() for i in items])
+        return JSONResponse(content=[_item_payload(i) for i in items])
 
     @staticmethod
     def respond_item_with_ref(
@@ -97,7 +99,7 @@ class ItemHttpResponseBuilder:
                 content={"detail": str(result.error)},
             )
         item = result.value
-        payload = item.to_dict()
+        payload = _item_payload(item)
         if reference_urn:
             payload["reference_urn"] = reference_urn
         return JSONResponse(content=payload)
@@ -137,7 +139,7 @@ class ItemHttpResponseBuilder:
                 status_code=HTTPStatus.BAD_REQUEST,
                 content={"detail": str(result.error)},
             )
-        return JSONResponse(content=result.value.to_dict())
+        return JSONResponse(content=_item_payload(result.value))
 
     @staticmethod
     def respond_item_stats(

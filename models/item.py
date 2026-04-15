@@ -5,7 +5,7 @@ serialization here.
 """
 
 from datetime import datetime
-from typing import Any, Optional, Self
+from typing import Optional
 
 from abstractions.entity import Entity
 
@@ -112,50 +112,6 @@ class Item(Entity):
     def updated_at(self, value: datetime) -> None:
         """Allow I/dataclass compatibility when setting updated_at."""
         self._updated_at = value
-
-    # Business logic
-    def complete(self) -> Self:
-        """Mark item as completed."""
-        self.completed = True
-        return self
-
-    def uncomplete(self) -> Self:
-        """Mark item as not completed."""
-        self.completed = False
-        return self
-
-    def toggle(self) -> Self:
-        """Toggle completion status."""
-        self.completed = not self._completed
-        return self
-
-    # Serialization
-    def to_dict(self) -> dict[str, Any]:
-        """Convert entity to dictionary."""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "description": self.description,
-            "completed": self.completed,
-            "created_at": self._created_at.isoformat(),
-            "updated_at": self._updated_at.isoformat(),
-        }
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Self:
-        """Create entity from dictionary."""
-        return cls(
-            id=data.get("id"),
-            name=data.get("name", ""),
-            description=data.get("description", ""),
-            completed=data.get("completed", False),
-            created_at=datetime.fromisoformat(data["created_at"])
-            if data.get("created_at")
-            else None,
-            updated_at=datetime.fromisoformat(data["updated_at"])
-            if data.get("updated_at")
-            else None,
-        )
 
     def __repr__(self) -> str:
         """Execute __repr__ operation.

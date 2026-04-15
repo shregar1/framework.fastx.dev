@@ -135,11 +135,11 @@ class IUtility(ABC):
         self._logger = value
 
     @property
-    def user_id(self) -> str | None:
-        """str | None: Get the user's database identifier."""
+    def user_id(self) -> int | None:
+        """int | None: Get the user's database identifier."""
         return self._user_id
 
     @user_id.setter
-    def user_id(self, value: str | None) -> None:
+    def user_id(self, value: int | None) -> None:
         """Set the user's database identifier."""
         self._user_id = value

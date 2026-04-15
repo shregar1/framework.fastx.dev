@@ -59,7 +59,7 @@ class ExampleCreateController(IExampleAPIController):
             example_repo=repository,
         )
 
-        result = service.run(request_dto)
+        result = await service.run(request_dto)
 
         response_data = ExampleResponseDataDTO(**result["item"])
 

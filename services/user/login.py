@@ -16,7 +16,7 @@ from fast_platform.errors import (
     UnauthorizedError,
 )
 from services.user.abstraction import IUserService
-from start_utils import logger
+from services.user.token_issuance import TokenIssuanceService
 
 
 class UserLoginService(IUserService):
@@ -31,6 +31,7 @@ class UserLoginService(IUserService):
         user_repository: Any = None,
         jwt_utility: Any = None,
         refresh_token_repository: Any = None,
+        token_issuance_service: TokenIssuanceService | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -38,6 +39,7 @@ class UserLoginService(IUserService):
         self.user_repository = user_repository
         self.jwt_utility = jwt_utility
         self.refresh_token_repository = refresh_token_repository
+        self._token_issuance_service = token_issuance_service
 
     async def run(self, request_dto: UserLoginRequestDTO) -> BaseResponseDTO:
         """Authenticate user and return token response DTO."""
@@ -89,24 +91,14 @@ class UserLoginService(IUserService):
                 data=data,
             )
 
-        # Standard token flow
-        token_payload = {
-            "user_id": user_id,
-            "email": user.email,
-            "user_urn": user_urn,
-        }
-        access_token = self.jwt_utility.generate_token(token_payload)
-        refresh_token = self.jwt_utility.generate_refresh_token(token_payload)
-
-        # Persist refresh token
-        if self.refresh_token_repository:
-            try:
-                self.refresh_token_repository.store(
-                    user_id=user_id,
-                    token=refresh_token,
-                )
-            except Exception as exc:
-                logger.warning("Failed to persist refresh token for user %s: %s", user_id, exc)
+        # Standard token flow — delegated to TokenIssuanceService.
+        public_key_pem = getattr(user, "public_key_pem", None)
+        tokens = await self._token_issuance_service.issue(
+            user_id=user_id,
+            user_urn=user_urn,
+            email=user.email,
+            public_key_pem=public_key_pem,
+        )
 
         # Update login state on the model (will be committed by controller/session)
         try:
@@ -115,18 +107,12 @@ class UserLoginService(IUserService):
         except Exception:
             pass
 
-        public_key_pem = getattr(user, "public_key_pem", None)
         data = {
             "status": True,
-            "token": access_token,
-            "refreshToken": refresh_token,
+            **tokens,
             "userUrn": user_urn,
             "userId": user_id,
-            "user_id": user_id,
-            "user_urn": user_urn,
         }
-        if public_key_pem:
-            data["publicKeyPem"] = public_key_pem
 
         return BaseResponseDTO(
             transactionUrn=self.urn or "",

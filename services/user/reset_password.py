@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 
 from constants.api_status import APIStatus
 from dtos.responses.base import BaseResponseDTO
-from fast_database.persistence.models.user import User
 from fast_platform.errors import BadInputError
+from repositories.user.user_repository import UserRepository
 from start_utils import ALGORITHM, SECRET_KEY, logger
 from structured_log import log_event
 
@@ -63,19 +63,19 @@ class ResetPasswordService:
                 responseKey="error_invalid_reset_token",
             )
 
-        user = (
-            self._session.query(User)
-            .filter(User.email == email.strip().lower(), User.is_deleted.is_(False))
-            .first()
+        repo = UserRepository(
+            urn=self._urn,
+            api_name=self._api_name,
+            session=self._session,
         )
+        user = repo.retrieve_record_by_email(email.strip().lower(), is_deleted=False)
         if not user:
             raise BadInputError(
                 responseMessage="Invalid or expired reset token.",
                 responseKey="error_invalid_reset_token",
             )
 
-        user.password = _hash_password(new_password)
-        self._session.commit()
+        repo.update_password(user, _hash_password(new_password))
 
         log_event("reset_password.success", urn=self._urn, email=email)
 

@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Optional
 
 from constants.default import Default
+from fast_platform.errors import ServiceUnavailableError
 from start_utils import logger
 
 
@@ -25,8 +26,13 @@ async def send_welcome_email(email: str) -> None:
         )
     except ImportError:
         logger.warning("Notification provider not available – skipping welcome email to %s", email)
-    except Exception as exc:
-        logger.warning("Failed to send welcome email to %s: %s", email, exc)
+        return
+    except Exception as err:
+        logger.exception("welcome email send failed for %s", email)
+        raise ServiceUnavailableError(
+            responseMessage="Failed to send notification email.",
+            responseKey="error_notification_send_failed",
+        ) from err
 
 
 async def send_password_reset_email(
@@ -47,8 +53,13 @@ async def send_password_reset_email(
         )
     except ImportError:
         logger.warning("Notification provider not available – skipping reset email to %s", email)
-    except Exception as exc:
-        logger.warning("Failed to send reset email to %s: %s", email, exc)
+        return
+    except Exception as err:
+        logger.exception("password reset email send failed for %s", email)
+        raise ServiceUnavailableError(
+            responseMessage="Failed to send notification email.",
+            responseKey="error_notification_send_failed",
+        ) from err
 
 
 async def send_verification_email(
@@ -69,8 +80,13 @@ async def send_verification_email(
         )
     except ImportError:
         logger.warning("Notification provider not available – skipping verification email to %s", email)
-    except Exception as exc:
-        logger.warning("Failed to send verification email to %s: %s", email, exc)
+        return
+    except Exception as err:
+        logger.exception("verification email send failed for %s", email)
+        raise ServiceUnavailableError(
+            responseMessage="Failed to send notification email.",
+            responseKey="error_notification_send_failed",
+        ) from err
 
 
 # Alias used by controllers/auth/user/account/send_verification_email.py

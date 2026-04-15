@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Optional
 
+from sqlalchemy import select, update
+
 from repositories.user.abstraction import IUserRepository
 
 
@@ -70,21 +72,20 @@ class RefreshTokenRepository(IUserRepository):
         """Find a refresh token record by token value."""
         if self.session is None or self._model is None:
             return None
-        return (
-            self.session.query(self._model)
-            .filter(self._model.token == token, self._model.revoked == False)
-            .first()
-        )
+        return self.session.scalars(
+            select(self._model).where(
+                self._model.token == token,
+                self._model.revoked == False,
+            )
+        ).first()
 
     def revoke(self, token: str) -> None:
         """Revoke a single refresh token."""
         if self.session is None or self._model is None:
             return
-        record = (
-            self.session.query(self._model)
-            .filter(self._model.token == token)
-            .first()
-        )
+        record = self.session.scalars(
+            select(self._model).where(self._model.token == token)
+        ).first()
         if record:
             record.revoked = True
             self.session.commit()
@@ -93,10 +94,14 @@ class RefreshTokenRepository(IUserRepository):
         """Revoke all refresh tokens for a user."""
         if self.session is None or self._model is None:
             return
-        self.session.query(self._model).filter(
-            self._model.user_id == int(user_id),
-            self._model.revoked == False,
-        ).update({"revoked": True})
+        self.session.execute(
+            update(self._model)
+            .where(
+                self._model.user_id == int(user_id),
+                self._model.revoked == False,
+            )
+            .values(revoked=True)
+        )
         self.session.commit()
 
 

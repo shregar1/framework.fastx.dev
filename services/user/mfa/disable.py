@@ -20,22 +20,23 @@ class MFADisableService:
 
     def __init__(
         self,
+        *args: Any,
         urn: Optional[str] = None,
         user_urn: Optional[str] = None,
         api_name: Optional[str] = None,
         user_id: Any = None,
         session: Optional[Session] = None,
-        mfa_service: Optional[MFAService] = None,
+        mfa_service: MFAService,
+        **kwargs: Any,
     ) -> None:
+        super().__init__()
         self._urn = urn or ""
         self._user_urn = user_urn
         self._api_name = api_name or "MFA_DISABLE"
         self._user_id = user_id
         self._session = session
-        self._mfa = mfa_service or MFAService(
-            urn=urn, user_urn=user_urn, api_name=api_name,
-            user_id=int(user_id) if user_id else None,
-        )
+        self._mfa_service = mfa_service
+        self._mfa = mfa_service
         self._logger = logger.bind(urn=self._urn, api_name=self._api_name)
 
     async def run(self, code: str) -> BaseResponseDTO:
@@ -75,7 +76,6 @@ class MFADisableService:
         user.mfa_enabled = False
         user.mfa_secret = None
         user.mfa_backup_codes_hash = None
-        self._session.commit()
         log_audit(
             self._session,
             "mfa.disabled",

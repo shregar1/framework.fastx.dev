@@ -167,7 +167,7 @@ class ItemService(IItemService):
             if req.is_failure:
                 return req
             item = req.value
-            item.complete()
+            item.completed = True
             return await self._repository.update(item)
         except Exception as e:
             return failure(f"Failed to complete item: {str(e)}")
@@ -187,7 +187,7 @@ class ItemService(IItemService):
             if req.is_failure:
                 return req
             item = req.value
-            item.uncomplete()
+            item.completed = False
             return await self._repository.update(item)
         except Exception as e:
             return failure(f"Failed to uncomplete item: {str(e)}")
@@ -207,7 +207,7 @@ class ItemService(IItemService):
             if req.is_failure:
                 return req
             item = req.value
-            item.toggle()
+            item.completed = not item.completed
             return await self._repository.update(item)
         except Exception as e:
             return failure(f"Failed to toggle item: {str(e)}")
@@ -296,7 +296,7 @@ class ItemService(IItemService):
             pending = pending_result.value
             count = 0
             for item in pending:
-                item.complete()
+                item.completed = True
                 update_result = await self._repository.update(item)
                 if update_result.is_success:
                     count += 1

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+from sqlalchemy import select
+
 from repositories.user.abstraction import IUserRepository
 
 
@@ -38,14 +40,12 @@ class SubscriptionRepository(IUserRepository):
         """Return the active subscription for *user_id*, or ``None``."""
         if self.session is None or self._model is None:
             return None
-        return (
-            self.session.query(self._model)
-            .filter(
+        return self.session.scalars(
+            select(self._model).where(
                 self._model.user_id == user_id,
                 self._model.is_active == True,
             )
-            .first()
-        )
+        ).first()
 
 
 __all__ = ["SubscriptionRepository"]

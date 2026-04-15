@@ -41,6 +41,9 @@ from controllers.auth.user.abstraction import IUserController
 from dependencies.db import DBDependency
 from dependencies.repositiories.user import UserRepositoryDependency
 from dependencies.services.user.refresh_token import UserRefreshTokenServiceDependency
+from dependencies.services.user.token_issuance import (
+    TokenIssuanceServiceDependency,
+)
 from dependencies.utilities.dictionary import DictionaryUtilityDependency
 from dependencies.utilities.jwt import JWTUtilityDependency
 from dtos.requests.user.refresh import RefreshTokenRequestDTO
@@ -71,6 +74,9 @@ class UserRefreshTokenController(IUserController):
         user_repository: UserRepository = Depends(UserRepositoryDependency.derive),
         refresh_service_factory: Callable = Depends(
             UserRefreshTokenServiceDependency.derive
+        ),
+        token_issuance_service_factory: Callable = Depends(
+            TokenIssuanceServiceDependency.derive
         ),
         dictionary_utility: DictionaryUtility = Depends(
             DictionaryUtilityDependency.derive
@@ -103,6 +109,14 @@ class UserRefreshTokenController(IUserController):
                 user_id=self.user_id,
             )
 
+            token_issuance_service = token_issuance_service_factory(
+                urn=self.urn,
+                user_urn=self.user_urn,
+                api_name=self.api_name,
+                user_id=self.user_id,
+                jwt_utility=self.jwt_utility,
+                refresh_token_repository=refresh_token_repo,
+            )
             response_dto: BaseResponseDTO = await refresh_service_factory(
                 urn=self.urn,
                 user_urn=self.user_urn,
@@ -111,6 +125,7 @@ class UserRefreshTokenController(IUserController):
                 jwt_utility=self.jwt_utility,
                 user_repository=self.user_repository,
                 refresh_token_repository=refresh_token_repo,
+                token_issuance_service=token_issuance_service,
             ).run(request_dto=request_payload)
 
             http_status = HTTPStatus.OK
@@ -140,9 +155,4 @@ class UserRefreshTokenController(IUserController):
                 fallback_message="Failed to refresh tokens.",
             )
 
-        content = (
-            self.dictionary_utility.convert_dict_keys_to_camel_case(response_dto.model_dump())
-            if self.dictionary_utility is not None
-            else response_dto.model_dump()
-        )
-        return JSONResponse(content=content, status_code=http_status)
+        return self.build_json_response(response_dto, status_code=http_status)

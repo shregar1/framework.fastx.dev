@@ -48,6 +48,9 @@ from controllers.auth.user.abstraction import IUserController
 from dependencies.db import DBDependency
 from dependencies.repositiories.user import UserRepositoryDependency
 from dependencies.services.user.login import UserLoginServiceDependency
+from dependencies.services.user.token_issuance import (
+    TokenIssuanceServiceDependency,
+)
 from dependencies.utilities.dictionary import DictionaryUtilityDependency
 from dependencies.utilities.jwt import JWTUtilityDependency
 from dtos.requests.user.login import UserLoginRequestDTO
@@ -103,6 +106,9 @@ class UserLoginController(IUserController):
         ),
         user_login_service_factory: Callable = Depends(
             UserLoginServiceDependency.derive
+        ),
+        token_issuance_service_factory: Callable = Depends(
+            TokenIssuanceServiceDependency.derive
         ),
         dictionary_utility: DictionaryUtility = Depends(
             DictionaryUtilityDependency.derive
@@ -192,6 +198,14 @@ class UserLoginController(IUserController):
             self.logger.debug("Verified request")
 
             self.logger.debug("Running login user service")
+            token_issuance_service = token_issuance_service_factory(
+                urn=self.urn,
+                user_urn=self.user_urn,
+                api_name=self.api_name,
+                user_id=self.user_id,
+                jwt_utility=self.jwt_utility,
+                refresh_token_repository=refresh_token_repo,
+            )
             response_dto: BaseResponseDTO = await user_login_service_factory(
                 urn=self.urn,
                 user_urn=self.user_urn,
@@ -200,6 +214,7 @@ class UserLoginController(IUserController):
                 jwt_utility=self.jwt_utility,
                 user_repository=self.user_repository,
                 refresh_token_repository=refresh_token_repo,
+                token_issuance_service=token_issuance_service,
             ).run(request_dto=request_payload)
 
             self.logger.debug("Preparing response metadata")
@@ -236,14 +251,4 @@ class UserLoginController(IUserController):
                 fallback_message="Failed to login users.",
             )
 
-        dict_util = self.dictionary_utility
-        content = (
-            dict_util.convert_dict_keys_to_camel_case(response_dto.model_dump())
-            if dict_util is not None
-            else response_dto.model_dump()
-        )
-
-        return JSONResponse(
-            content=content,
-            status_code=httpStatusCode,
-        )
+        return self.build_json_response(response_dto, status_code=httpStatusCode)

@@ -9,6 +9,7 @@ from dtos.requests.user.refresh import RefreshTokenRequestDTO
 from dtos.responses.base import BaseResponseDTO
 from fast_platform.errors import UnauthorizedError
 from services.user.abstraction import IUserService
+from services.user.token_issuance import TokenIssuanceService
 from start_utils import logger
 
 
@@ -20,6 +21,7 @@ class UserRefreshTokenService(IUserService):
         user_repository: Any = None,
         jwt_utility: Any = None,
         refresh_token_repository: Any = None,
+        token_issuance_service: TokenIssuanceService | None = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -27,6 +29,7 @@ class UserRefreshTokenService(IUserService):
         self.user_repository = user_repository
         self.jwt_utility = jwt_utility
         self.refresh_token_repository = refresh_token_repository
+        self._token_issuance_service = token_issuance_service
 
     async def run(self, request_dto: RefreshTokenRequestDTO) -> BaseResponseDTO:
         """Validate refresh token and issue new pair."""
@@ -72,33 +75,30 @@ class UserRefreshTokenService(IUserService):
             )
 
         user_urn = getattr(user, "urn", None) or ""
-        token_payload = {
-            "user_id": user.id,
-            "email": user.email,
-            "user_urn": user_urn,
-        }
-        new_access = self.jwt_utility.generate_token(token_payload)
-        new_refresh = self.jwt_utility.generate_refresh_token(token_payload)
 
-        # Rotate refresh token — revoke old, store new
+        # Revoke the old refresh token before issuing a new pair.
         if self.refresh_token_repository:
             try:
                 self.refresh_token_repository.revoke(token=request_dto.refreshToken)
-                self.refresh_token_repository.store(user_id=user.id, token=new_refresh)
             except Exception as exc:
-                logger.warning("Failed to rotate refresh token for user %s: %s", user.id, exc)
+                logger.warning(
+                    "Failed to revoke old refresh token for user %s: %s",
+                    user.id,
+                    exc,
+                )
+
+        tokens = await self._token_issuance_service.issue(
+            user_id=user.id,
+            user_urn=user_urn,
+            email=user.email,
+        )
 
         return BaseResponseDTO(
             transactionUrn=self.urn or "",
             status=APIStatus.SUCCESS,
             responseMessage="Tokens refreshed successfully.",
             responseKey="success_refresh_token",
-            data={
-                "token": new_access,
-                "refreshToken": new_refresh,
-                "user_urn": user_urn,
-                "user_id": user.id,
-            },
+            data=tokens,
         )
 
 

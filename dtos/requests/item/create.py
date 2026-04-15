@@ -5,10 +5,10 @@ Leaf module under ``dtos/requests/item/`` — filename is ``create.py`` (context
 
 from __future__ import annotations
 
-from typing import Self
+from typing import Annotated
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from dtos.requests.item.abstraction import IRequestItemDTO
 
@@ -17,31 +17,13 @@ class CreateItemRequestDTO(IRequestItemDTO):
     """DTO for creating a new item."""
 
     reference_urn: str = Field(default_factory=lambda: str(uuid4()))
-    name: str
-    description: str = ""
+    name: Annotated[str, Field(min_length=1, max_length=100)]
+    description: Annotated[str, Field(default="", max_length=500)] = ""
     completed: bool = False
 
-    def validate(self) -> tuple[bool, list[str]]:
-        errors: list[str] = []
-        if not self.name or not self.name.strip():
-            errors.append("Name is required")
-        elif len(self.name) > 100:
-            errors.append("Name cannot exceed 100 characters")
-        if len(self.description) > 500:
-            errors.append("Description cannot exceed 500 characters")
-        return len(errors) == 0, errors
-
-    def to_dict(self) -> dict:
-        return {
-            "name": self.name,
-            "description": self.description,
-            "completed": self.completed,
-        }
-
+    @field_validator("name")
     @classmethod
-    def from_dict(cls, data: dict) -> Self:
-        return cls(
-            name=data.get("name", ""),
-            description=data.get("description", ""),
-            completed=data.get("completed", False),
-        )
+    def _strip_and_require_name(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("Name is required")
+        return v

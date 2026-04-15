@@ -211,9 +211,4 @@ class UserLogoutController(IUserController):
                 fallback_message="Failed to logout users.",
             )
 
-        content = (
-            self.dictionary_utility.convert_dict_keys_to_camel_case(response_dto.model_dump())
-            if self.dictionary_utility is not None
-            else response_dto.model_dump()
-        )
-        return JSONResponse(content=content, status_code=httpStatusCode)
+        return self.build_json_response(response_dto, status_code=httpStatusCode)

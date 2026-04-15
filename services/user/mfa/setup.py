@@ -19,22 +19,23 @@ class MFASetupService:
 
     def __init__(
         self,
+        *args: Any,
         urn: Optional[str] = None,
         user_urn: Optional[str] = None,
         api_name: Optional[str] = None,
         user_id: Any = None,
         session: Optional[Session] = None,
-        mfa_service: Optional[MFAService] = None,
+        mfa_service: MFAService,
+        **kwargs: Any,
     ) -> None:
+        super().__init__()
         self._urn = urn or ""
         self._user_urn = user_urn
         self._api_name = api_name or "MFA_SETUP"
         self._user_id = user_id
         self._session = session
-        self._mfa = mfa_service or MFAService(
-            urn=urn, user_urn=user_urn, api_name=api_name,
-            user_id=int(user_id) if user_id else None,
-        )
+        self._mfa_service = mfa_service
+        self._mfa = mfa_service
         self._logger = logger.bind(urn=self._urn, api_name=self._api_name)
 
     async def run(self) -> BaseResponseDTO:
@@ -57,7 +58,6 @@ class MFASetupService:
 
         secret = self._mfa.generate_secret()
         user.mfa_secret = secret
-        self._session.commit()
         provisioning_uri = self._mfa.get_provisioning_uri(
             secret, user.email or "user",
         )

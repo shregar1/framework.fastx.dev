@@ -5,10 +5,10 @@ Leaf module under ``dtos/requests/item/`` — filename is ``update.py`` (context
 
 from __future__ import annotations
 
-from typing import Optional, Self
+from typing import Annotated, Optional
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from dtos.requests.item.abstraction import IRequestItemDTO
 
@@ -17,31 +17,12 @@ class UpdateItemRequestDTO(IRequestItemDTO):
     """DTO for updating an existing item."""
 
     reference_urn: str = Field(default_factory=lambda: str(uuid4()))
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: Annotated[Optional[str], Field(default=None, max_length=100)] = None
+    description: Annotated[Optional[str], Field(default=None, max_length=500)] = None
 
-    def validate(self) -> tuple[bool, list[str]]:
-        errors: list[str] = []
-        if self.name is not None:
-            if not self.name.strip():
-                errors.append("Name cannot be empty")
-            elif len(self.name) > 100:
-                errors.append("Name cannot exceed 100 characters")
-        if self.description is not None and len(self.description) > 500:
-            errors.append("Description cannot exceed 500 characters")
-        return len(errors) == 0, errors
-
-    def to_dict(self) -> dict:
-        result: dict[str, str] = {}
-        if self.name is not None:
-            result["name"] = self.name
-        if self.description is not None:
-            result["description"] = self.description
-        return result
-
+    @field_validator("name")
     @classmethod
-    def from_dict(cls, data: dict) -> Self:
-        return cls(
-            name=data.get("name", ""),
-            description=data.get("description", ""),
-        )
+    def _non_empty_name_if_set(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            raise ValueError("Name cannot be empty")
+        return v

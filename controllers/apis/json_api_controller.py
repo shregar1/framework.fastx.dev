@@ -70,5 +70,16 @@ class JSONAPIController(IController):
                 status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             )
 
+    def build_json_response(
+        self,
+        response_dto: "BaseResponseDTO",
+        status_code: int = HTTPStatus.OK,
+    ) -> JSONResponse:
+        """Convert a BaseResponseDTO to a JSONResponse with camelCase keys."""
+        payload = response_dto.model_dump()
+        if self.dictionary_utility is not None:
+            payload = self.dictionary_utility.convert_dict_keys_to_camel_case(payload)
+        return JSONResponse(content=payload, status_code=status_code)
+
 
 __all__ = ["JSONAPIController"]

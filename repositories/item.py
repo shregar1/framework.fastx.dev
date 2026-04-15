@@ -36,11 +36,31 @@ class ItemRepository(IRepository):
 
     def _to_entity(self, data: dict[str, Any]) -> Item:
         """Convert stored data to entity."""
-        return Item.from_dict(data)
+        created_at = data.get("created_at")
+        updated_at = data.get("updated_at")
+        return Item(
+            id=data.get("id"),
+            name=data.get("name", ""),
+            description=data.get("description", ""),
+            completed=data.get("completed", False),
+            created_at=datetime.fromisoformat(created_at)
+            if isinstance(created_at, str)
+            else created_at,
+            updated_at=datetime.fromisoformat(updated_at)
+            if isinstance(updated_at, str)
+            else updated_at,
+        )
 
     def _from_entity(self, entity: Item) -> dict[str, Any]:
         """Convert entity to stored data."""
-        return entity.to_dict()
+        return {
+            "id": entity.id,
+            "name": entity.name,
+            "description": entity.description,
+            "completed": entity.completed,
+            "created_at": entity.created_at.isoformat(),
+            "updated_at": entity.updated_at.isoformat(),
+        }
 
     # CRUD Operations
 

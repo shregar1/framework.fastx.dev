@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
@@ -16,15 +17,13 @@ class ItemTestHelper:
     @staticmethod
     def item_from_api_json(data: dict) -> Item:
         """Convert API JSON response to Item entity."""
-        return Item.from_dict(
-            {
-                "id": data["id"],
-                "name": data["name"],
-                "description": data["description"],
-                "completed": data["completed"],
-                "created_at": data["created_at"],
-                "updated_at": data["updated_at"],
-            }
+        return Item(
+            id=data["id"],
+            name=data["name"],
+            description=data["description"],
+            completed=data["completed"],
+            created_at=datetime.fromisoformat(data["created_at"]),
+            updated_at=datetime.fromisoformat(data["updated_at"]),
         )
 
     @staticmethod

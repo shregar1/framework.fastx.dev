@@ -52,13 +52,17 @@ def log_audit(
         session.add(record)
         session.flush()
     except Exception:
+        # Audit failures are intentionally non-fatal — a broken audit write
+        # must not crash the request. We still want visibility, so log at
+        # error level with the full traceback instead of swallowing silently.
         logger.bind(
             action=action,
             resource_type=resource_type,
             actor_id=actor_id,
             resource_id=resource_id,
             ip=ip,
-        ).info("audit.%s", action)
+        ).error("audit.%s failed to persist", action)
+        logger.exception("log_audit: failed to record audit event %s", action)
 
 
 __all__ = ["log_audit"]

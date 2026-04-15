@@ -45,11 +45,40 @@ class UserSubscriptionService(IUserService):
                 data={"subscription": None},
             )
 
-        sub_data = (
-            subscription.to_dict()
-            if hasattr(subscription, "to_dict")
-            else {"id": getattr(subscription, "id", None)}
-        )
+        sub_data = {
+            "id": getattr(subscription, "id", None),
+            "urn": getattr(subscription, "urn", None),
+            "user_id": getattr(subscription, "user_id", None),
+            "organization_id": getattr(subscription, "organization_id", None),
+            "plan_code": getattr(subscription, "plan_code", None),
+            "status": getattr(subscription, "status", None),
+            "start_date": (
+                subscription.start_date.isoformat()
+                if getattr(subscription, "start_date", None)
+                else None
+            ),
+            "end_date": (
+                subscription.end_date.isoformat()
+                if getattr(subscription, "end_date", None)
+                else None
+            ),
+            "grace_period_ends_at": (
+                subscription.grace_period_ends_at.isoformat()
+                if getattr(subscription, "grace_period_ends_at", None)
+                else None
+            ),
+            "is_deleted": getattr(subscription, "is_deleted", None),
+            "created_at": (
+                subscription.created_at.isoformat()
+                if getattr(subscription, "created_at", None)
+                else None
+            ),
+            "updated_at": (
+                subscription.updated_at.isoformat()
+                if getattr(subscription, "updated_at", None)
+                else None
+            ),
+        }
 
         return BaseResponseDTO(
             transactionUrn=self.urn or "",

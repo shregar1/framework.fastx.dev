@@ -52,12 +52,7 @@ class MFAStatusController(IV1APIController):
                 fallback_message="Failed to fetch MFA status.",
             )
 
-        content = (
-            self.dictionary_utility.convert_dict_keys_to_camel_case(response_dto.model_dump())
-            if self.dictionary_utility is not None
-            else response_dto.model_dump()
-        )
-        return JSONResponse(status_code=http_status, content=content)
+        return self.build_json_response(response_dto, status_code=http_status)
 
 
 __all__ = ["MFAStatusController"]

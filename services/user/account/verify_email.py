@@ -89,9 +89,7 @@ class VerifyEmailService:
             )
 
         now = datetime.now(timezone.utc)
-        user.email_verified_at = now
-        self._session.commit()
-        self._session.refresh(user)
+        repo.mark_email_verified(user, now)
 
         return BaseResponseDTO(
             transactionUrn=self._urn,
