@@ -155,27 +155,26 @@ class ItemController(IController):
             await self._service.get_statistics(), http_request
         )
 
+    async def safe_dispatch(self, event_name: str, request: Request, coro) -> JSONResponse:
+        """Invoke *coro* and translate any exception to an error JSON envelope."""
+        try:
+            return await coro
+        except Exception as err:
+            response_dto, http_status = self.handle_exception(
+                err,
+                request,
+                event_name=event_name,
+                force_http_ok=False,
+                fallback_message="Request failed.",
+            )
+            return JSONResponse(
+                status_code=http_status, content=response_dto.model_dump(),
+            )
+
 
 # Route Definitions
 
 _controller = ItemController()
-
-
-async def _wrap(event_name: str, request: Request, coro):
-    """Invoke *coro* and translate any exception to an error JSON envelope."""
-    try:
-        return await coro
-    except Exception as err:
-        response_dto, http_status = _controller.handle_exception(
-            err,
-            request,
-            event_name=event_name,
-            force_http_ok=False,
-            fallback_message="Request failed.",
-        )
-        return JSONResponse(
-            status_code=http_status, content=response_dto.model_dump(),
-        )
 
 
 @router.post("", response_model=dict, status_code=HTTPStatus.CREATED)
@@ -183,43 +182,43 @@ async def create_item(
     http_request: Request, body: CreateItemRequestDTO
 ) -> JSONResponse:
     """Create a new item."""
-    return await _wrap("item.create", http_request, _controller.create(body, http_request))
+    return await _controller.safe_dispatch("item.create", http_request, _controller.create(body, http_request))
 
 
 @router.get("", response_model=dict)
 async def get_all_items(http_request: Request) -> JSONResponse:
     """Get all items."""
-    return await _wrap("item.get_all", http_request, _controller.get_all(http_request))
+    return await _controller.safe_dispatch("item.get_all", http_request, _controller.get_all(http_request))
 
 
 @router.get("/search", response_model=dict)
 async def search_items(http_request: Request, query: str = "") -> JSONResponse:
     """Search items by name."""
-    return await _wrap("item.search", http_request, _controller.search(query, http_request))
+    return await _controller.safe_dispatch("item.search", http_request, _controller.search(query, http_request))
 
 
 @router.get("/completed", response_model=dict)
 async def get_completed_items(http_request: Request) -> JSONResponse:
     """Get all completed items."""
-    return await _wrap("item.get_completed", http_request, _controller.get_completed(http_request))
+    return await _controller.safe_dispatch("item.get_completed", http_request, _controller.get_completed(http_request))
 
 
 @router.get("/pending", response_model=dict)
 async def get_pending_items(http_request: Request) -> JSONResponse:
     """Get all pending items."""
-    return await _wrap("item.get_pending", http_request, _controller.get_pending(http_request))
+    return await _controller.safe_dispatch("item.get_pending", http_request, _controller.get_pending(http_request))
 
 
 @router.get("/statistics", response_model=dict)
 async def get_item_statistics(http_request: Request) -> JSONResponse:
     """Get item statistics."""
-    return await _wrap("item.stats", http_request, _controller.get_statistics(http_request))
+    return await _controller.safe_dispatch("item.stats", http_request, _controller.get_statistics(http_request))
 
 
 @router.get("/{item_id}", response_model=dict)
 async def get_item(http_request: Request, item_id: str) -> JSONResponse:
     """Get item by ID."""
-    return await _wrap("item.get_by_id", http_request, _controller.get_by_id(item_id, http_request))
+    return await _controller.safe_dispatch("item.get_by_id", http_request, _controller.get_by_id(item_id, http_request))
 
 
 @router.patch("/{item_id}", response_model=dict)
@@ -227,28 +226,28 @@ async def update_item(
     http_request: Request, item_id: str, body: UpdateItemRequestDTO
 ) -> JSONResponse:
     """Update an item."""
-    return await _wrap("item.update", http_request, _controller.update(item_id, body, http_request))
+    return await _controller.safe_dispatch("item.update", http_request, _controller.update(item_id, body, http_request))
 
 
 @router.delete("/{item_id}", response_model=dict)
 async def delete_item(http_request: Request, item_id: str) -> JSONResponse:
     """Delete an item."""
-    return await _wrap("item.delete", http_request, _controller.delete(item_id, http_request))
+    return await _controller.safe_dispatch("item.delete", http_request, _controller.delete(item_id, http_request))
 
 
 @router.post("/{item_id}/complete", response_model=dict)
 async def complete_item(http_request: Request, item_id: str) -> JSONResponse:
     """Mark item as completed."""
-    return await _wrap("item.complete", http_request, _controller.complete(item_id, http_request))
+    return await _controller.safe_dispatch("item.complete", http_request, _controller.complete(item_id, http_request))
 
 
 @router.post("/{item_id}/uncomplete", response_model=dict)
 async def uncomplete_item(http_request: Request, item_id: str) -> JSONResponse:
     """Mark item as not completed."""
-    return await _wrap("item.uncomplete", http_request, _controller.uncomplete(item_id, http_request))
+    return await _controller.safe_dispatch("item.uncomplete", http_request, _controller.uncomplete(item_id, http_request))
 
 
 @router.post("/{item_id}/toggle", response_model=dict)
 async def toggle_item(http_request: Request, item_id: str) -> JSONResponse:
     """Toggle item completion status."""
-    return await _wrap("item.toggle", http_request, _controller.toggle(item_id, http_request))
+    return await _controller.safe_dispatch("item.toggle", http_request, _controller.toggle(item_id, http_request))

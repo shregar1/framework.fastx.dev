@@ -18,3 +18,4 @@ class ResponseKey:
 
     ERROR_BAD_INPUT: Final[str] = "error_bad_input"
     ERROR_AUTHENTICATION_REQUIRED: Final[str] = "error_authentication_required"
+    UNAUTHORIZED: Final[str] = "error_unauthorized"

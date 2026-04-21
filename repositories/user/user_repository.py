@@ -72,6 +72,7 @@ class UserRepository(IUserRepository):
         """Create a new user record.
 
         Accepts either a dict (controller convenience) or a model instance.
+        The caller is responsible for committing the transaction.
         """
         if self.session is None or self._model is None:
             raise RuntimeError("Database session is required to create records.")
@@ -82,8 +83,6 @@ class UserRepository(IUserRepository):
             record = data
 
         self.session.add(record)
-        self.session.commit()
-        self.session.refresh(record)
         return record
 
     def retrieve_record_by_id(self, id: str | int, is_deleted: bool = False) -> Any | None:

@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
+import jwt as pyjwt
+
 from constants.api_status import APIStatus
+from constants.response_keys import ResponseKey
 from dtos.requests.user.refresh import RefreshTokenRequestDTO
 from dtos.responses.base import BaseResponseDTO
 from fast_platform.errors import UnauthorizedError
@@ -36,16 +39,16 @@ class UserRefreshTokenService(IUserService):
         # Decode and validate the token
         try:
             payload = self.jwt_utility.decode_token(request_dto.refreshToken)
-        except Exception:
+        except (pyjwt.ExpiredSignatureError, pyjwt.InvalidTokenError, ValueError):
             raise UnauthorizedError(
                 responseMessage="Invalid or expired refresh token.",
-                responseKey="error_invalid_refresh_token",
+                responseKey=ResponseKey.ERROR_INVALID_REFRESH_TOKEN,
             )
 
         if payload.get("type") != "refresh":
             raise UnauthorizedError(
                 responseMessage="Invalid token type.",
-                responseKey="error_invalid_token_type",
+                responseKey=ResponseKey.ERROR_INVALID_TOKEN_TYPE,
             )
 
         user_id = payload.get("user_id")
@@ -59,7 +62,7 @@ class UserRefreshTokenService(IUserService):
                 if not stored:
                     raise UnauthorizedError(
                         responseMessage="Refresh token has been revoked.",
-                        responseKey="error_token_revoked",
+                        responseKey=ResponseKey.ERROR_TOKEN_REVOKED,
                     )
             except UnauthorizedError:
                 raise
@@ -71,7 +74,7 @@ class UserRefreshTokenService(IUserService):
         if not user:
             raise UnauthorizedError(
                 responseMessage="User not found.",
-                responseKey="error_user_not_found",
+                responseKey=ResponseKey.ERROR_USER_NOT_FOUND,
             )
 
         user_urn = getattr(user, "urn", None) or ""
@@ -97,7 +100,7 @@ class UserRefreshTokenService(IUserService):
             transactionUrn=self.urn or "",
             status=APIStatus.SUCCESS,
             responseMessage="Tokens refreshed successfully.",
-            responseKey="success_refresh_token",
+            responseKey=ResponseKey.SUCCESS_REFRESH_TOKEN,
             data=tokens,
         )
 

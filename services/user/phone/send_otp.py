@@ -7,7 +7,7 @@ from typing import Any, Optional
 from constants.api_status import APIStatus
 from dtos.responses.base import BaseResponseDTO
 from fast_platform.errors import ServiceUnavailableError
-from services.user.phone_otp import PhoneOtpService
+from utilities.phone_otp import PhoneOtpUtility
 from start_utils import logger
 
 
@@ -22,7 +22,7 @@ class PhoneSendOtpService:
         user_id: int | None = None,
         session: Any = None,
         redis_client: Any = None,
-        phone_otp_service: PhoneOtpService | None = None,
+        phone_otp_service: PhoneOtpUtility | None = None,
     ) -> None:
         self._urn = urn or ""
         self._user_urn = user_urn

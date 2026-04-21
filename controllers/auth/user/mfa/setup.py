@@ -12,7 +12,7 @@ from constants.api_lk import APILK
 from controllers.apis.v1.abstraction import IV1APIController
 from dependencies.db import DBDependency
 from dependencies.repositiories.user import UserRepositoryDependency
-from dependencies.services.mfa import MFAServiceDependency
+from dependencies.services.mfa import MFAUtilityDependency as MFAServiceDependency
 from dependencies.services.user.mfa.setup import MFASetupServiceDependency
 from dependencies.utilities.dictionary import DictionaryUtilityDependency
 

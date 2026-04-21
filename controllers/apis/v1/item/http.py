@@ -5,6 +5,7 @@ from __future__ import annotations
 from http import HTTPStatus
 from typing import Any
 
+from constants.response_keys import ResponseKey
 from fast_platform.errors import NotFoundError
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -15,13 +16,13 @@ from dtos.responses.apis.v1.item import ItemResponseDTO
 from models.item import Item
 
 
-def _item_payload(entity: Item) -> dict[str, Any]:
-    """Serialize a domain :class:`Item` via the response DTO."""
-    return ItemResponseDTO.from_entity(entity).to_payload()
-
-
 class ItemHttpResponseBuilder:
     """Build JSON responses for item routes (flat JSON bodies for sample CRUD)."""
+
+    @staticmethod
+    def _item_payload(entity: Item) -> dict[str, Any]:
+        """Serialize a domain :class:`Item` via the response DTO."""
+        return ItemResponseDTO.from_entity(entity).to_payload()
 
     @staticmethod
     def raise_unprocessable_if_dto_invalid(
@@ -44,7 +45,7 @@ class ItemHttpResponseBuilder:
                 content={"detail": str(result.error)},
             )
         item = result.value
-        payload: dict[str, Any] = _item_payload(item)
+        payload: dict[str, Any] = ItemHttpResponseBuilder._item_payload(item)
         if reference_urn:
             payload["reference_urn"] = reference_urn
         return JSONResponse(status_code=HTTPStatus.CREATED, content=payload)
@@ -58,19 +59,19 @@ class ItemHttpResponseBuilder:
         if result.is_failure:
             raise NotFoundError(
                 responseMessage=str(result.error),
-                responseKey="error_item_not_found",
+                responseKey=ResponseKey.ERROR_ITEM_NOT_FOUND,
             )
         if result.value is None:
             raise NotFoundError(
                 responseMessage=f"Item not found: {item_id}",
-                responseKey="error_item_not_found",
+                responseKey=ResponseKey.ERROR_ITEM_NOT_FOUND,
             )
         return result.value
 
     @staticmethod
     def json_item(entity: Item, http_request: Request | None) -> JSONResponse:
         del http_request
-        return JSONResponse(content=_item_payload(entity))
+        return JSONResponse(content=ItemHttpResponseBuilder._item_payload(entity))
 
     @staticmethod
     def respond_item_list(
@@ -84,7 +85,7 @@ class ItemHttpResponseBuilder:
                 content={"detail": str(result.error)},
             )
         items = result.value
-        return JSONResponse(content=[_item_payload(i) for i in items])
+        return JSONResponse(content=[ItemHttpResponseBuilder._item_payload(i) for i in items])
 
     @staticmethod
     def respond_item_with_ref(
@@ -100,7 +101,7 @@ class ItemHttpResponseBuilder:
                 content={"detail": str(result.error)},
             )
         item = result.value
-        payload = _item_payload(item)
+        payload = ItemHttpResponseBuilder._item_payload(item)
         if reference_urn:
             payload["reference_urn"] = reference_urn
         return JSONResponse(content=payload)
@@ -114,12 +115,12 @@ class ItemHttpResponseBuilder:
         if result.is_failure:
             raise NotFoundError(
                 responseMessage=str(result.error),
-                responseKey="error_item_not_found",
+                responseKey=ResponseKey.ERROR_ITEM_NOT_FOUND,
             )
         if not result.value:
             raise NotFoundError(
                 responseMessage=f"Item not found: {item_id}",
-                responseKey="error_item_not_found",
+                responseKey=ResponseKey.ERROR_ITEM_NOT_FOUND,
             )
 
     @staticmethod
@@ -140,7 +141,7 @@ class ItemHttpResponseBuilder:
                 status_code=HTTPStatus.BAD_REQUEST,
                 content={"detail": str(result.error)},
             )
-        return JSONResponse(content=_item_payload(result.value))
+        return JSONResponse(content=ItemHttpResponseBuilder._item_payload(result.value))
 
     @staticmethod
     def respond_item_stats(

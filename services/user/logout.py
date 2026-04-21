@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from constants.api_status import APIStatus
+from constants.response_keys import ResponseKey
 from dtos.responses.base import BaseResponseDTO
 from services.user.abstraction import IUserService
 from start_utils import logger
@@ -50,7 +51,7 @@ class UserLogoutService(IUserService):
             transactionUrn=self.urn or "",
             status=APIStatus.SUCCESS,
             responseMessage="Logout successful.",
-            responseKey="success_logout",
+            responseKey=ResponseKey.SUCCESS_LOGOUT,
             data={},
         )
 

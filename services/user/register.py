@@ -6,6 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 from constants.api_status import APIStatus
+from constants.response_keys import ResponseKey
 from dtos.requests.user.registration import UserRegistrationRequestDTO
 from dtos.responses.base import BaseResponseDTO
 from fast_platform.errors import ConflictError
@@ -37,7 +38,7 @@ class UserRegistrationService(IUserService):
         if existing:
             raise ConflictError(
                 responseMessage="An account with this email already exists.",
-                responseKey="error_duplicate_email",
+                responseKey=ResponseKey.ERROR_DUPLICATE_EMAIL,
             )
 
         hashed = hash_password(request_dto.password)
@@ -47,6 +48,9 @@ class UserRegistrationService(IUserService):
             "urn": f"urn:user:{uuid4()}",
             "user_type_id": 1,
         })
+        session = self.user_repository.session
+        session.commit()
+        session.refresh(user)
 
         user_id = user.get("id") if isinstance(user, dict) else getattr(user, "id", None)
 
@@ -54,7 +58,7 @@ class UserRegistrationService(IUserService):
             transactionUrn=self.urn or "",
             status=APIStatus.SUCCESS,
             responseMessage="Registration successful.",
-            responseKey="success_registration",
+            responseKey=ResponseKey.SUCCESS_REGISTRATION,
             data={
                 "user_id": user_id,
                 "user_email": request_dto.email,

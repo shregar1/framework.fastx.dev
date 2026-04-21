@@ -8,7 +8,7 @@ from typing import Any
 from abstractions.dependency_factory import ServiceDependencyFactory
 from abstractions.service import IService
 from services.user.phone.send_otp import PhoneSendOtpService
-from services.user.phone_otp import PhoneOtpService
+from utilities.phone_otp import PhoneOtpUtility
 
 
 class PhoneSendOtpServiceDependency(ServiceDependencyFactory):
@@ -18,7 +18,7 @@ class PhoneSendOtpServiceDependency(ServiceDependencyFactory):
 
     @classmethod
     def derive(cls) -> Callable[..., IService]:
-        """Return a factory that injects a PhoneOtpService into PhoneSendOtpService."""
+        """Return a factory that injects a PhoneOtpUtility into PhoneSendOtpService."""
 
         def factory(
             urn: str | None = None,
@@ -28,7 +28,7 @@ class PhoneSendOtpServiceDependency(ServiceDependencyFactory):
             **deps: Any,
         ) -> IService:
             redis_client = deps.get("redis_client")
-            phone_otp_service = PhoneOtpService(
+            phone_otp_service = PhoneOtpUtility(
                 redis_client=redis_client,
                 urn=urn,
                 user_urn=user_urn,

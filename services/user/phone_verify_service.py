@@ -7,13 +7,26 @@ issue JWT tokens.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Optional
 
 from constants.api_status import APIStatus
 from dtos.responses.base import BaseResponseDTO
-from services.user.phone_otp import PhoneOtpService
+from utilities.phone_otp import PhoneOtpUtility
 from start_utils import logger
+
+
+@dataclass
+class _PhoneUserDTO:
+    """Lightweight transient user representation for phone registration flow."""
+
+    id: Any = None
+    urn: str = ""
+    email: str = ""
+    phone: str = ""
+    is_logged_in: bool = False
+    last_login: Optional[datetime] = None
 
 
 async def verify_otp_and_issue_tokens(
@@ -21,7 +34,7 @@ async def verify_otp_and_issue_tokens(
     phone: str,
     otp: str,
     purpose: str,
-    otp_service: PhoneOtpService,
+    otp_service: PhoneOtpUtility,
     user_repository: Any = None,
     jwt_utility: Any = None,
     refresh_token_repository: Any = None,
@@ -34,7 +47,7 @@ async def verify_otp_and_issue_tokens(
         phone: Phone number the OTP was sent to.
         otp: The code entered by the user.
         purpose: The OTP purpose (``login``, ``register``, ``verify_phone``, ``reset_password``).
-        otp_service: :class:`PhoneOtpService` instance with Redis.
+        otp_service: :class:`PhoneOtpUtility` instance with Redis.
         user_repository: Repository for user lookup / creation.
         jwt_utility: JWT utility for token generation.
         refresh_token_repository: For persisting refresh tokens.
@@ -78,7 +91,10 @@ async def verify_otp_and_issue_tokens(
         user = user_repository.retrieve_record_by_phone(phone) if user_repository else None
         if not user:
             user_data = user_repository.create_record({"phone": phone, "email": "", "password": "", "name": ""})
-            user = user_data if not isinstance(user_data, dict) else type("User", (), user_data)()
+            if session:
+                session.commit()
+                session.refresh(user_data)
+            user = user_data if not isinstance(user_data, dict) else _PhoneUserDTO(**{k: v for k, v in user_data.items() if k in _PhoneUserDTO.__dataclass_fields__})
 
     user_id = getattr(user, "id", None)
     user_urn = getattr(user, "urn", None) or ""

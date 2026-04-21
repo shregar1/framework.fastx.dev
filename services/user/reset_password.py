@@ -24,16 +24,27 @@ class ResetPasswordService:
         urn: Optional[str] = None,
         api_name: Optional[str] = None,
         session: Optional[Session] = None,
+        user_repository: Optional[UserRepository] = None,
     ) -> None:
         self._urn = urn or ""
         self._api_name = api_name or "reset_password"
         self._session = session
+        self._repo = user_repository or UserRepository(
+            urn=self._urn,
+            api_name=self._api_name,
+            session=self._session,
+        )
         self._logger = logger.bind(urn=self._urn, api_name=self._api_name)
 
     async def run(self, token: str, new_password: str) -> BaseResponseDTO:
         try:
             payload = jwt.decode(token.strip(), SECRET_KEY, algorithms=[ALGORITHM])
-        except Exception as err:
+        except jwt.ExpiredSignatureError as err:
+            raise BadInputError(
+                responseMessage="Invalid or expired reset token.",
+                responseKey="error_invalid_reset_token",
+            ) from err
+        except jwt.InvalidTokenError as err:
             raise BadInputError(
                 responseMessage="Invalid or expired reset token.",
                 responseKey="error_invalid_reset_token",
@@ -52,19 +63,14 @@ class ResetPasswordService:
                 responseKey="error_invalid_reset_token",
             )
 
-        repo = UserRepository(
-            urn=self._urn,
-            api_name=self._api_name,
-            session=self._session,
-        )
-        user = repo.retrieve_record_by_email(email.strip().lower(), is_deleted=False)
+        user = self._repo.retrieve_record_by_email(email.strip().lower(), is_deleted=False)
         if not user:
             raise BadInputError(
                 responseMessage="Invalid or expired reset token.",
                 responseKey="error_invalid_reset_token",
             )
 
-        repo.update_password(user, hash_password(new_password))
+        self._repo.update_password(user, hash_password(new_password))
         self._session.commit()
 
         log_event("reset_password.success", urn=self._urn, email=email)

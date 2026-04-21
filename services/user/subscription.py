@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from constants.api_status import APIStatus
+from constants.response_keys import ResponseKey
 from dtos.responses.base import BaseResponseDTO
 from services.user.abstraction import IUserService
 
@@ -34,14 +35,14 @@ class UserSubscriptionService(IUserService):
                     user_id=self.user_id
                 )
             except Exception:
-                pass
+                self.logger.exception("Subscription lookup failed")
 
         if subscription is None:
             return BaseResponseDTO(
                 transactionUrn=self.urn or "",
                 status=APIStatus.SUCCESS,
                 responseMessage="No active subscription.",
-                responseKey="success_no_subscription",
+                responseKey=ResponseKey.SUCCESS_NO_SUBSCRIPTION,
                 data={"subscription": None},
             )
 
@@ -84,7 +85,7 @@ class UserSubscriptionService(IUserService):
             transactionUrn=self.urn or "",
             status=APIStatus.SUCCESS,
             responseMessage="Subscription retrieved.",
-            responseKey="success_get_subscription",
+            responseKey=ResponseKey.SUCCESS_GET_SUBSCRIPTION,
             data={"subscription": sub_data},
         )
 

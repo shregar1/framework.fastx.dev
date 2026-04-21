@@ -71,13 +71,6 @@ class ItemService(IItemService):
         except Exception as e:
             return failure(f"Failed to create item: {str(e)}")
 
-    async def create(self, entity: Item) -> Item:
-        """Compatibility wrapper used by tests/legacy service callers."""
-        result = await self._repository.create(entity)
-        if result.is_failure:
-            raise ValueError(str(result.error))
-        return cast(Item, result.value)
-
     async def get_item(self, item_id: str) -> Result[Item | None, Any]:
         """Get item by ID.
 
@@ -89,13 +82,6 @@ class ItemService(IItemService):
 
         """
         return await self._repository.get_by_id(item_id)
-
-    async def get_by_id(self, item_id: str) -> Item | None:
-        """Compatibility wrapper used by tests/legacy service callers."""
-        result = await self._repository.get_by_id(item_id)
-        if result.is_failure:
-            return None
-        return cast(Item | None, result.value)
 
     async def get_all_items(self) -> Result[list[Item], Any]:
         """Get all items.

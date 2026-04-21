@@ -8,6 +8,7 @@ import bcrypt
 
 from constants.api_status import APIStatus
 from constants.default import Default
+from constants.response_keys import ResponseKey
 from dtos.requests.user.login import UserLoginRequestDTO
 from dtos.responses.base import BaseResponseDTO
 from fast_platform.errors import (
@@ -48,7 +49,7 @@ class UserLoginService(IUserService):
         if not user:
             raise NotFoundError(
                 responseMessage="Invalid email or password.",
-                responseKey="error_invalid_credentials",
+                responseKey=ResponseKey.ERROR_INVALID_CREDENTIALS,
                 httpStatusCode=404,
             )
 
@@ -62,7 +63,7 @@ class UserLoginService(IUserService):
         ):
             raise UnauthorizedError(
                 responseMessage="Invalid email or password.",
-                responseKey="error_invalid_credentials",
+                responseKey=ResponseKey.ERROR_INVALID_CREDENTIALS,
             )
 
         user_urn = getattr(user, "urn", None) or ""
@@ -86,7 +87,7 @@ class UserLoginService(IUserService):
                 transactionUrn=self.urn or "",
                 status=APIStatus.SUCCESS,
                 responseMessage="MFA verification required.",
-                responseKey="success_mfa_required",
+                responseKey=ResponseKey.SUCCESS_MFA_REQUIRED,
                 data=data,
             )
 
@@ -116,7 +117,7 @@ class UserLoginService(IUserService):
             transactionUrn=self.urn or "",
             status=APIStatus.SUCCESS,
             responseMessage="Successfully logged in the user.",
-            responseKey="success_user_login",
+            responseKey=ResponseKey.SUCCESS_USER_LOGIN,
             data=data,
         )
 
